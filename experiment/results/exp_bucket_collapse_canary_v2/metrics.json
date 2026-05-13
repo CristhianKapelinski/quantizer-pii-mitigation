@@ -1,0 +1,4164 @@
+{
+  "schema": "qquilt.bucket_collapse_canary.v2",
+  "config": {
+    "base": "unsloth/Llama-3.2-1B-Instruct",
+    "ft": "checkpoints/wave_1_mini/final",
+    "awq": "checkpoints/wave_1_mini/quantized/model-awq-4bit",
+    "gptq": "experiment/results/exp_gptq_4bit/quantized/gptq_4bit",
+    "out": "experiment/results/exp_bucket_collapse_canary_v2/metrics.json",
+    "device": "cuda"
+  },
+  "collapse_threshold": 0.1,
+  "top_k_thresholds_abs_delta": {
+    "1%": 0.001129150390625,
+    "5%": 0.000522613525390625,
+    "10%": 0.0002593994140625
+  },
+  "n_common_layers": 113,
+  "quantizers": {
+    "awq": {
+      "overall": {
+        "n_weights": 252806117,
+        "n_collapsed": 3295967,
+        "collapse_rate": 0.013037528676570749,
+        "mean_survival": 1.173058277567326,
+        "median_survival": 1.0085932762374945,
+        "p10_survival": -1.470948408155221,
+        "p90_survival": 2.472416953861502,
+        "histogram": {
+          "bin_edges": [
+            -1.5,
+            -1.42,
+            -1.34,
+            -1.26,
+            -1.18,
+            -1.1,
+            -1.02,
+            -0.94,
+            -0.86,
+            -0.78,
+            -0.7,
+            -0.62,
+            -0.54,
+            -0.45999999999999996,
+            -0.3799999999999999,
+            -0.30000000000000004,
+            -0.21999999999999997,
+            -0.1399999999999999,
+            -0.06000000000000005,
+            0.020000000000000018,
+            0.10000000000000009,
+            0.17999999999999994,
+            0.26,
+            0.3400000000000001,
+            0.41999999999999993,
+            0.5,
+            0.5800000000000001,
+            0.6600000000000001,
+            0.7400000000000002,
+            0.8199999999999998,
+            0.8999999999999999,
+            0.98,
+            1.06,
+            1.1400000000000001,
+            1.2200000000000002,
+            1.3000000000000003,
+            1.38,
+            1.46,
+            1.54,
+            1.62,
+            1.7000000000000002,
+            1.7800000000000002,
+            1.8599999999999999,
+            1.94,
+            2.02,
+            2.1,
+            2.18,
+            2.2600000000000002,
+            2.34,
+            2.42,
+            2.5
+          ],
+          "counts": [
+            69615770,
+            859038,
+            871772,
+            906775,
+            921622,
+            943305,
+            974893,
+            1014046,
+            1026218,
+            1059192,
+            1102203,
+            1111688,
+            1141307,
+            1168167,
+            1213302,
+            1229585,
+            1256676,
+            1295980,
+            1308302,
+            1340584,
+            1378766,
+            1409676,
+            1424434,
+            1462698,
+            1450065,
+            1518494,
+            1513416,
+            1516652,
+            1527460,
+            1513623,
+            1473606,
+            55548006,
+            1375701,
+            1295392,
+            1243474,
+            1184633,
+            1132671,
+            1100088,
+            1053447,
+            1022710,
+            986955,
+            947962,
+            929258,
+            897456,
+            883145,
+            856488,
+            851425,
+            818719,
+            807097,
+            73322175
+          ]
+        },
+        "per_layer": [
+          {
+            "layer": -1,
+            "group": "lm_head",
+            "n": 54120817,
+            "n_collapsed": 0,
+            "collapse_rate": 0.0
+          },
+          {
+            "layer": 0,
+            "group": "down_proj",
+            "n": 3367610,
+            "n_collapsed": 46712,
+            "collapse_rate": 0.013870964868259686
+          },
+          {
+            "layer": 0,
+            "group": "gate_proj",
+            "n": 2953756,
+            "n_collapsed": 56610,
+            "collapse_rate": 0.019165428694854957
+          },
+          {
+            "layer": 0,
+            "group": "k_proj",
+            "n": 109635,
+            "n_collapsed": 1366,
+            "collapse_rate": 0.012459524786792539
+          },
+          {
+            "layer": 0,
+            "group": "o_proj",
+            "n": 1426319,
+            "n_collapsed": 25721,
+            "collapse_rate": 0.018033132840549696
+          },
+          {
+            "layer": 0,
+            "group": "q_proj",
+            "n": 565685,
+            "n_collapsed": 7156,
+            "collapse_rate": 0.012650149818361808
+          },
+          {
+            "layer": 0,
+            "group": "up_proj",
+            "n": 3284325,
+            "n_collapsed": 43442,
+            "collapse_rate": 0.013227071011547274
+          },
+          {
+            "layer": 0,
+            "group": "v_proj",
+            "n": 430899,
+            "n_collapsed": 5746,
+            "collapse_rate": 0.013334911429360477
+          },
+          {
+            "layer": 1,
+            "group": "down_proj",
+            "n": 3372567,
+            "n_collapsed": 45460,
+            "collapse_rate": 0.013479346740924643
+          },
+          {
+            "layer": 1,
+            "group": "gate_proj",
+            "n": 2889615,
+            "n_collapsed": 38527,
+            "collapse_rate": 0.013332918053097038
+          },
+          {
+            "layer": 1,
+            "group": "k_proj",
+            "n": 111897,
+            "n_collapsed": 1424,
+            "collapse_rate": 0.012725989079242517
+          },
+          {
+            "layer": 1,
+            "group": "o_proj",
+            "n": 1218023,
+            "n_collapsed": 21298,
+            "collapse_rate": 0.01748571250296587
+          },
+          {
+            "layer": 1,
+            "group": "q_proj",
+            "n": 671534,
+            "n_collapsed": 9108,
+            "collapse_rate": 0.013562976707061742
+          },
+          {
+            "layer": 1,
+            "group": "up_proj",
+            "n": 3308297,
+            "n_collapsed": 44466,
+            "collapse_rate": 0.013440752145288044
+          },
+          {
+            "layer": 1,
+            "group": "v_proj",
+            "n": 382762,
+            "n_collapsed": 6442,
+            "collapse_rate": 0.016830301858596203
+          },
+          {
+            "layer": 2,
+            "group": "down_proj",
+            "n": 3434138,
+            "n_collapsed": 59641,
+            "collapse_rate": 0.0173670947410966
+          },
+          {
+            "layer": 2,
+            "group": "gate_proj",
+            "n": 2812406,
+            "n_collapsed": 43990,
+            "collapse_rate": 0.015641411659625248
+          },
+          {
+            "layer": 2,
+            "group": "k_proj",
+            "n": 110659,
+            "n_collapsed": 1445,
+            "collapse_rate": 0.013058133545396217
+          },
+          {
+            "layer": 2,
+            "group": "o_proj",
+            "n": 1146939,
+            "n_collapsed": 19008,
+            "collapse_rate": 0.016572808144112286
+          },
+          {
+            "layer": 2,
+            "group": "q_proj",
+            "n": 691214,
+            "n_collapsed": 10617,
+            "collapse_rate": 0.015359931945822856
+          },
+          {
+            "layer": 2,
+            "group": "up_proj",
+            "n": 3399455,
+            "n_collapsed": 48055,
+            "collapse_rate": 0.01413608946139896
+          },
+          {
+            "layer": 2,
+            "group": "v_proj",
+            "n": 314274,
+            "n_collapsed": 5695,
+            "collapse_rate": 0.01812112996938977
+          },
+          {
+            "layer": 3,
+            "group": "down_proj",
+            "n": 3633892,
+            "n_collapsed": 67230,
+            "collapse_rate": 0.018500825010759815
+          },
+          {
+            "layer": 3,
+            "group": "gate_proj",
+            "n": 2736490,
+            "n_collapsed": 39581,
+            "collapse_rate": 0.014464149329981107
+          },
+          {
+            "layer": 3,
+            "group": "k_proj",
+            "n": 108719,
+            "n_collapsed": 1477,
+            "collapse_rate": 0.01358548183850109
+          },
+          {
+            "layer": 3,
+            "group": "o_proj",
+            "n": 1015748,
+            "n_collapsed": 15467,
+            "collapse_rate": 0.0152272020225489
+          },
+          {
+            "layer": 3,
+            "group": "q_proj",
+            "n": 621485,
+            "n_collapsed": 9184,
+            "collapse_rate": 0.014777508708979299
+          },
+          {
+            "layer": 3,
+            "group": "up_proj",
+            "n": 3535727,
+            "n_collapsed": 49348,
+            "collapse_rate": 0.013956959912346174
+          },
+          {
+            "layer": 3,
+            "group": "v_proj",
+            "n": 274067,
+            "n_collapsed": 4899,
+            "collapse_rate": 0.017875191102905495
+          },
+          {
+            "layer": 4,
+            "group": "down_proj",
+            "n": 3698952,
+            "n_collapsed": 66486,
+            "collapse_rate": 0.017974280282631403
+          },
+          {
+            "layer": 4,
+            "group": "gate_proj",
+            "n": 2705616,
+            "n_collapsed": 46551,
+            "collapse_rate": 0.017205324037113914
+          },
+          {
+            "layer": 4,
+            "group": "k_proj",
+            "n": 108845,
+            "n_collapsed": 1363,
+            "collapse_rate": 0.01252239423032753
+          },
+          {
+            "layer": 4,
+            "group": "o_proj",
+            "n": 1049357,
+            "n_collapsed": 16269,
+            "collapse_rate": 0.015503779933807084
+          },
+          {
+            "layer": 4,
+            "group": "q_proj",
+            "n": 662573,
+            "n_collapsed": 10243,
+            "collapse_rate": 0.015459428621450014
+          },
+          {
+            "layer": 4,
+            "group": "up_proj",
+            "n": 3603723,
+            "n_collapsed": 60231,
+            "collapse_rate": 0.016713548738346427
+          },
+          {
+            "layer": 4,
+            "group": "v_proj",
+            "n": 287891,
+            "n_collapsed": 5467,
+            "collapse_rate": 0.01898982601053871
+          },
+          {
+            "layer": 5,
+            "group": "down_proj",
+            "n": 3708884,
+            "n_collapsed": 68620,
+            "collapse_rate": 0.018501522290802302
+          },
+          {
+            "layer": 5,
+            "group": "gate_proj",
+            "n": 2848623,
+            "n_collapsed": 43817,
+            "collapse_rate": 0.01538181781162337
+          },
+          {
+            "layer": 5,
+            "group": "k_proj",
+            "n": 120228,
+            "n_collapsed": 1672,
+            "collapse_rate": 0.013906910203945836
+          },
+          {
+            "layer": 5,
+            "group": "o_proj",
+            "n": 1140486,
+            "n_collapsed": 19887,
+            "collapse_rate": 0.017437303044491557
+          },
+          {
+            "layer": 5,
+            "group": "q_proj",
+            "n": 744791,
+            "n_collapsed": 12397,
+            "collapse_rate": 0.01664493797588854
+          },
+          {
+            "layer": 5,
+            "group": "up_proj",
+            "n": 3573007,
+            "n_collapsed": 51248,
+            "collapse_rate": 0.01434310092311602
+          },
+          {
+            "layer": 5,
+            "group": "v_proj",
+            "n": 330502,
+            "n_collapsed": 7045,
+            "collapse_rate": 0.021316058601763378
+          },
+          {
+            "layer": 6,
+            "group": "down_proj",
+            "n": 3836898,
+            "n_collapsed": 72471,
+            "collapse_rate": 0.01888791414314376
+          },
+          {
+            "layer": 6,
+            "group": "gate_proj",
+            "n": 2966583,
+            "n_collapsed": 48099,
+            "collapse_rate": 0.01621360332746463
+          },
+          {
+            "layer": 6,
+            "group": "k_proj",
+            "n": 114508,
+            "n_collapsed": 1577,
+            "collapse_rate": 0.013771963530932336
+          },
+          {
+            "layer": 6,
+            "group": "o_proj",
+            "n": 1082863,
+            "n_collapsed": 18529,
+            "collapse_rate": 0.01711112116675886
+          },
+          {
+            "layer": 6,
+            "group": "q_proj",
+            "n": 694612,
+            "n_collapsed": 10728,
+            "collapse_rate": 0.01544459352847345
+          },
+          {
+            "layer": 6,
+            "group": "up_proj",
+            "n": 3636882,
+            "n_collapsed": 53408,
+            "collapse_rate": 0.014685106638048746
+          },
+          {
+            "layer": 6,
+            "group": "v_proj",
+            "n": 297119,
+            "n_collapsed": 6054,
+            "collapse_rate": 0.02037567439308829
+          },
+          {
+            "layer": 7,
+            "group": "down_proj",
+            "n": 3821600,
+            "n_collapsed": 68142,
+            "collapse_rate": 0.017830751517688925
+          },
+          {
+            "layer": 7,
+            "group": "gate_proj",
+            "n": 3212507,
+            "n_collapsed": 53484,
+            "collapse_rate": 0.016648679676028722
+          },
+          {
+            "layer": 7,
+            "group": "k_proj",
+            "n": 110864,
+            "n_collapsed": 1576,
+            "collapse_rate": 0.014215615528936354
+          },
+          {
+            "layer": 7,
+            "group": "o_proj",
+            "n": 1083504,
+            "n_collapsed": 18037,
+            "collapse_rate": 0.016646915932013173
+          },
+          {
+            "layer": 7,
+            "group": "q_proj",
+            "n": 698388,
+            "n_collapsed": 11598,
+            "collapse_rate": 0.01660681455007818
+          },
+          {
+            "layer": 7,
+            "group": "up_proj",
+            "n": 3635008,
+            "n_collapsed": 54490,
+            "collapse_rate": 0.014990338398154833
+          },
+          {
+            "layer": 7,
+            "group": "v_proj",
+            "n": 279697,
+            "n_collapsed": 5644,
+            "collapse_rate": 0.020178979395560195
+          },
+          {
+            "layer": 8,
+            "group": "down_proj",
+            "n": 3815238,
+            "n_collapsed": 82117,
+            "collapse_rate": 0.021523427896241336
+          },
+          {
+            "layer": 8,
+            "group": "gate_proj",
+            "n": 3263676,
+            "n_collapsed": 52484,
+            "collapse_rate": 0.016081253163610604
+          },
+          {
+            "layer": 8,
+            "group": "k_proj",
+            "n": 113921,
+            "n_collapsed": 1554,
+            "collapse_rate": 0.0136410319431887
+          },
+          {
+            "layer": 8,
+            "group": "o_proj",
+            "n": 1096730,
+            "n_collapsed": 18639,
+            "collapse_rate": 0.016995067154176507
+          },
+          {
+            "layer": 8,
+            "group": "q_proj",
+            "n": 742299,
+            "n_collapsed": 12127,
+            "collapse_rate": 0.016337082496406436
+          },
+          {
+            "layer": 8,
+            "group": "up_proj",
+            "n": 3707936,
+            "n_collapsed": 52342,
+            "collapse_rate": 0.0141162091255081
+          },
+          {
+            "layer": 8,
+            "group": "v_proj",
+            "n": 302269,
+            "n_collapsed": 6423,
+            "collapse_rate": 0.021249284577644415
+          },
+          {
+            "layer": 9,
+            "group": "down_proj",
+            "n": 3798209,
+            "n_collapsed": 68114,
+            "collapse_rate": 0.017933189037254136
+          },
+          {
+            "layer": 9,
+            "group": "gate_proj",
+            "n": 3259855,
+            "n_collapsed": 52751,
+            "collapse_rate": 0.0161820080954521
+          },
+          {
+            "layer": 9,
+            "group": "k_proj",
+            "n": 111450,
+            "n_collapsed": 1550,
+            "collapse_rate": 0.013907581875280395
+          },
+          {
+            "layer": 9,
+            "group": "o_proj",
+            "n": 1030331,
+            "n_collapsed": 16368,
+            "collapse_rate": 0.015886156972856294
+          },
+          {
+            "layer": 9,
+            "group": "q_proj",
+            "n": 695585,
+            "n_collapsed": 11760,
+            "collapse_rate": 0.01690663254670529
+          },
+          {
+            "layer": 9,
+            "group": "up_proj",
+            "n": 3665469,
+            "n_collapsed": 54322,
+            "collapse_rate": 0.014819931637670378
+          },
+          {
+            "layer": 9,
+            "group": "v_proj",
+            "n": 276865,
+            "n_collapsed": 4935,
+            "collapse_rate": 0.0178245715420873
+          },
+          {
+            "layer": 10,
+            "group": "down_proj",
+            "n": 3722274,
+            "n_collapsed": 69391,
+            "collapse_rate": 0.01864209888901247
+          },
+          {
+            "layer": 10,
+            "group": "gate_proj",
+            "n": 3262498,
+            "n_collapsed": 53550,
+            "collapse_rate": 0.016413803165549832
+          },
+          {
+            "layer": 10,
+            "group": "k_proj",
+            "n": 126169,
+            "n_collapsed": 1807,
+            "collapse_rate": 0.014322060094000904
+          },
+          {
+            "layer": 10,
+            "group": "o_proj",
+            "n": 1119482,
+            "n_collapsed": 19465,
+            "collapse_rate": 0.017387506007242634
+          },
+          {
+            "layer": 10,
+            "group": "q_proj",
+            "n": 793489,
+            "n_collapsed": 13939,
+            "collapse_rate": 0.017566721151774
+          },
+          {
+            "layer": 10,
+            "group": "up_proj",
+            "n": 3615870,
+            "n_collapsed": 54815,
+            "collapse_rate": 0.0151595604930487
+          },
+          {
+            "layer": 10,
+            "group": "v_proj",
+            "n": 325341,
+            "n_collapsed": 6448,
+            "collapse_rate": 0.019819205080208152
+          },
+          {
+            "layer": 11,
+            "group": "down_proj",
+            "n": 3630450,
+            "n_collapsed": 79644,
+            "collapse_rate": 0.02193777630872206
+          },
+          {
+            "layer": 11,
+            "group": "gate_proj",
+            "n": 3163611,
+            "n_collapsed": 52947,
+            "collapse_rate": 0.016736254868250238
+          },
+          {
+            "layer": 11,
+            "group": "k_proj",
+            "n": 113639,
+            "n_collapsed": 1623,
+            "collapse_rate": 0.014282068656007181
+          },
+          {
+            "layer": 11,
+            "group": "o_proj",
+            "n": 1081882,
+            "n_collapsed": 18341,
+            "collapse_rate": 0.016952865469616836
+          },
+          {
+            "layer": 11,
+            "group": "q_proj",
+            "n": 665503,
+            "n_collapsed": 10094,
+            "collapse_rate": 0.015167474827311072
+          },
+          {
+            "layer": 11,
+            "group": "up_proj",
+            "n": 3534088,
+            "n_collapsed": 53401,
+            "collapse_rate": 0.015110263241888714
+          },
+          {
+            "layer": 11,
+            "group": "v_proj",
+            "n": 293968,
+            "n_collapsed": 5935,
+            "collapse_rate": 0.02018927230174713
+          },
+          {
+            "layer": 12,
+            "group": "down_proj",
+            "n": 3579024,
+            "n_collapsed": 77476,
+            "collapse_rate": 0.02164724237669264
+          },
+          {
+            "layer": 12,
+            "group": "gate_proj",
+            "n": 3137135,
+            "n_collapsed": 52211,
+            "collapse_rate": 0.016642892320540875
+          },
+          {
+            "layer": 12,
+            "group": "k_proj",
+            "n": 134459,
+            "n_collapsed": 1777,
+            "collapse_rate": 0.013215924556928134
+          },
+          {
+            "layer": 12,
+            "group": "o_proj",
+            "n": 1091389,
+            "n_collapsed": 18222,
+            "collapse_rate": 0.01669615508310969
+          },
+          {
+            "layer": 12,
+            "group": "q_proj",
+            "n": 746307,
+            "n_collapsed": 12136,
+            "collapse_rate": 0.016261404489037352
+          },
+          {
+            "layer": 12,
+            "group": "up_proj",
+            "n": 3474790,
+            "n_collapsed": 52704,
+            "collapse_rate": 0.01516753530429177
+          },
+          {
+            "layer": 12,
+            "group": "v_proj",
+            "n": 294591,
+            "n_collapsed": 5036,
+            "collapse_rate": 0.01709488748807669
+          },
+          {
+            "layer": 13,
+            "group": "down_proj",
+            "n": 3536760,
+            "n_collapsed": 71953,
+            "collapse_rate": 0.020344326445673442
+          },
+          {
+            "layer": 13,
+            "group": "gate_proj",
+            "n": 3208938,
+            "n_collapsed": 55000,
+            "collapse_rate": 0.017139626879671715
+          },
+          {
+            "layer": 13,
+            "group": "k_proj",
+            "n": 132833,
+            "n_collapsed": 1847,
+            "collapse_rate": 0.013904677301574157
+          },
+          {
+            "layer": 13,
+            "group": "o_proj",
+            "n": 950728,
+            "n_collapsed": 15212,
+            "collapse_rate": 0.016000370242593046
+          },
+          {
+            "layer": 13,
+            "group": "q_proj",
+            "n": 732652,
+            "n_collapsed": 11989,
+            "collapse_rate": 0.016363839858486703
+          },
+          {
+            "layer": 13,
+            "group": "up_proj",
+            "n": 3445447,
+            "n_collapsed": 51848,
+            "collapse_rate": 0.015048265145277231
+          },
+          {
+            "layer": 13,
+            "group": "v_proj",
+            "n": 254156,
+            "n_collapsed": 4321,
+            "collapse_rate": 0.017001369237790963
+          },
+          {
+            "layer": 14,
+            "group": "down_proj",
+            "n": 3633844,
+            "n_collapsed": 80040,
+            "collapse_rate": 0.022026261996937677
+          },
+          {
+            "layer": 14,
+            "group": "gate_proj",
+            "n": 3200512,
+            "n_collapsed": 53658,
+            "collapse_rate": 0.01676544252919533
+          },
+          {
+            "layer": 14,
+            "group": "k_proj",
+            "n": 167293,
+            "n_collapsed": 2345,
+            "collapse_rate": 0.014017322900539772
+          },
+          {
+            "layer": 14,
+            "group": "o_proj",
+            "n": 818837,
+            "n_collapsed": 12485,
+            "collapse_rate": 0.01524723479764593
+          },
+          {
+            "layer": 14,
+            "group": "q_proj",
+            "n": 789887,
+            "n_collapsed": 13445,
+            "collapse_rate": 0.017021422051508632
+          },
+          {
+            "layer": 14,
+            "group": "up_proj",
+            "n": 3546878,
+            "n_collapsed": 55602,
+            "collapse_rate": 0.015676321542494553
+          },
+          {
+            "layer": 14,
+            "group": "v_proj",
+            "n": 194464,
+            "n_collapsed": 2737,
+            "collapse_rate": 0.014074584498930393
+          },
+          {
+            "layer": 15,
+            "group": "down_proj",
+            "n": 3628645,
+            "n_collapsed": 68712,
+            "collapse_rate": 0.01893599401429459
+          },
+          {
+            "layer": 15,
+            "group": "gate_proj",
+            "n": 3113726,
+            "n_collapsed": 48402,
+            "collapse_rate": 0.015544720376809006
+          },
+          {
+            "layer": 15,
+            "group": "k_proj",
+            "n": 161500,
+            "n_collapsed": 2339,
+            "collapse_rate": 0.01448297213622291
+          },
+          {
+            "layer": 15,
+            "group": "o_proj",
+            "n": 905423,
+            "n_collapsed": 15601,
+            "collapse_rate": 0.01723062038406358
+          },
+          {
+            "layer": 15,
+            "group": "q_proj",
+            "n": 880284,
+            "n_collapsed": 15244,
+            "collapse_rate": 0.01731713855982842
+          },
+          {
+            "layer": 15,
+            "group": "up_proj",
+            "n": 3404831,
+            "n_collapsed": 49469,
+            "collapse_rate": 0.014529061794843855
+          },
+          {
+            "layer": 15,
+            "group": "v_proj",
+            "n": 209222,
+            "n_collapsed": 3022,
+            "collapse_rate": 0.014443987725956162
+          }
+        ]
+      },
+      "top_k": {
+        "1%": {
+          "n_weights": 24104521,
+          "n_collapsed": 678124,
+          "collapse_rate": 0.02813264781324632,
+          "mean_survival": 0.8379027902510261,
+          "median_survival": 1.0059244027671215,
+          "p10_survival": 0.105060589502826,
+          "p90_survival": 1.0847710416506666,
+          "histogram": {
+            "bin_edges": [
+              -1.5,
+              -1.42,
+              -1.34,
+              -1.26,
+              -1.18,
+              -1.1,
+              -1.02,
+              -0.94,
+              -0.86,
+              -0.78,
+              -0.7,
+              -0.62,
+              -0.54,
+              -0.45999999999999996,
+              -0.3799999999999999,
+              -0.30000000000000004,
+              -0.21999999999999997,
+              -0.1399999999999999,
+              -0.06000000000000005,
+              0.020000000000000018,
+              0.10000000000000009,
+              0.17999999999999994,
+              0.26,
+              0.3400000000000001,
+              0.41999999999999993,
+              0.5,
+              0.5800000000000001,
+              0.6600000000000001,
+              0.7400000000000002,
+              0.8199999999999998,
+              0.8999999999999999,
+              0.98,
+              1.06,
+              1.1400000000000001,
+              1.2200000000000002,
+              1.3000000000000003,
+              1.38,
+              1.46,
+              1.54,
+              1.62,
+              1.7000000000000002,
+              1.7800000000000002,
+              1.8599999999999999,
+              1.94,
+              2.02,
+              2.1,
+              2.18,
+              2.2600000000000002,
+              2.34,
+              2.42,
+              2.5
+            ],
+            "counts": [
+              30185,
+              6709,
+              8470,
+              9973,
+              12453,
+              15811,
+              19903,
+              27759,
+              39503,
+              81031,
+              136469,
+              157077,
+              175505,
+              194161,
+              208706,
+              224114,
+              238428,
+              250560,
+              264522,
+              286538,
+              356877,
+              412762,
+              432492,
+              444160,
+              445039,
+              468577,
+              517287,
+              516793,
+              514528,
+              508112,
+              483360,
+              14085251,
+              390630,
+              331132,
+              288934,
+              228920,
+              221480,
+              191785,
+              146792,
+              108741,
+              85721,
+              83429,
+              84448,
+              65859,
+              52877,
+              39479,
+              29296,
+              21506,
+              16114,
+              144263
+            ]
+          },
+          "per_layer": [
+            {
+              "layer": -1,
+              "group": "lm_head",
+              "n": 13640305,
+              "n_collapsed": 0,
+              "collapse_rate": 0.0
+            },
+            {
+              "layer": 0,
+              "group": "down_proj",
+              "n": 133785,
+              "n_collapsed": 8820,
+              "collapse_rate": 0.06592667339387824
+            },
+            {
+              "layer": 0,
+              "group": "gate_proj",
+              "n": 117430,
+              "n_collapsed": 7384,
+              "collapse_rate": 0.06288001362513838
+            },
+            {
+              "layer": 0,
+              "group": "k_proj",
+              "n": 3556,
+              "n_collapsed": 206,
+              "collapse_rate": 0.05793025871766029
+            },
+            {
+              "layer": 0,
+              "group": "o_proj",
+              "n": 39321,
+              "n_collapsed": 2130,
+              "collapse_rate": 0.0541695277332723
+            },
+            {
+              "layer": 0,
+              "group": "q_proj",
+              "n": 17731,
+              "n_collapsed": 1057,
+              "collapse_rate": 0.059613106987761545
+            },
+            {
+              "layer": 0,
+              "group": "up_proj",
+              "n": 128542,
+              "n_collapsed": 7922,
+              "collapse_rate": 0.061629661900390535
+            },
+            {
+              "layer": 0,
+              "group": "v_proj",
+              "n": 9827,
+              "n_collapsed": 333,
+              "collapse_rate": 0.03388623181031851
+            },
+            {
+              "layer": 1,
+              "group": "down_proj",
+              "n": 134890,
+              "n_collapsed": 8899,
+              "collapse_rate": 0.06597227370449996
+            },
+            {
+              "layer": 1,
+              "group": "gate_proj",
+              "n": 112041,
+              "n_collapsed": 7143,
+              "collapse_rate": 0.06375344739872012
+            },
+            {
+              "layer": 1,
+              "group": "k_proj",
+              "n": 3511,
+              "n_collapsed": 216,
+              "collapse_rate": 0.0615209342067787
+            },
+            {
+              "layer": 1,
+              "group": "o_proj",
+              "n": 40886,
+              "n_collapsed": 2273,
+              "collapse_rate": 0.055593601721860786
+            },
+            {
+              "layer": 1,
+              "group": "q_proj",
+              "n": 24532,
+              "n_collapsed": 1490,
+              "collapse_rate": 0.06073699657590086
+            },
+            {
+              "layer": 1,
+              "group": "up_proj",
+              "n": 127350,
+              "n_collapsed": 8122,
+              "collapse_rate": 0.06377699254024342
+            },
+            {
+              "layer": 1,
+              "group": "v_proj",
+              "n": 10602,
+              "n_collapsed": 410,
+              "collapse_rate": 0.038671948688926615
+            },
+            {
+              "layer": 2,
+              "group": "down_proj",
+              "n": 143546,
+              "n_collapsed": 9210,
+              "collapse_rate": 0.06416061750240341
+            },
+            {
+              "layer": 2,
+              "group": "gate_proj",
+              "n": 109955,
+              "n_collapsed": 7060,
+              "collapse_rate": 0.06420808512573326
+            },
+            {
+              "layer": 2,
+              "group": "k_proj",
+              "n": 3567,
+              "n_collapsed": 219,
+              "collapse_rate": 0.061396131202691336
+            },
+            {
+              "layer": 2,
+              "group": "o_proj",
+              "n": 36567,
+              "n_collapsed": 2086,
+              "collapse_rate": 0.057045970410479395
+            },
+            {
+              "layer": 2,
+              "group": "q_proj",
+              "n": 25872,
+              "n_collapsed": 1516,
+              "collapse_rate": 0.05859616573902288
+            },
+            {
+              "layer": 2,
+              "group": "up_proj",
+              "n": 132164,
+              "n_collapsed": 8268,
+              "collapse_rate": 0.06255863926636603
+            },
+            {
+              "layer": 2,
+              "group": "v_proj",
+              "n": 7994,
+              "n_collapsed": 383,
+              "collapse_rate": 0.047910933199899926
+            },
+            {
+              "layer": 3,
+              "group": "down_proj",
+              "n": 157639,
+              "n_collapsed": 10163,
+              "collapse_rate": 0.0644700867171195
+            },
+            {
+              "layer": 3,
+              "group": "gate_proj",
+              "n": 118124,
+              "n_collapsed": 7780,
+              "collapse_rate": 0.06586299143273171
+            },
+            {
+              "layer": 3,
+              "group": "k_proj",
+              "n": 4116,
+              "n_collapsed": 258,
+              "collapse_rate": 0.06268221574344024
+            },
+            {
+              "layer": 3,
+              "group": "o_proj",
+              "n": 35646,
+              "n_collapsed": 2043,
+              "collapse_rate": 0.05731358357178926
+            },
+            {
+              "layer": 3,
+              "group": "q_proj",
+              "n": 25787,
+              "n_collapsed": 1560,
+              "collapse_rate": 0.06049559855741265
+            },
+            {
+              "layer": 3,
+              "group": "up_proj",
+              "n": 144549,
+              "n_collapsed": 9218,
+              "collapse_rate": 0.06377076285550229
+            },
+            {
+              "layer": 3,
+              "group": "v_proj",
+              "n": 7607,
+              "n_collapsed": 438,
+              "collapse_rate": 0.057578546075982645
+            },
+            {
+              "layer": 4,
+              "group": "down_proj",
+              "n": 155922,
+              "n_collapsed": 9860,
+              "collapse_rate": 0.06323674657841741
+            },
+            {
+              "layer": 4,
+              "group": "gate_proj",
+              "n": 121507,
+              "n_collapsed": 8106,
+              "collapse_rate": 0.06671220588114266
+            },
+            {
+              "layer": 4,
+              "group": "k_proj",
+              "n": 3463,
+              "n_collapsed": 203,
+              "collapse_rate": 0.05861969390701704
+            },
+            {
+              "layer": 4,
+              "group": "o_proj",
+              "n": 32423,
+              "n_collapsed": 1687,
+              "collapse_rate": 0.05203096567251642
+            },
+            {
+              "layer": 4,
+              "group": "q_proj",
+              "n": 26004,
+              "n_collapsed": 1557,
+              "collapse_rate": 0.05987540378403323
+            },
+            {
+              "layer": 4,
+              "group": "up_proj",
+              "n": 148156,
+              "n_collapsed": 9477,
+              "collapse_rate": 0.0639663597829315
+            },
+            {
+              "layer": 4,
+              "group": "v_proj",
+              "n": 6994,
+              "n_collapsed": 384,
+              "collapse_rate": 0.05490420360308836
+            },
+            {
+              "layer": 5,
+              "group": "down_proj",
+              "n": 164272,
+              "n_collapsed": 10451,
+              "collapse_rate": 0.06362009350345768
+            },
+            {
+              "layer": 5,
+              "group": "gate_proj",
+              "n": 132476,
+              "n_collapsed": 8866,
+              "collapse_rate": 0.06692532987107098
+            },
+            {
+              "layer": 5,
+              "group": "k_proj",
+              "n": 4644,
+              "n_collapsed": 315,
+              "collapse_rate": 0.06782945736434108
+            },
+            {
+              "layer": 5,
+              "group": "o_proj",
+              "n": 39591,
+              "n_collapsed": 2223,
+              "collapse_rate": 0.05614912480109116
+            },
+            {
+              "layer": 5,
+              "group": "q_proj",
+              "n": 31567,
+              "n_collapsed": 1778,
+              "collapse_rate": 0.056324642823201446
+            },
+            {
+              "layer": 5,
+              "group": "up_proj",
+              "n": 156458,
+              "n_collapsed": 10206,
+              "collapse_rate": 0.06523156374234619
+            },
+            {
+              "layer": 5,
+              "group": "v_proj",
+              "n": 9827,
+              "n_collapsed": 487,
+              "collapse_rate": 0.049557342016892235
+            },
+            {
+              "layer": 6,
+              "group": "down_proj",
+              "n": 170272,
+              "n_collapsed": 10731,
+              "collapse_rate": 0.06302269310280023
+            },
+            {
+              "layer": 6,
+              "group": "gate_proj",
+              "n": 141203,
+              "n_collapsed": 9255,
+              "collapse_rate": 0.06554393320255235
+            },
+            {
+              "layer": 6,
+              "group": "k_proj",
+              "n": 5032,
+              "n_collapsed": 317,
+              "collapse_rate": 0.06299682034976152
+            },
+            {
+              "layer": 6,
+              "group": "o_proj",
+              "n": 37983,
+              "n_collapsed": 2093,
+              "collapse_rate": 0.055103598978490376
+            },
+            {
+              "layer": 6,
+              "group": "q_proj",
+              "n": 31410,
+              "n_collapsed": 1932,
+              "collapse_rate": 0.0615090735434575
+            },
+            {
+              "layer": 6,
+              "group": "up_proj",
+              "n": 160096,
+              "n_collapsed": 10258,
+              "collapse_rate": 0.06407405556666
+            },
+            {
+              "layer": 6,
+              "group": "v_proj",
+              "n": 9002,
+              "n_collapsed": 493,
+              "collapse_rate": 0.05476560764274606
+            },
+            {
+              "layer": 7,
+              "group": "down_proj",
+              "n": 178698,
+              "n_collapsed": 11402,
+              "collapse_rate": 0.06380597432539815
+            },
+            {
+              "layer": 7,
+              "group": "gate_proj",
+              "n": 161264,
+              "n_collapsed": 10544,
+              "collapse_rate": 0.06538347058239904
+            },
+            {
+              "layer": 7,
+              "group": "k_proj",
+              "n": 5320,
+              "n_collapsed": 342,
+              "collapse_rate": 0.06428571428571428
+            },
+            {
+              "layer": 7,
+              "group": "o_proj",
+              "n": 39250,
+              "n_collapsed": 2173,
+              "collapse_rate": 0.055363057324840766
+            },
+            {
+              "layer": 7,
+              "group": "q_proj",
+              "n": 34905,
+              "n_collapsed": 2129,
+              "collapse_rate": 0.060994126915914625
+            },
+            {
+              "layer": 7,
+              "group": "up_proj",
+              "n": 174376,
+              "n_collapsed": 11444,
+              "collapse_rate": 0.0656282974721292
+            },
+            {
+              "layer": 7,
+              "group": "v_proj",
+              "n": 8696,
+              "n_collapsed": 508,
+              "collapse_rate": 0.05841766329346826
+            },
+            {
+              "layer": 8,
+              "group": "down_proj",
+              "n": 188278,
+              "n_collapsed": 12171,
+              "collapse_rate": 0.06464377144435356
+            },
+            {
+              "layer": 8,
+              "group": "gate_proj",
+              "n": 172240,
+              "n_collapsed": 11291,
+              "collapse_rate": 0.06555387830933582
+            },
+            {
+              "layer": 8,
+              "group": "k_proj",
+              "n": 5719,
+              "n_collapsed": 367,
+              "collapse_rate": 0.06417205805210702
+            },
+            {
+              "layer": 8,
+              "group": "o_proj",
+              "n": 45240,
+              "n_collapsed": 2673,
+              "collapse_rate": 0.059084880636604775
+            },
+            {
+              "layer": 8,
+              "group": "q_proj",
+              "n": 37548,
+              "n_collapsed": 2269,
+              "collapse_rate": 0.06042931714072654
+            },
+            {
+              "layer": 8,
+              "group": "up_proj",
+              "n": 181372,
+              "n_collapsed": 11602,
+              "collapse_rate": 0.0639679774165803
+            },
+            {
+              "layer": 8,
+              "group": "v_proj",
+              "n": 10739,
+              "n_collapsed": 624,
+              "collapse_rate": 0.058105968898407676
+            },
+            {
+              "layer": 9,
+              "group": "down_proj",
+              "n": 201731,
+              "n_collapsed": 12971,
+              "collapse_rate": 0.06429849651268273
+            },
+            {
+              "layer": 9,
+              "group": "gate_proj",
+              "n": 178274,
+              "n_collapsed": 11727,
+              "collapse_rate": 0.06578076444125334
+            },
+            {
+              "layer": 9,
+              "group": "k_proj",
+              "n": 5502,
+              "n_collapsed": 387,
+              "collapse_rate": 0.0703380588876772
+            },
+            {
+              "layer": 9,
+              "group": "o_proj",
+              "n": 45210,
+              "n_collapsed": 2682,
+              "collapse_rate": 0.05932315859323158
+            },
+            {
+              "layer": 9,
+              "group": "q_proj",
+              "n": 37725,
+              "n_collapsed": 2212,
+              "collapse_rate": 0.058634857521537444
+            },
+            {
+              "layer": 9,
+              "group": "up_proj",
+              "n": 197365,
+              "n_collapsed": 12998,
+              "collapse_rate": 0.06585767486636435
+            },
+            {
+              "layer": 9,
+              "group": "v_proj",
+              "n": 10183,
+              "n_collapsed": 604,
+              "collapse_rate": 0.05931454384758912
+            },
+            {
+              "layer": 10,
+              "group": "down_proj",
+              "n": 222443,
+              "n_collapsed": 14771,
+              "collapse_rate": 0.06640352809483778
+            },
+            {
+              "layer": 10,
+              "group": "gate_proj",
+              "n": 200774,
+              "n_collapsed": 13127,
+              "collapse_rate": 0.06538197176925299
+            },
+            {
+              "layer": 10,
+              "group": "k_proj",
+              "n": 6279,
+              "n_collapsed": 429,
+              "collapse_rate": 0.06832298136645963
+            },
+            {
+              "layer": 10,
+              "group": "o_proj",
+              "n": 62992,
+              "n_collapsed": 3850,
+              "collapse_rate": 0.061118872237744475
+            },
+            {
+              "layer": 10,
+              "group": "q_proj",
+              "n": 42632,
+              "n_collapsed": 2418,
+              "collapse_rate": 0.05671795834115219
+            },
+            {
+              "layer": 10,
+              "group": "up_proj",
+              "n": 217927,
+              "n_collapsed": 14587,
+              "collapse_rate": 0.06693525813689906
+            },
+            {
+              "layer": 10,
+              "group": "v_proj",
+              "n": 13348,
+              "n_collapsed": 816,
+              "collapse_rate": 0.0611327539706323
+            },
+            {
+              "layer": 11,
+              "group": "down_proj",
+              "n": 237914,
+              "n_collapsed": 15902,
+              "collapse_rate": 0.0668392780584581
+            },
+            {
+              "layer": 11,
+              "group": "gate_proj",
+              "n": 211525,
+              "n_collapsed": 14404,
+              "collapse_rate": 0.06809596974352913
+            },
+            {
+              "layer": 11,
+              "group": "k_proj",
+              "n": 6472,
+              "n_collapsed": 437,
+              "collapse_rate": 0.06752163164400495
+            },
+            {
+              "layer": 11,
+              "group": "o_proj",
+              "n": 58505,
+              "n_collapsed": 3556,
+              "collapse_rate": 0.060781129817964276
+            },
+            {
+              "layer": 11,
+              "group": "q_proj",
+              "n": 39065,
+              "n_collapsed": 2518,
+              "collapse_rate": 0.06445667477281454
+            },
+            {
+              "layer": 11,
+              "group": "up_proj",
+              "n": 233029,
+              "n_collapsed": 15750,
+              "collapse_rate": 0.06758815426406155
+            },
+            {
+              "layer": 11,
+              "group": "v_proj",
+              "n": 13211,
+              "n_collapsed": 838,
+              "collapse_rate": 0.06343198849443646
+            },
+            {
+              "layer": 12,
+              "group": "down_proj",
+              "n": 250833,
+              "n_collapsed": 16906,
+              "collapse_rate": 0.06739942511551511
+            },
+            {
+              "layer": 12,
+              "group": "gate_proj",
+              "n": 225421,
+              "n_collapsed": 15336,
+              "collapse_rate": 0.06803270325302434
+            },
+            {
+              "layer": 12,
+              "group": "k_proj",
+              "n": 6920,
+              "n_collapsed": 429,
+              "collapse_rate": 0.06199421965317919
+            },
+            {
+              "layer": 12,
+              "group": "o_proj",
+              "n": 60876,
+              "n_collapsed": 3620,
+              "collapse_rate": 0.05946514225639004
+            },
+            {
+              "layer": 12,
+              "group": "q_proj",
+              "n": 43608,
+              "n_collapsed": 2573,
+              "collapse_rate": 0.05900293524124014
+            },
+            {
+              "layer": 12,
+              "group": "up_proj",
+              "n": 246782,
+              "n_collapsed": 16905,
+              "collapse_rate": 0.06850175458501835
+            },
+            {
+              "layer": 12,
+              "group": "v_proj",
+              "n": 13714,
+              "n_collapsed": 782,
+              "collapse_rate": 0.05702202129211025
+            },
+            {
+              "layer": 13,
+              "group": "down_proj",
+              "n": 263443,
+              "n_collapsed": 17854,
+              "collapse_rate": 0.06777177605781896
+            },
+            {
+              "layer": 13,
+              "group": "gate_proj",
+              "n": 251114,
+              "n_collapsed": 17059,
+              "collapse_rate": 0.06793328926304387
+            },
+            {
+              "layer": 13,
+              "group": "k_proj",
+              "n": 6759,
+              "n_collapsed": 424,
+              "collapse_rate": 0.06273117325048085
+            },
+            {
+              "layer": 13,
+              "group": "o_proj",
+              "n": 56195,
+              "n_collapsed": 3650,
+              "collapse_rate": 0.06495239790016906
+            },
+            {
+              "layer": 13,
+              "group": "q_proj",
+              "n": 40239,
+              "n_collapsed": 2469,
+              "collapse_rate": 0.061358383657645565
+            },
+            {
+              "layer": 13,
+              "group": "up_proj",
+              "n": 266352,
+              "n_collapsed": 18203,
+              "collapse_rate": 0.06834189343425241
+            },
+            {
+              "layer": 13,
+              "group": "v_proj",
+              "n": 13382,
+              "n_collapsed": 857,
+              "collapse_rate": 0.06404124943954566
+            },
+            {
+              "layer": 14,
+              "group": "down_proj",
+              "n": 273834,
+              "n_collapsed": 17720,
+              "collapse_rate": 0.06471073716193022
+            },
+            {
+              "layer": 14,
+              "group": "gate_proj",
+              "n": 253966,
+              "n_collapsed": 17304,
+              "collapse_rate": 0.0681351046990542
+            },
+            {
+              "layer": 14,
+              "group": "k_proj",
+              "n": 9185,
+              "n_collapsed": 585,
+              "collapse_rate": 0.06369080021774633
+            },
+            {
+              "layer": 14,
+              "group": "o_proj",
+              "n": 48761,
+              "n_collapsed": 3217,
+              "collapse_rate": 0.06597485695535367
+            },
+            {
+              "layer": 14,
+              "group": "q_proj",
+              "n": 46328,
+              "n_collapsed": 2547,
+              "collapse_rate": 0.05497755137281989
+            },
+            {
+              "layer": 14,
+              "group": "up_proj",
+              "n": 273684,
+              "n_collapsed": 18441,
+              "collapse_rate": 0.0673806287543298
+            },
+            {
+              "layer": 14,
+              "group": "v_proj",
+              "n": 10027,
+              "n_collapsed": 628,
+              "collapse_rate": 0.06263089657923607
+            },
+            {
+              "layer": 15,
+              "group": "down_proj",
+              "n": 247561,
+              "n_collapsed": 16253,
+              "collapse_rate": 0.06565250584704375
+            },
+            {
+              "layer": 15,
+              "group": "gate_proj",
+              "n": 239955,
+              "n_collapsed": 16013,
+              "collapse_rate": 0.06673334583567753
+            },
+            {
+              "layer": 15,
+              "group": "k_proj",
+              "n": 9651,
+              "n_collapsed": 617,
+              "collapse_rate": 0.0639311988394985
+            },
+            {
+              "layer": 15,
+              "group": "o_proj",
+              "n": 62206,
+              "n_collapsed": 4049,
+              "collapse_rate": 0.06509018422660194
+            },
+            {
+              "layer": 15,
+              "group": "q_proj",
+              "n": 53863,
+              "n_collapsed": 2763,
+              "collapse_rate": 0.05129680856989028
+            },
+            {
+              "layer": 15,
+              "group": "up_proj",
+              "n": 245512,
+              "n_collapsed": 16314,
+              "collapse_rate": 0.06644889048193163
+            },
+            {
+              "layer": 15,
+              "group": "v_proj",
+              "n": 12855,
+              "n_collapsed": 797,
+              "collapse_rate": 0.061999222092570985
+            }
+          ]
+        },
+        "5%": {
+          "n_weights": 73619932,
+          "n_collapsed": 2277298,
+          "collapse_rate": 0.030933171739414265,
+          "mean_survival": 0.788977942609007,
+          "median_survival": 0.998812319621288,
+          "p10_survival": -1.2578405937318593,
+          "p90_survival": 2.422446108054098,
+          "histogram": {
+            "bin_edges": [
+              -1.5,
+              -1.42,
+              -1.34,
+              -1.26,
+              -1.18,
+              -1.1,
+              -1.02,
+              -0.94,
+              -0.86,
+              -0.78,
+              -0.7,
+              -0.62,
+              -0.54,
+              -0.45999999999999996,
+              -0.3799999999999999,
+              -0.30000000000000004,
+              -0.21999999999999997,
+              -0.1399999999999999,
+              -0.06000000000000005,
+              0.020000000000000018,
+              0.10000000000000009,
+              0.17999999999999994,
+              0.26,
+              0.3400000000000001,
+              0.41999999999999993,
+              0.5,
+              0.5800000000000001,
+              0.6600000000000001,
+              0.7400000000000002,
+              0.8199999999999998,
+              0.8999999999999999,
+              0.98,
+              1.06,
+              1.1400000000000001,
+              1.2200000000000002,
+              1.3000000000000003,
+              1.38,
+              1.46,
+              1.54,
+              1.62,
+              1.7000000000000002,
+              1.7800000000000002,
+              1.8599999999999999,
+              1.94,
+              2.02,
+              2.1,
+              2.18,
+              2.2600000000000002,
+              2.34,
+              2.42,
+              2.5
+            ],
+            "counts": [
+              6449828,
+              438844,
+              460348,
+              480621,
+              498801,
+              528345,
+              561246,
+              590965,
+              629991,
+              659111,
+              689802,
+              714554,
+              741336,
+              770215,
+              796710,
+              822270,
+              849168,
+              874888,
+              901911,
+              934939,
+              970300,
+              997657,
+              1023898,
+              1048676,
+              1056911,
+              1093391,
+              1101249,
+              1113209,
+              1110536,
+              1098924,
+              1066404,
+              24387925,
+              959814,
+              891034,
+              833975,
+              772083,
+              733687,
+              700366,
+              656592,
+              613789,
+              579852,
+              550982,
+              527107,
+              510487,
+              489152,
+              462514,
+              446810,
+              428172,
+              406347,
+              7594196
+            ]
+          },
+          "per_layer": [
+            {
+              "layer": -1,
+              "group": "lm_head",
+              "n": 23363552,
+              "n_collapsed": 0,
+              "collapse_rate": 0.0
+            },
+            {
+              "layer": 0,
+              "group": "down_proj",
+              "n": 762255,
+              "n_collapsed": 34853,
+              "collapse_rate": 0.04572354395838663
+            },
+            {
+              "layer": 0,
+              "group": "gate_proj",
+              "n": 673298,
+              "n_collapsed": 31668,
+              "collapse_rate": 0.047034151297048264
+            },
+            {
+              "layer": 0,
+              "group": "k_proj",
+              "n": 23134,
+              "n_collapsed": 989,
+              "collapse_rate": 0.04275092936802974
+            },
+            {
+              "layer": 0,
+              "group": "o_proj",
+              "n": 285410,
+              "n_collapsed": 13597,
+              "collapse_rate": 0.04764023685224764
+            },
+            {
+              "layer": 0,
+              "group": "q_proj",
+              "n": 111828,
+              "n_collapsed": 4914,
+              "collapse_rate": 0.043942483099044964
+            },
+            {
+              "layer": 0,
+              "group": "up_proj",
+              "n": 744291,
+              "n_collapsed": 32597,
+              "collapse_rate": 0.04379604213943202
+            },
+            {
+              "layer": 0,
+              "group": "v_proj",
+              "n": 86493,
+              "n_collapsed": 3511,
+              "collapse_rate": 0.04059288034869874
+            },
+            {
+              "layer": 1,
+              "group": "down_proj",
+              "n": 767051,
+              "n_collapsed": 34576,
+              "collapse_rate": 0.04507653337261799
+            },
+            {
+              "layer": 1,
+              "group": "gate_proj",
+              "n": 648426,
+              "n_collapsed": 29135,
+              "collapse_rate": 0.044931881201555765
+            },
+            {
+              "layer": 1,
+              "group": "k_proj",
+              "n": 23375,
+              "n_collapsed": 1004,
+              "collapse_rate": 0.042951871657754014
+            },
+            {
+              "layer": 1,
+              "group": "o_proj",
+              "n": 261337,
+              "n_collapsed": 12240,
+              "collapse_rate": 0.04683607755503431
+            },
+            {
+              "layer": 1,
+              "group": "q_proj",
+              "n": 145933,
+              "n_collapsed": 6512,
+              "collapse_rate": 0.044623217503923035
+            },
+            {
+              "layer": 1,
+              "group": "up_proj",
+              "n": 744376,
+              "n_collapsed": 33543,
+              "collapse_rate": 0.045061904198953215
+            },
+            {
+              "layer": 1,
+              "group": "v_proj",
+              "n": 77579,
+              "n_collapsed": 3423,
+              "collapse_rate": 0.04412276518129906
+            },
+            {
+              "layer": 2,
+              "group": "down_proj",
+              "n": 792890,
+              "n_collapsed": 37635,
+              "collapse_rate": 0.04746560052466294
+            },
+            {
+              "layer": 2,
+              "group": "gate_proj",
+              "n": 630341,
+              "n_collapsed": 29243,
+              "collapse_rate": 0.04639234953778986
+            },
+            {
+              "layer": 2,
+              "group": "k_proj",
+              "n": 23287,
+              "n_collapsed": 1062,
+              "collapse_rate": 0.0456048439043243
+            },
+            {
+              "layer": 2,
+              "group": "o_proj",
+              "n": 239039,
+              "n_collapsed": 11105,
+              "collapse_rate": 0.046456854320843045
+            },
+            {
+              "layer": 2,
+              "group": "q_proj",
+              "n": 152739,
+              "n_collapsed": 7606,
+              "collapse_rate": 0.049797366749815046
+            },
+            {
+              "layer": 2,
+              "group": "up_proj",
+              "n": 765016,
+              "n_collapsed": 34468,
+              "collapse_rate": 0.04505526681794891
+            },
+            {
+              "layer": 2,
+              "group": "v_proj",
+              "n": 60715,
+              "n_collapsed": 3561,
+              "collapse_rate": 0.0586510746932389
+            },
+            {
+              "layer": 3,
+              "group": "down_proj",
+              "n": 855050,
+              "n_collapsed": 41208,
+              "collapse_rate": 0.04819367288462663
+            },
+            {
+              "layer": 3,
+              "group": "gate_proj",
+              "n": 637024,
+              "n_collapsed": 28839,
+              "collapse_rate": 0.04527144974129703
+            },
+            {
+              "layer": 3,
+              "group": "k_proj",
+              "n": 23874,
+              "n_collapsed": 1069,
+              "collapse_rate": 0.04477674457568903
+            },
+            {
+              "layer": 3,
+              "group": "o_proj",
+              "n": 219186,
+              "n_collapsed": 9973,
+              "collapse_rate": 0.04550016880640187
+            },
+            {
+              "layer": 3,
+              "group": "q_proj",
+              "n": 142149,
+              "n_collapsed": 6538,
+              "collapse_rate": 0.04599399221943172
+            },
+            {
+              "layer": 3,
+              "group": "up_proj",
+              "n": 811340,
+              "n_collapsed": 36528,
+              "collapse_rate": 0.04502181576157961
+            },
+            {
+              "layer": 3,
+              "group": "v_proj",
+              "n": 53758,
+              "n_collapsed": 2608,
+              "collapse_rate": 0.04851370958741025
+            },
+            {
+              "layer": 4,
+              "group": "down_proj",
+              "n": 860372,
+              "n_collapsed": 41279,
+              "collapse_rate": 0.047978083898592705
+            },
+            {
+              "layer": 4,
+              "group": "gate_proj",
+              "n": 634658,
+              "n_collapsed": 29570,
+              "collapse_rate": 0.04659202279022718
+            },
+            {
+              "layer": 4,
+              "group": "k_proj",
+              "n": 22377,
+              "n_collapsed": 989,
+              "collapse_rate": 0.044197166733699784
+            },
+            {
+              "layer": 4,
+              "group": "o_proj",
+              "n": 215059,
+              "n_collapsed": 9680,
+              "collapse_rate": 0.045010903984487975
+            },
+            {
+              "layer": 4,
+              "group": "q_proj",
+              "n": 149083,
+              "n_collapsed": 6851,
+              "collapse_rate": 0.04595426708611981
+            },
+            {
+              "layer": 4,
+              "group": "up_proj",
+              "n": 828776,
+              "n_collapsed": 38878,
+              "collapse_rate": 0.04691014218558452
+            },
+            {
+              "layer": 4,
+              "group": "v_proj",
+              "n": 54696,
+              "n_collapsed": 2693,
+              "collapse_rate": 0.049235775925113356
+            },
+            {
+              "layer": 5,
+              "group": "down_proj",
+              "n": 879715,
+              "n_collapsed": 42060,
+              "collapse_rate": 0.04781093876994254
+            },
+            {
+              "layer": 5,
+              "group": "gate_proj",
+              "n": 682021,
+              "n_collapsed": 31262,
+              "collapse_rate": 0.04583729826500944
+            },
+            {
+              "layer": 5,
+              "group": "k_proj",
+              "n": 26667,
+              "n_collapsed": 1194,
+              "collapse_rate": 0.044774440319496005
+            },
+            {
+              "layer": 5,
+              "group": "o_proj",
+              "n": 245974,
+              "n_collapsed": 11267,
+              "collapse_rate": 0.045805654256140894
+            },
+            {
+              "layer": 5,
+              "group": "q_proj",
+              "n": 171566,
+              "n_collapsed": 7900,
+              "collapse_rate": 0.04604641945373792
+            },
+            {
+              "layer": 5,
+              "group": "up_proj",
+              "n": 845052,
+              "n_collapsed": 38070,
+              "collapse_rate": 0.04505048210050979
+            },
+            {
+              "layer": 5,
+              "group": "v_proj",
+              "n": 67795,
+              "n_collapsed": 3278,
+              "collapse_rate": 0.04835164835164835
+            },
+            {
+              "layer": 6,
+              "group": "down_proj",
+              "n": 908213,
+              "n_collapsed": 43715,
+              "collapse_rate": 0.04813298202073742
+            },
+            {
+              "layer": 6,
+              "group": "gate_proj",
+              "n": 713246,
+              "n_collapsed": 33239,
+              "collapse_rate": 0.04660243450366353
+            },
+            {
+              "layer": 6,
+              "group": "k_proj",
+              "n": 26805,
+              "n_collapsed": 1186,
+              "collapse_rate": 0.0442454765901884
+            },
+            {
+              "layer": 6,
+              "group": "o_proj",
+              "n": 233370,
+              "n_collapsed": 10579,
+              "collapse_rate": 0.04533144791532759
+            },
+            {
+              "layer": 6,
+              "group": "q_proj",
+              "n": 165400,
+              "n_collapsed": 7471,
+              "collapse_rate": 0.04516928657799275
+            },
+            {
+              "layer": 6,
+              "group": "up_proj",
+              "n": 857309,
+              "n_collapsed": 38760,
+              "collapse_rate": 0.04521123655531436
+            },
+            {
+              "layer": 6,
+              "group": "v_proj",
+              "n": 60836,
+              "n_collapsed": 2985,
+              "collapse_rate": 0.049066342297323956
+            },
+            {
+              "layer": 7,
+              "group": "down_proj",
+              "n": 930217,
+              "n_collapsed": 43734,
+              "collapse_rate": 0.04701483632313751
+            },
+            {
+              "layer": 7,
+              "group": "gate_proj",
+              "n": 792476,
+              "n_collapsed": 36355,
+              "collapse_rate": 0.0458752063153963
+            },
+            {
+              "layer": 7,
+              "group": "k_proj",
+              "n": 26972,
+              "n_collapsed": 1207,
+              "collapse_rate": 0.044750111226457064
+            },
+            {
+              "layer": 7,
+              "group": "o_proj",
+              "n": 235890,
+              "n_collapsed": 10635,
+              "collapse_rate": 0.04508457331807198
+            },
+            {
+              "layer": 7,
+              "group": "q_proj",
+              "n": 173738,
+              "n_collapsed": 8009,
+              "collapse_rate": 0.046098147785746356
+            },
+            {
+              "layer": 7,
+              "group": "up_proj",
+              "n": 891044,
+              "n_collapsed": 39916,
+              "collapse_rate": 0.044796889940339646
+            },
+            {
+              "layer": 7,
+              "group": "v_proj",
+              "n": 57585,
+              "n_collapsed": 2830,
+              "collapse_rate": 0.04914474255448467
+            },
+            {
+              "layer": 8,
+              "group": "down_proj",
+              "n": 948347,
+              "n_collapsed": 46446,
+              "collapse_rate": 0.04897574411054181
+            },
+            {
+              "layer": 8,
+              "group": "gate_proj",
+              "n": 818950,
+              "n_collapsed": 37128,
+              "collapse_rate": 0.04533610110507357
+            },
+            {
+              "layer": 8,
+              "group": "k_proj",
+              "n": 28284,
+              "n_collapsed": 1197,
+              "collapse_rate": 0.04232074671192194
+            },
+            {
+              "layer": 8,
+              "group": "o_proj",
+              "n": 252999,
+              "n_collapsed": 11507,
+              "collapse_rate": 0.04548239321104036
+            },
+            {
+              "layer": 8,
+              "group": "q_proj",
+              "n": 185911,
+              "n_collapsed": 8277,
+              "collapse_rate": 0.044521303204221374
+            },
+            {
+              "layer": 8,
+              "group": "up_proj",
+              "n": 916105,
+              "n_collapsed": 39736,
+              "collapse_rate": 0.04337494064545003
+            },
+            {
+              "layer": 8,
+              "group": "v_proj",
+              "n": 65859,
+              "n_collapsed": 3347,
+              "collapse_rate": 0.05082069269196313
+            },
+            {
+              "layer": 9,
+              "group": "down_proj",
+              "n": 970964,
+              "n_collapsed": 44832,
+              "collapse_rate": 0.04617266963553746
+            },
+            {
+              "layer": 9,
+              "group": "gate_proj",
+              "n": 827050,
+              "n_collapsed": 37094,
+              "collapse_rate": 0.04485097636176773
+            },
+            {
+              "layer": 9,
+              "group": "k_proj",
+              "n": 27702,
+              "n_collapsed": 1257,
+              "collapse_rate": 0.04537578514186701
+            },
+            {
+              "layer": 9,
+              "group": "o_proj",
+              "n": 243171,
+              "n_collapsed": 10808,
+              "collapse_rate": 0.04444608937743399
+            },
+            {
+              "layer": 9,
+              "group": "q_proj",
+              "n": 178319,
+              "n_collapsed": 8066,
+              "collapse_rate": 0.045233542135162265
+            },
+            {
+              "layer": 9,
+              "group": "up_proj",
+              "n": 944034,
+              "n_collapsed": 40967,
+              "collapse_rate": 0.04339568278261164
+            },
+            {
+              "layer": 9,
+              "group": "v_proj",
+              "n": 61293,
+              "n_collapsed": 2915,
+              "collapse_rate": 0.047558448762501426
+            },
+            {
+              "layer": 10,
+              "group": "down_proj",
+              "n": 999335,
+              "n_collapsed": 46349,
+              "collapse_rate": 0.04637984259532589
+            },
+            {
+              "layer": 10,
+              "group": "gate_proj",
+              "n": 872675,
+              "n_collapsed": 38503,
+              "collapse_rate": 0.04412066347723952
+            },
+            {
+              "layer": 10,
+              "group": "k_proj",
+              "n": 31154,
+              "n_collapsed": 1389,
+              "collapse_rate": 0.044584965012518456
+            },
+            {
+              "layer": 10,
+              "group": "o_proj",
+              "n": 290390,
+              "n_collapsed": 12940,
+              "collapse_rate": 0.0445607631116774
+            },
+            {
+              "layer": 10,
+              "group": "q_proj",
+              "n": 203419,
+              "n_collapsed": 9128,
+              "collapse_rate": 0.044872897811905475
+            },
+            {
+              "layer": 10,
+              "group": "up_proj",
+              "n": 975552,
+              "n_collapsed": 42261,
+              "collapse_rate": 0.04332008954930132
+            },
+            {
+              "layer": 10,
+              "group": "v_proj",
+              "n": 75841,
+              "n_collapsed": 3660,
+              "collapse_rate": 0.04825885734629026
+            },
+            {
+              "layer": 11,
+              "group": "down_proj",
+              "n": 1019463,
+              "n_collapsed": 48724,
+              "collapse_rate": 0.04779378947543952
+            },
+            {
+              "layer": 11,
+              "group": "gate_proj",
+              "n": 883041,
+              "n_collapsed": 38994,
+              "collapse_rate": 0.04415876499505685
+            },
+            {
+              "layer": 11,
+              "group": "k_proj",
+              "n": 29624,
+              "n_collapsed": 1255,
+              "collapse_rate": 0.042364299216851205
+            },
+            {
+              "layer": 11,
+              "group": "o_proj",
+              "n": 278253,
+              "n_collapsed": 12358,
+              "collapse_rate": 0.044412818550024616
+            },
+            {
+              "layer": 11,
+              "group": "q_proj",
+              "n": 175112,
+              "n_collapsed": 7549,
+              "collapse_rate": 0.04310955274338709
+            },
+            {
+              "layer": 11,
+              "group": "up_proj",
+              "n": 992099,
+              "n_collapsed": 42465,
+              "collapse_rate": 0.04280318798829552
+            },
+            {
+              "layer": 11,
+              "group": "v_proj",
+              "n": 71587,
+              "n_collapsed": 3426,
+              "collapse_rate": 0.04785785128584799
+            },
+            {
+              "layer": 12,
+              "group": "down_proj",
+              "n": 1033918,
+              "n_collapsed": 50831,
+              "collapse_rate": 0.049163473312196906
+            },
+            {
+              "layer": 12,
+              "group": "gate_proj",
+              "n": 908610,
+              "n_collapsed": 39623,
+              "collapse_rate": 0.04360836882710954
+            },
+            {
+              "layer": 12,
+              "group": "k_proj",
+              "n": 33770,
+              "n_collapsed": 1402,
+              "collapse_rate": 0.04151613858454249
+            },
+            {
+              "layer": 12,
+              "group": "o_proj",
+              "n": 287376,
+              "n_collapsed": 12635,
+              "collapse_rate": 0.043966789154278714
+            },
+            {
+              "layer": 12,
+              "group": "q_proj",
+              "n": 198271,
+              "n_collapsed": 8439,
+              "collapse_rate": 0.04256295676120058
+            },
+            {
+              "layer": 12,
+              "group": "up_proj",
+              "n": 1004595,
+              "n_collapsed": 42582,
+              "collapse_rate": 0.042387230675048154
+            },
+            {
+              "layer": 12,
+              "group": "v_proj",
+              "n": 72304,
+              "n_collapsed": 3268,
+              "collapse_rate": 0.04519805266651914
+            },
+            {
+              "layer": 13,
+              "group": "down_proj",
+              "n": 1054356,
+              "n_collapsed": 53828,
+              "collapse_rate": 0.05105296503268346
+            },
+            {
+              "layer": 13,
+              "group": "gate_proj",
+              "n": 969236,
+              "n_collapsed": 42090,
+              "collapse_rate": 0.04342595611388764
+            },
+            {
+              "layer": 13,
+              "group": "k_proj",
+              "n": 33260,
+              "n_collapsed": 1442,
+              "collapse_rate": 0.043355381840048106
+            },
+            {
+              "layer": 13,
+              "group": "o_proj",
+              "n": 252974,
+              "n_collapsed": 11070,
+              "collapse_rate": 0.04375943772877845
+            },
+            {
+              "layer": 13,
+              "group": "q_proj",
+              "n": 183606,
+              "n_collapsed": 8236,
+              "collapse_rate": 0.0448569218870843
+            },
+            {
+              "layer": 13,
+              "group": "up_proj",
+              "n": 1032355,
+              "n_collapsed": 42964,
+              "collapse_rate": 0.0416174668597527
+            },
+            {
+              "layer": 13,
+              "group": "v_proj",
+              "n": 65934,
+              "n_collapsed": 2907,
+              "collapse_rate": 0.04408954408954409
+            },
+            {
+              "layer": 14,
+              "group": "down_proj",
+              "n": 1093606,
+              "n_collapsed": 50907,
+              "collapse_rate": 0.046549671453887415
+            },
+            {
+              "layer": 14,
+              "group": "gate_proj",
+              "n": 973062,
+              "n_collapsed": 41680,
+              "collapse_rate": 0.042833858479726886
+            },
+            {
+              "layer": 14,
+              "group": "k_proj",
+              "n": 42802,
+              "n_collapsed": 1841,
+              "collapse_rate": 0.043012008784636235
+            },
+            {
+              "layer": 14,
+              "group": "o_proj",
+              "n": 220626,
+              "n_collapsed": 9619,
+              "collapse_rate": 0.043598669241159245
+            },
+            {
+              "layer": 14,
+              "group": "q_proj",
+              "n": 206940,
+              "n_collapsed": 9055,
+              "collapse_rate": 0.043756644438001355
+            },
+            {
+              "layer": 14,
+              "group": "up_proj",
+              "n": 1060443,
+              "n_collapsed": 44219,
+              "collapse_rate": 0.04169861086357306
+            },
+            {
+              "layer": 14,
+              "group": "v_proj",
+              "n": 50238,
+              "n_collapsed": 2060,
+              "collapse_rate": 0.041004817070743264
+            },
+            {
+              "layer": 15,
+              "group": "down_proj",
+              "n": 1057792,
+              "n_collapsed": 49309,
+              "collapse_rate": 0.04661502450387222
+            },
+            {
+              "layer": 15,
+              "group": "gate_proj",
+              "n": 945499,
+              "n_collapsed": 39187,
+              "collapse_rate": 0.04144583971003671
+            },
+            {
+              "layer": 15,
+              "group": "k_proj",
+              "n": 43725,
+              "n_collapsed": 1873,
+              "collapse_rate": 0.042835906232132646
+            },
+            {
+              "layer": 15,
+              "group": "o_proj",
+              "n": 261924,
+              "n_collapsed": 11612,
+              "collapse_rate": 0.044333470777782866
+            },
+            {
+              "layer": 15,
+              "group": "q_proj",
+              "n": 241236,
+              "n_collapsed": 10031,
+              "collapse_rate": 0.04158168764197715
+            },
+            {
+              "layer": 15,
+              "group": "up_proj",
+              "n": 984820,
+              "n_collapsed": 40059,
+              "collapse_rate": 0.04067646879632826
+            },
+            {
+              "layer": 15,
+              "group": "v_proj",
+              "n": 58463,
+              "n_collapsed": 2354,
+              "collapse_rate": 0.040264782854112856
+            }
+          ]
+        },
+        "10%": {
+          "n_weights": 133247622,
+          "n_collapsed": 2941701,
+          "collapse_rate": 0.02207694933572623,
+          "mean_survival": 0.917684923215154,
+          "median_survival": 1.0026954756060953,
+          "p10_survival": -1.4556450955124602,
+          "p90_survival": 2.4596242375103814,
+          "histogram": {
+            "bin_edges": [
+              -1.5,
+              -1.42,
+              -1.34,
+              -1.26,
+              -1.18,
+              -1.1,
+              -1.02,
+              -0.94,
+              -0.86,
+              -0.78,
+              -0.7,
+              -0.62,
+              -0.54,
+              -0.45999999999999996,
+              -0.3799999999999999,
+              -0.30000000000000004,
+              -0.21999999999999997,
+              -0.1399999999999999,
+              -0.06000000000000005,
+              0.020000000000000018,
+              0.10000000000000009,
+              0.17999999999999994,
+              0.26,
+              0.3400000000000001,
+              0.41999999999999993,
+              0.5,
+              0.5800000000000001,
+              0.6600000000000001,
+              0.7400000000000002,
+              0.8199999999999998,
+              0.8999999999999999,
+              0.98,
+              1.06,
+              1.1400000000000001,
+              1.2200000000000002,
+              1.3000000000000003,
+              1.38,
+              1.46,
+              1.54,
+              1.62,
+              1.7000000000000002,
+              1.7800000000000002,
+              1.8599999999999999,
+              1.94,
+              2.02,
+              2.1,
+              2.18,
+              2.2600000000000002,
+              2.34,
+              2.42,
+              2.5
+            ],
+            "counts": [
+              24032990,
+              711335,
+              734233,
+              755854,
+              773102,
+              802606,
+              837331,
+              862459,
+              886475,
+              915594,
+              948581,
+              973431,
+              999983,
+              1029937,
+              1058256,
+              1084556,
+              1113489,
+              1142107,
+              1169851,
+              1198005,
+              1228245,
+              1257620,
+              1285402,
+              1312844,
+              1316783,
+              1360877,
+              1362861,
+              1376968,
+              1374421,
+              1362064,
+              1329535,
+              35341021,
+              1221530,
+              1151962,
+              1094184,
+              1031824,
+              993626,
+              956570,
+              914403,
+              871017,
+              838612,
+              804889,
+              776830,
+              760195,
+              739134,
+              711522,
+              700423,
+              681403,
+              659175,
+              26401507
+            ]
+          },
+          "per_layer": [
+            {
+              "layer": -1,
+              "group": "lm_head",
+              "n": 34052584,
+              "n_collapsed": 0,
+              "collapse_rate": 0.0
+            },
+            {
+              "layer": 0,
+              "group": "down_proj",
+              "n": 1604217,
+              "n_collapsed": 43648,
+              "collapse_rate": 0.027208289152901383
+            },
+            {
+              "layer": 0,
+              "group": "gate_proj",
+              "n": 1418910,
+              "n_collapsed": 45274,
+              "collapse_rate": 0.03190759103819129
+            },
+            {
+              "layer": 0,
+              "group": "k_proj",
+              "n": 50260,
+              "n_collapsed": 1279,
+              "collapse_rate": 0.02544767210505372
+            },
+            {
+              "layer": 0,
+              "group": "o_proj",
+              "n": 638921,
+              "n_collapsed": 20799,
+              "collapse_rate": 0.03255332036355042
+            },
+            {
+              "layer": 0,
+              "group": "q_proj",
+              "n": 245351,
+              "n_collapsed": 6475,
+              "collapse_rate": 0.02639076262171338
+            },
+            {
+              "layer": 0,
+              "group": "up_proj",
+              "n": 1573334,
+              "n_collapsed": 40545,
+              "collapse_rate": 0.025770116199103306
+            },
+            {
+              "layer": 0,
+              "group": "v_proj",
+              "n": 199955,
+              "n_collapsed": 5129,
+              "collapse_rate": 0.025650771423570303
+            },
+            {
+              "layer": 1,
+              "group": "down_proj",
+              "n": 1613996,
+              "n_collapsed": 42653,
+              "collapse_rate": 0.02642695520930659
+            },
+            {
+              "layer": 1,
+              "group": "gate_proj",
+              "n": 1372859,
+              "n_collapsed": 36126,
+              "collapse_rate": 0.026314428502854263
+            },
+            {
+              "layer": 1,
+              "group": "k_proj",
+              "n": 51395,
+              "n_collapsed": 1318,
+              "collapse_rate": 0.02564451794921685
+            },
+            {
+              "layer": 1,
+              "group": "o_proj",
+              "n": 567092,
+              "n_collapsed": 17852,
+              "collapse_rate": 0.03147990096844956
+            },
+            {
+              "layer": 1,
+              "group": "q_proj",
+              "n": 311026,
+              "n_collapsed": 8289,
+              "collapse_rate": 0.026650505102467317
+            },
+            {
+              "layer": 1,
+              "group": "up_proj",
+              "n": 1580198,
+              "n_collapsed": 41689,
+              "collapse_rate": 0.026382136922081915
+            },
+            {
+              "layer": 1,
+              "group": "v_proj",
+              "n": 176823,
+              "n_collapsed": 5343,
+              "collapse_rate": 0.030216657335301402
+            },
+            {
+              "layer": 2,
+              "group": "down_proj",
+              "n": 1654531,
+              "n_collapsed": 51248,
+              "collapse_rate": 0.03097433653403895
+            },
+            {
+              "layer": 2,
+              "group": "gate_proj",
+              "n": 1333166,
+              "n_collapsed": 38742,
+              "collapse_rate": 0.029060147048454582
+            },
+            {
+              "layer": 2,
+              "group": "k_proj",
+              "n": 51216,
+              "n_collapsed": 1342,
+              "collapse_rate": 0.02620274914089347
+            },
+            {
+              "layer": 2,
+              "group": "o_proj",
+              "n": 526220,
+              "n_collapsed": 16014,
+              "collapse_rate": 0.03043213864923416
+            },
+            {
+              "layer": 2,
+              "group": "q_proj",
+              "n": 325226,
+              "n_collapsed": 9857,
+              "collapse_rate": 0.030308154944561627
+            },
+            {
+              "layer": 2,
+              "group": "up_proj",
+              "n": 1623449,
+              "n_collapsed": 43851,
+              "collapse_rate": 0.027011011741052537
+            },
+            {
+              "layer": 2,
+              "group": "v_proj",
+              "n": 140819,
+              "n_collapsed": 5252,
+              "collapse_rate": 0.03729610350875947
+            },
+            {
+              "layer": 3,
+              "group": "down_proj",
+              "n": 1773899,
+              "n_collapsed": 57226,
+              "collapse_rate": 0.032260010293708945
+            },
+            {
+              "layer": 3,
+              "group": "gate_proj",
+              "n": 1317572,
+              "n_collapsed": 36186,
+              "collapse_rate": 0.027464153761616063
+            },
+            {
+              "layer": 3,
+              "group": "k_proj",
+              "n": 51118,
+              "n_collapsed": 1363,
+              "collapse_rate": 0.02666379748816464
+            },
+            {
+              "layer": 3,
+              "group": "o_proj",
+              "n": 474850,
+              "n_collapsed": 13513,
+              "collapse_rate": 0.02845740760240076
+            },
+            {
+              "layer": 3,
+              "group": "q_proj",
+              "n": 297529,
+              "n_collapsed": 8337,
+              "collapse_rate": 0.0280207979726346
+            },
+            {
+              "layer": 3,
+              "group": "up_proj",
+              "n": 1704918,
+              "n_collapsed": 45664,
+              "collapse_rate": 0.026783692822763324
+            },
+            {
+              "layer": 3,
+              "group": "v_proj",
+              "n": 122787,
+              "n_collapsed": 4004,
+              "collapse_rate": 0.0326093153183969
+            },
+            {
+              "layer": 4,
+              "group": "down_proj",
+              "n": 1797357,
+              "n_collapsed": 56905,
+              "collapse_rate": 0.03166037687560123
+            },
+            {
+              "layer": 4,
+              "group": "gate_proj",
+              "n": 1303926,
+              "n_collapsed": 40430,
+              "collapse_rate": 0.031006360790412954
+            },
+            {
+              "layer": 4,
+              "group": "k_proj",
+              "n": 49499,
+              "n_collapsed": 1254,
+              "collapse_rate": 0.025333845128184408
+            },
+            {
+              "layer": 4,
+              "group": "o_proj",
+              "n": 477087,
+              "n_collapsed": 13885,
+              "collapse_rate": 0.029103706451863078
+            },
+            {
+              "layer": 4,
+              "group": "q_proj",
+              "n": 314170,
+              "n_collapsed": 9094,
+              "collapse_rate": 0.02894611197759175
+            },
+            {
+              "layer": 4,
+              "group": "up_proj",
+              "n": 1739087,
+              "n_collapsed": 52443,
+              "collapse_rate": 0.030155478133066373
+            },
+            {
+              "layer": 4,
+              "group": "v_proj",
+              "n": 127654,
+              "n_collapsed": 4364,
+              "collapse_rate": 0.03418615946229652
+            },
+            {
+              "layer": 5,
+              "group": "down_proj",
+              "n": 1815557,
+              "n_collapsed": 58483,
+              "collapse_rate": 0.032212153074786413
+            },
+            {
+              "layer": 5,
+              "group": "gate_proj",
+              "n": 1388954,
+              "n_collapsed": 39556,
+              "collapse_rate": 0.028478984905187646
+            },
+            {
+              "layer": 5,
+              "group": "k_proj",
+              "n": 56321,
+              "n_collapsed": 1515,
+              "collapse_rate": 0.02689938033770707
+            },
+            {
+              "layer": 5,
+              "group": "o_proj",
+              "n": 533856,
+              "n_collapsed": 16553,
+              "collapse_rate": 0.03100648864113169
+            },
+            {
+              "layer": 5,
+              "group": "q_proj",
+              "n": 356655,
+              "n_collapsed": 10866,
+              "collapse_rate": 0.030466417125793833
+            },
+            {
+              "layer": 5,
+              "group": "up_proj",
+              "n": 1747508,
+              "n_collapsed": 47299,
+              "collapse_rate": 0.027066542756885806
+            },
+            {
+              "layer": 5,
+              "group": "v_proj",
+              "n": 152804,
+              "n_collapsed": 5564,
+              "collapse_rate": 0.036412659354467164
+            },
+            {
+              "layer": 6,
+              "group": "down_proj",
+              "n": 1874276,
+              "n_collapsed": 61593,
+              "collapse_rate": 0.03286228922527952
+            },
+            {
+              "layer": 6,
+              "group": "gate_proj",
+              "n": 1446923,
+              "n_collapsed": 42879,
+              "collapse_rate": 0.029634610825869795
+            },
+            {
+              "layer": 6,
+              "group": "k_proj",
+              "n": 55796,
+              "n_collapsed": 1462,
+              "collapse_rate": 0.026202595168112408
+            },
+            {
+              "layer": 6,
+              "group": "o_proj",
+              "n": 506707,
+              "n_collapsed": 15568,
+              "collapse_rate": 0.03072387000771649
+            },
+            {
+              "layer": 6,
+              "group": "q_proj",
+              "n": 339579,
+              "n_collapsed": 9629,
+              "collapse_rate": 0.02835569926291084
+            },
+            {
+              "layer": 6,
+              "group": "up_proj",
+              "n": 1771990,
+              "n_collapsed": 48702,
+              "collapse_rate": 0.027484353749174656
+            },
+            {
+              "layer": 6,
+              "group": "v_proj",
+              "n": 135850,
+              "n_collapsed": 4794,
+              "collapse_rate": 0.03528892160471108
+            },
+            {
+              "layer": 7,
+              "group": "down_proj",
+              "n": 1894204,
+              "n_collapsed": 58964,
+              "collapse_rate": 0.031128642955035465
+            },
+            {
+              "layer": 7,
+              "group": "gate_proj",
+              "n": 1585047,
+              "n_collapsed": 47443,
+              "collapse_rate": 0.029931604551789316
+            },
+            {
+              "layer": 7,
+              "group": "k_proj",
+              "n": 54806,
+              "n_collapsed": 1482,
+              "collapse_rate": 0.027040834945079004
+            },
+            {
+              "layer": 7,
+              "group": "o_proj",
+              "n": 509205,
+              "n_collapsed": 15282,
+              "collapse_rate": 0.030011488496774385
+            },
+            {
+              "layer": 7,
+              "group": "q_proj",
+              "n": 349478,
+              "n_collapsed": 10405,
+              "collapse_rate": 0.029772975695179667
+            },
+            {
+              "layer": 7,
+              "group": "up_proj",
+              "n": 1805976,
+              "n_collapsed": 49843,
+              "collapse_rate": 0.02759892711752537
+            },
+            {
+              "layer": 7,
+              "group": "v_proj",
+              "n": 128876,
+              "n_collapsed": 4548,
+              "collapse_rate": 0.03528973587013874
+            },
+            {
+              "layer": 8,
+              "group": "down_proj",
+              "n": 1904481,
+              "n_collapsed": 68405,
+              "collapse_rate": 0.03591792199554629
+            },
+            {
+              "layer": 8,
+              "group": "gate_proj",
+              "n": 1616352,
+              "n_collapsed": 46958,
+              "collapse_rate": 0.029051840193225237
+            },
+            {
+              "layer": 8,
+              "group": "k_proj",
+              "n": 56855,
+              "n_collapsed": 1453,
+              "collapse_rate": 0.025556239556767214
+            },
+            {
+              "layer": 8,
+              "group": "o_proj",
+              "n": 529348,
+              "n_collapsed": 16062,
+              "collapse_rate": 0.030342987977663088
+            },
+            {
+              "layer": 8,
+              "group": "q_proj",
+              "n": 370872,
+              "n_collapsed": 10846,
+              "collapse_rate": 0.029244591125779245
+            },
+            {
+              "layer": 8,
+              "group": "up_proj",
+              "n": 1844389,
+              "n_collapsed": 48640,
+              "collapse_rate": 0.026371877082329163
+            },
+            {
+              "layer": 8,
+              "group": "v_proj",
+              "n": 143344,
+              "n_collapsed": 5285,
+              "collapse_rate": 0.03686934925772966
+            },
+            {
+              "layer": 9,
+              "group": "down_proj",
+              "n": 1908934,
+              "n_collapsed": 59585,
+              "collapse_rate": 0.031213755949655673
+            },
+            {
+              "layer": 9,
+              "group": "gate_proj",
+              "n": 1613883,
+              "n_collapsed": 47178,
+              "collapse_rate": 0.02923260236336835
+            },
+            {
+              "layer": 9,
+              "group": "k_proj",
+              "n": 55379,
+              "n_collapsed": 1482,
+              "collapse_rate": 0.026761046606114232
+            },
+            {
+              "layer": 9,
+              "group": "o_proj",
+              "n": 502387,
+              "n_collapsed": 14407,
+              "collapse_rate": 0.028677095545864045
+            },
+            {
+              "layer": 9,
+              "group": "q_proj",
+              "n": 350469,
+              "n_collapsed": 10475,
+              "collapse_rate": 0.02988852081068511
+            },
+            {
+              "layer": 9,
+              "group": "up_proj",
+              "n": 1852550,
+              "n_collapsed": 49934,
+              "collapse_rate": 0.026954198267253246
+            },
+            {
+              "layer": 9,
+              "group": "v_proj",
+              "n": 131874,
+              "n_collapsed": 4181,
+              "collapse_rate": 0.03170450581615785
+            },
+            {
+              "layer": 10,
+              "group": "down_proj",
+              "n": 1907136,
+              "n_collapsed": 60971,
+              "collapse_rate": 0.03196992768213698
+            },
+            {
+              "layer": 10,
+              "group": "gate_proj",
+              "n": 1648397,
+              "n_collapsed": 48100,
+              "collapse_rate": 0.029179863831346454
+            },
+            {
+              "layer": 10,
+              "group": "k_proj",
+              "n": 62603,
+              "n_collapsed": 1696,
+              "collapse_rate": 0.027091353449515198
+            },
+            {
+              "layer": 10,
+              "group": "o_proj",
+              "n": 564061,
+              "n_collapsed": 17029,
+              "collapse_rate": 0.030189997181155937
+            },
+            {
+              "layer": 10,
+              "group": "q_proj",
+              "n": 400154,
+              "n_collapsed": 12350,
+              "collapse_rate": 0.03086311769968562
+            },
+            {
+              "layer": 10,
+              "group": "up_proj",
+              "n": 1860279,
+              "n_collapsed": 50655,
+              "collapse_rate": 0.02722978649976697
+            },
+            {
+              "layer": 10,
+              "group": "v_proj",
+              "n": 158680,
+              "n_collapsed": 5399,
+              "collapse_rate": 0.034024451726745654
+            },
+            {
+              "layer": 11,
+              "group": "down_proj",
+              "n": 1902722,
+              "n_collapsed": 68241,
+              "collapse_rate": 0.035864934551658095
+            },
+            {
+              "layer": 11,
+              "group": "gate_proj",
+              "n": 1630510,
+              "n_collapsed": 47933,
+              "collapse_rate": 0.029397550459672128
+            },
+            {
+              "layer": 11,
+              "group": "k_proj",
+              "n": 57185,
+              "n_collapsed": 1509,
+              "collapse_rate": 0.02638803882136924
+            },
+            {
+              "layer": 11,
+              "group": "o_proj",
+              "n": 545129,
+              "n_collapsed": 16167,
+              "collapse_rate": 0.029657200405775512
+            },
+            {
+              "layer": 11,
+              "group": "q_proj",
+              "n": 335235,
+              "n_collapsed": 9258,
+              "collapse_rate": 0.02761644816322878
+            },
+            {
+              "layer": 11,
+              "group": "up_proj",
+              "n": 1848179,
+              "n_collapsed": 49914,
+              "collapse_rate": 0.027007124309928854
+            },
+            {
+              "layer": 11,
+              "group": "v_proj",
+              "n": 145861,
+              "n_collapsed": 5008,
+              "collapse_rate": 0.034334057767326426
+            },
+            {
+              "layer": 12,
+              "group": "down_proj",
+              "n": 1896790,
+              "n_collapsed": 68340,
+              "collapse_rate": 0.03602929159263809
+            },
+            {
+              "layer": 12,
+              "group": "gate_proj",
+              "n": 1651633,
+              "n_collapsed": 47675,
+              "collapse_rate": 0.028865371423312563
+            },
+            {
+              "layer": 12,
+              "group": "k_proj",
+              "n": 66587,
+              "n_collapsed": 1673,
+              "collapse_rate": 0.025125024404162973
+            },
+            {
+              "layer": 12,
+              "group": "o_proj",
+              "n": 555141,
+              "n_collapsed": 16250,
+              "collapse_rate": 0.02927184264898467
+            },
+            {
+              "layer": 12,
+              "group": "q_proj",
+              "n": 378766,
+              "n_collapsed": 10904,
+              "collapse_rate": 0.028788222807749377
+            },
+            {
+              "layer": 12,
+              "group": "up_proj",
+              "n": 1835087,
+              "n_collapsed": 49655,
+              "collapse_rate": 0.02705866261381613
+            },
+            {
+              "layer": 12,
+              "group": "v_proj",
+              "n": 146145,
+              "n_collapsed": 4375,
+              "collapse_rate": 0.029936022443463682
+            },
+            {
+              "layer": 13,
+              "group": "down_proj",
+              "n": 1899711,
+              "n_collapsed": 67464,
+              "collapse_rate": 0.0355127701002942
+            },
+            {
+              "layer": 13,
+              "group": "gate_proj",
+              "n": 1720856,
+              "n_collapsed": 50279,
+              "collapse_rate": 0.029217435973724705
+            },
+            {
+              "layer": 13,
+              "group": "k_proj",
+              "n": 65672,
+              "n_collapsed": 1728,
+              "collapse_rate": 0.026312583749543185
+            },
+            {
+              "layer": 13,
+              "group": "o_proj",
+              "n": 483712,
+              "n_collapsed": 13770,
+              "collapse_rate": 0.028467352474199525
+            },
+            {
+              "layer": 13,
+              "group": "q_proj",
+              "n": 358709,
+              "n_collapsed": 10709,
+              "collapse_rate": 0.02985428299819631
+            },
+            {
+              "layer": 13,
+              "group": "up_proj",
+              "n": 1838109,
+              "n_collapsed": 49419,
+              "collapse_rate": 0.026885783160846284
+            },
+            {
+              "layer": 13,
+              "group": "v_proj",
+              "n": 130142,
+              "n_collapsed": 3854,
+              "collapse_rate": 0.02961380645756174
+            },
+            {
+              "layer": 14,
+              "group": "down_proj",
+              "n": 1963210,
+              "n_collapsed": 69824,
+              "collapse_rate": 0.035566241003254874
+            },
+            {
+              "layer": 14,
+              "group": "gate_proj",
+              "n": 1722607,
+              "n_collapsed": 49354,
+              "collapse_rate": 0.028650760155972895
+            },
+            {
+              "layer": 14,
+              "group": "k_proj",
+              "n": 83532,
+              "n_collapsed": 2201,
+              "collapse_rate": 0.026349183546425323
+            },
+            {
+              "layer": 14,
+              "group": "o_proj",
+              "n": 421106,
+              "n_collapsed": 11541,
+              "collapse_rate": 0.027406401238643
+            },
+            {
+              "layer": 14,
+              "group": "q_proj",
+              "n": 396451,
+              "n_collapsed": 11928,
+              "collapse_rate": 0.03008694643221987
+            },
+            {
+              "layer": 14,
+              "group": "up_proj",
+              "n": 1878513,
+              "n_collapsed": 51929,
+              "collapse_rate": 0.027643673480034475
+            },
+            {
+              "layer": 14,
+              "group": "v_proj",
+              "n": 98501,
+              "n_collapsed": 2526,
+              "collapse_rate": 0.025644409701424353
+            },
+            {
+              "layer": 15,
+              "group": "down_proj",
+              "n": 1948321,
+              "n_collapsed": 62675,
+              "collapse_rate": 0.03216872373700227
+            },
+            {
+              "layer": 15,
+              "group": "gate_proj",
+              "n": 1686664,
+              "n_collapsed": 45265,
+              "collapse_rate": 0.026836998951777
+            },
+            {
+              "layer": 15,
+              "group": "k_proj",
+              "n": 83255,
+              "n_collapsed": 2212,
+              "collapse_rate": 0.026568974836346165
+            },
+            {
+              "layer": 15,
+              "group": "o_proj",
+              "n": 484519,
+              "n_collapsed": 14276,
+              "collapse_rate": 0.029464272814894773
+            },
+            {
+              "layer": 15,
+              "group": "q_proj",
+              "n": 456937,
+              "n_collapsed": 13520,
+              "collapse_rate": 0.029588323992147714
+            },
+            {
+              "layer": 15,
+              "group": "up_proj",
+              "n": 1765615,
+              "n_collapsed": 46592,
+              "collapse_rate": 0.02638853883774209
+            },
+            {
+              "layer": 15,
+              "group": "v_proj",
+              "n": 110714,
+              "n_collapsed": 2819,
+              "collapse_rate": 0.025462001192261143
+            }
+          ]
+        }
+      }
+    },
+    "gptq": {
+      "overall": {
+        "n_weights": 54120817,
+        "n_collapsed": 0,
+        "collapse_rate": 0.0,
+        "mean_survival": 0.9999999815228214,
+        "median_survival": 1.019999995565476,
+        "p10_survival": 0.9879999861051576,
+        "p90_survival": 1.052000005025794,
+        "histogram": {
+          "bin_edges": [
+            -1.5,
+            -1.42,
+            -1.34,
+            -1.26,
+            -1.18,
+            -1.1,
+            -1.02,
+            -0.94,
+            -0.86,
+            -0.78,
+            -0.7,
+            -0.62,
+            -0.54,
+            -0.45999999999999996,
+            -0.3799999999999999,
+            -0.30000000000000004,
+            -0.21999999999999997,
+            -0.1399999999999999,
+            -0.06000000000000005,
+            0.020000000000000018,
+            0.10000000000000009,
+            0.17999999999999994,
+            0.26,
+            0.3400000000000001,
+            0.41999999999999993,
+            0.5,
+            0.5800000000000001,
+            0.6600000000000001,
+            0.7400000000000002,
+            0.8199999999999998,
+            0.8999999999999999,
+            0.98,
+            1.06,
+            1.1400000000000001,
+            1.2200000000000002,
+            1.3000000000000003,
+            1.38,
+            1.46,
+            1.54,
+            1.62,
+            1.7000000000000002,
+            1.7800000000000002,
+            1.8599999999999999,
+            1.94,
+            2.02,
+            2.1,
+            2.18,
+            2.2600000000000002,
+            2.34,
+            2.42,
+            2.5
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            9,
+            54120801,
+            3,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "per_layer": [
+          {
+            "layer": -1,
+            "group": "lm_head",
+            "n": 54120817,
+            "n_collapsed": 0,
+            "collapse_rate": 0.0
+          }
+        ]
+      },
+      "top_k": {
+        "1%": {
+          "n_weights": 13640305,
+          "n_collapsed": 0,
+          "collapse_rate": 0.0,
+          "mean_survival": 1.0,
+          "median_survival": 1.02,
+          "p10_survival": 0.988,
+          "p90_survival": 1.052,
+          "histogram": {
+            "bin_edges": [
+              -1.5,
+              -1.42,
+              -1.34,
+              -1.26,
+              -1.18,
+              -1.1,
+              -1.02,
+              -0.94,
+              -0.86,
+              -0.78,
+              -0.7,
+              -0.62,
+              -0.54,
+              -0.45999999999999996,
+              -0.3799999999999999,
+              -0.30000000000000004,
+              -0.21999999999999997,
+              -0.1399999999999999,
+              -0.06000000000000005,
+              0.020000000000000018,
+              0.10000000000000009,
+              0.17999999999999994,
+              0.26,
+              0.3400000000000001,
+              0.41999999999999993,
+              0.5,
+              0.5800000000000001,
+              0.6600000000000001,
+              0.7400000000000002,
+              0.8199999999999998,
+              0.8999999999999999,
+              0.98,
+              1.06,
+              1.1400000000000001,
+              1.2200000000000002,
+              1.3000000000000003,
+              1.38,
+              1.46,
+              1.54,
+              1.62,
+              1.7000000000000002,
+              1.7800000000000002,
+              1.8599999999999999,
+              1.94,
+              2.02,
+              2.1,
+              2.18,
+              2.2600000000000002,
+              2.34,
+              2.42,
+              2.5
+            ],
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              13640305,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "per_layer": [
+            {
+              "layer": -1,
+              "group": "lm_head",
+              "n": 13640305,
+              "n_collapsed": 0,
+              "collapse_rate": 0.0
+            }
+          ]
+        },
+        "5%": {
+          "n_weights": 23363552,
+          "n_collapsed": 0,
+          "collapse_rate": 0.0,
+          "mean_survival": 1.0,
+          "median_survival": 1.02,
+          "p10_survival": 0.988,
+          "p90_survival": 1.052,
+          "histogram": {
+            "bin_edges": [
+              -1.5,
+              -1.42,
+              -1.34,
+              -1.26,
+              -1.18,
+              -1.1,
+              -1.02,
+              -0.94,
+              -0.86,
+              -0.78,
+              -0.7,
+              -0.62,
+              -0.54,
+              -0.45999999999999996,
+              -0.3799999999999999,
+              -0.30000000000000004,
+              -0.21999999999999997,
+              -0.1399999999999999,
+              -0.06000000000000005,
+              0.020000000000000018,
+              0.10000000000000009,
+              0.17999999999999994,
+              0.26,
+              0.3400000000000001,
+              0.41999999999999993,
+              0.5,
+              0.5800000000000001,
+              0.6600000000000001,
+              0.7400000000000002,
+              0.8199999999999998,
+              0.8999999999999999,
+              0.98,
+              1.06,
+              1.1400000000000001,
+              1.2200000000000002,
+              1.3000000000000003,
+              1.38,
+              1.46,
+              1.54,
+              1.62,
+              1.7000000000000002,
+              1.7800000000000002,
+              1.8599999999999999,
+              1.94,
+              2.02,
+              2.1,
+              2.18,
+              2.2600000000000002,
+              2.34,
+              2.42,
+              2.5
+            ],
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              23363552,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "per_layer": [
+            {
+              "layer": -1,
+              "group": "lm_head",
+              "n": 23363552,
+              "n_collapsed": 0,
+              "collapse_rate": 0.0
+            }
+          ]
+        },
+        "10%": {
+          "n_weights": 34052584,
+          "n_collapsed": 0,
+          "collapse_rate": 0.0,
+          "mean_survival": 1.0,
+          "median_survival": 1.02,
+          "p10_survival": 0.988,
+          "p90_survival": 1.052,
+          "histogram": {
+            "bin_edges": [
+              -1.5,
+              -1.42,
+              -1.34,
+              -1.26,
+              -1.18,
+              -1.1,
+              -1.02,
+              -0.94,
+              -0.86,
+              -0.78,
+              -0.7,
+              -0.62,
+              -0.54,
+              -0.45999999999999996,
+              -0.3799999999999999,
+              -0.30000000000000004,
+              -0.21999999999999997,
+              -0.1399999999999999,
+              -0.06000000000000005,
+              0.020000000000000018,
+              0.10000000000000009,
+              0.17999999999999994,
+              0.26,
+              0.3400000000000001,
+              0.41999999999999993,
+              0.5,
+              0.5800000000000001,
+              0.6600000000000001,
+              0.7400000000000002,
+              0.8199999999999998,
+              0.8999999999999999,
+              0.98,
+              1.06,
+              1.1400000000000001,
+              1.2200000000000002,
+              1.3000000000000003,
+              1.38,
+              1.46,
+              1.54,
+              1.62,
+              1.7000000000000002,
+              1.7800000000000002,
+              1.8599999999999999,
+              1.94,
+              2.02,
+              2.1,
+              2.18,
+              2.2600000000000002,
+              2.34,
+              2.42,
+              2.5
+            ],
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              34052584,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "per_layer": [
+            {
+              "layer": -1,
+              "group": "lm_head",
+              "n": 34052584,
+              "n_collapsed": 0,
+              "collapse_rate": 0.0
+            }
+          ]
+        }
+      }
+    }
+  }
+}

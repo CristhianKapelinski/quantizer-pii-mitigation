@@ -95,8 +95,13 @@ say() { echo "[$(ts)] [$RUN_TAG] $*"; }
 say "config: MODEL_ID=$MODEL_ID SEED=$SEED REGIME=$REGIME MAX_SEQ=$MAX_SEQ BS=$BS ACCUM=$ACCUM EPOCHS=$EPOCHS LR=$LR OPTIM=$OPTIM LORA_R=$LORA_R SKIP_GGUF=${QQUILT_SKIP_GGUF:-0}"
 
 if [ -f "$EXTRACT" ] && [ -f "$W1/metrics.json" ]; then
-    say "already complete (extraction.jsonl + metrics.json present) -> nothing to do"
-    exit 0
+    rows=$(wc -l < "$EXTRACT" 2>/dev/null || echo 0)
+    if [ "$rows" -ge 3000 ]; then
+        say "already complete (extraction.jsonl has $rows rows + metrics.json present) -> nothing to do"
+        exit 0
+    fi
+    say "stale partial detected (extraction.jsonl has $rows rows, < 3000); re-running. clearing $EXTRACT, $PARTIAL.gguf, $W1/metrics.json"
+    rm -f "$EXTRACT" "$W1/extraction.gguf.jsonl" "$W1/metrics.json"
 fi
 
 # ---- FINALIZE mode: GGUF half of a run whose bf16+awq half came from a
@@ -120,7 +125,7 @@ if [ -n "${QQUILT_FINALIZE_GGUF:-}" ]; then
             --version "q4_k_m:gguf:$CKPT/quantized/model-q4_k_m.gguf" \
             --llama-cli "$LLAMA_CLI" --out "$W1/extraction.gguf.jsonl" \
             --max-new-tokens 60 --seed "$SEED" --n-stochastic 5 \
-            --top-p 0.9 --temperature 0.8 --threads 8 || exit 26
+            --top-p 0.9 --temperature 0.8 --threads 8 --device "${QQUILT_DEVICE:-cuda}" || exit 26
     fi
     cat "$PARTIAL" "$W1/extraction.gguf.jsonl" > "$EXTRACT"
     say "FINALIZE: merged partial + gguf rows -> $EXTRACT ($(wc -l < "$EXTRACT") rows)"
@@ -212,7 +217,7 @@ if [ "$GGUF_OK" = "1" ]; then
             --version "awq_4bit:awq:$AWQ_DIR" \
             --llama-cli "$LLAMA_CLI" --out "$EXTRACT" \
             --max-new-tokens 60 --seed "$SEED" --n-stochastic 5 \
-            --top-p 0.9 --temperature 0.8 --threads 8 || exit 16
+            --top-p 0.9 --temperature 0.8 --threads 8 --device "${QQUILT_DEVICE:-cuda}" || exit 16
     fi
 else
     # GGUF skipped: partial extraction (bf16 + awq only), no metrics here.

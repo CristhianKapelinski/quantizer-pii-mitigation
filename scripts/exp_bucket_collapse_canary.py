@@ -60,13 +60,17 @@ def layer_of(name: str) -> int:
 
 
 def load_hf(model_id_or_dir: str) -> dict:
-    """Load a vanilla HF model and return {name: fp32 tensor}."""
+    """Load a vanilla HF model and return {name: bf16 tensor on CPU}.
+
+    bf16 (2 bytes/weight) halves memory vs fp32; cast to fp32 happens
+    per-parameter inside the analysis loop so peak RAM stays bounded.
+    """
     import torch
     from transformers import AutoModelForCausalLM
     m = AutoModelForCausalLM.from_pretrained(
-        model_id_or_dir, torch_dtype=torch.float32, low_cpu_mem_usage=True,
+        model_id_or_dir, torch_dtype=torch.bfloat16, low_cpu_mem_usage=True,
     )
-    out = {k: v.detach().cpu().float() for k, v in m.named_parameters()}
+    out = {k: v.detach().cpu().to(torch.bfloat16) for k, v in m.named_parameters()}
     del m
     gc.collect()
     return out
@@ -76,7 +80,8 @@ def load_awq(path: str) -> dict:
     from awq import AutoAWQForCausalLM
     m = AutoAWQForCausalLM.from_quantized(path, fuse_layers=False, safetensors=True)
     inner = m.model if hasattr(m, "model") else m
-    out = {k: v.detach().cpu().float() for k, v in inner.named_parameters()}
+    import torch
+    out = {k: v.detach().cpu().to(torch.bfloat16) for k, v in inner.named_parameters()}
     del m, inner
     gc.collect()
     return out
@@ -94,21 +99,23 @@ def load_gptq(path: str) -> dict:
         from transformers import AutoModelForCausalLM
         import torch
         m = AutoModelForCausalLM.from_pretrained(
-            path, device_map={"": "cpu"}, torch_dtype=torch.float32,
+            path, device_map={"": "cpu"}, torch_dtype=torch.bfloat16,
         )
         inner = m
-    out = {k: v.detach().cpu().float() for k, v in inner.named_parameters()}
+    import torch
+    out = {k: v.detach().cpu().to(torch.bfloat16) for k, v in inner.named_parameters()}
     del m, inner
     gc.collect()
     return out
 
 
 def analyze(*, name: str, base, ft, quant, top_k_thresholds: dict) -> dict:
-    """Compare quant vs base/ft per weight; aggregate per-tensor and per-layer.
+    """Compare quant vs base/ft per weight. Streaming -- no full accumulator.
 
-    ``top_k_thresholds`` maps each top-K percentile (float) to its global
-    absolute-delta cutoff (computed in main from the union of all weight
-    matrices). All percentiles are evaluated in one pass over the tensors.
+    For peak-RAM safety on a 30 GB box we never keep a numpy array of all
+    survival values. Instead we maintain running sums and a fixed-size 50-bin
+    histogram per top-K subset; the mean is exact; the median/p10/p90 are
+    interpolated from the histogram (1% precision, plenty for "collapsed?").
     """
     import numpy as np
     import torch
@@ -117,68 +124,94 @@ def analyze(*, name: str, base, ft, quant, top_k_thresholds: dict) -> dict:
                    if k in ft and k in quant
                    and base[k].shape == ft[k].shape == quant[k].shape
                    and base[k].ndim >= 2]
-    by_pct = {pct: {"survival": [], "per_layer": defaultdict(lambda: [0, 0])}
-              for pct in top_k_thresholds}
-    survival_all = []
-    n_collapsed_all = 0; n_total_all = 0
+    H_LO, H_HI, H_BINS = -1.5, 2.5, 50
+    edges = np.linspace(H_LO, H_HI, H_BINS + 1)
+    def fresh_acc():
+        return {"hist": np.zeros(H_BINS, dtype=np.int64),
+                "n": 0, "n_collapsed": 0,
+                "sum_x": 0.0, "sum_xx": 0.0,
+                "per_layer": defaultdict(lambda: [0, 0])}
+    by_pct = {pct: fresh_acc() for pct in top_k_thresholds}
+    overall = fresh_acc()
+
+    def accumulate(acc, sur_np):
+        if sur_np.size == 0:
+            return
+        acc["n"] += int(sur_np.size)
+        acc["n_collapsed"] += int((np.abs(sur_np) < COLLAPSE_THR).sum())
+        acc["sum_x"] += float(sur_np.sum())
+        acc["sum_xx"] += float(np.dot(sur_np, sur_np))
+        clipped = np.clip(sur_np, H_LO + 1e-9, H_HI - 1e-9)
+        h, _ = np.histogram(clipped, bins=edges)
+        acc["hist"] += h
 
     for k in weight_keys:
-        d_full = (ft[k] - base[k]).flatten()
-        qmb_full = (quant[k] - base[k]).flatten()
+        # Per-tensor cast to fp32 and immediately discard once we have the survival values.
+        b = base[k].float(); f = ft[k].float(); q = quant[k].float()
+        d_full = (f - b).flatten()
+        qmb_full = (q - b).flatten()
+        del b, f, q
         valid = d_full.abs() > EPS
         if not valid.any():
+            del d_full, qmb_full, valid
             continue
         d_v = d_full[valid]; qmb_v = qmb_full[valid]
-        survival_v = qmb_v / d_v
-        survival_all.append(survival_v.cpu().numpy())
-        n_collapsed_all += int((survival_v.abs() < COLLAPSE_THR).sum())
-        n_total_all += int(survival_v.numel())
+        survival_v = (qmb_v / d_v).cpu().numpy()
+        accumulate(overall, survival_v)
 
         layer = layer_of(k); grp = group_of(k); lk = (layer, grp)
         d_abs_full = d_full.abs()
         for pct, thr in top_k_thresholds.items():
-            topk = (d_abs_full >= thr) & valid
-            if not topk.any():
+            topk_mask = (d_abs_full >= thr) & valid
+            if not topk_mask.any():
                 continue
-            sur_topk = (qmb_full[topk] / d_full[topk]).cpu().numpy()
-            by_pct[pct]["survival"].append(sur_topk)
+            sur_topk = (qmb_full[topk_mask] / d_full[topk_mask]).cpu().numpy()
+            accumulate(by_pct[pct], sur_topk)
             by_pct[pct]["per_layer"][lk][0] += int(sur_topk.size)
             by_pct[pct]["per_layer"][lk][1] += int((np.abs(sur_topk) < COLLAPSE_THR).sum())
+            del sur_topk
+        del d_full, qmb_full, d_v, qmb_v, survival_v, valid, d_abs_full
+        gc.collect()
 
-    out = {"overall": {}, "top_k": {}, "name": name}
-    sur_all = np.concatenate(survival_all) if survival_all else np.array([])
-    out["overall"] = {
-        "n_weights": n_total_all,
-        "n_collapsed": n_collapsed_all,
-        "collapse_rate": n_collapsed_all / max(1, n_total_all),
-        "mean_survival":   float(sur_all.mean())          if sur_all.size else None,
-        "median_survival": float(np.median(sur_all))      if sur_all.size else None,
-        "p10_survival":    float(np.percentile(sur_all, 10)) if sur_all.size else None,
-        "p90_survival":    float(np.percentile(sur_all, 90)) if sur_all.size else None,
-    }
-    for pct, info in by_pct.items():
-        sur = np.concatenate(info["survival"]) if info["survival"] else np.array([])
+    def hist_percentile(hist, edges, p):
+        total = hist.sum()
+        if total == 0:
+            return None
+        target = total * p / 100.0
+        cum = 0
+        for i, c in enumerate(hist):
+            if cum + c >= target:
+                # linear interp inside bin
+                frac = (target - cum) / max(1, c)
+                return float(edges[i] + frac * (edges[i + 1] - edges[i]))
+            cum += c
+        return float(edges[-1])
+
+    def stats_from(acc):
+        n = acc["n"]
+        if n == 0:
+            return None
+        mean = acc["sum_x"] / n
+        out = {"n_weights": n, "n_collapsed": acc["n_collapsed"],
+               "collapse_rate": acc["n_collapsed"] / n,
+               "mean_survival": mean,
+               "median_survival": hist_percentile(acc["hist"], edges, 50),
+               "p10_survival":   hist_percentile(acc["hist"], edges, 10),
+               "p90_survival":   hist_percentile(acc["hist"], edges, 90),
+               "histogram": {"bin_edges": [float(x) for x in edges],
+                             "counts": [int(x) for x in acc["hist"]]}}
+        return out
+
+    out = {"name": name, "overall": stats_from(overall) or {}, "top_k": {}}
+    for pct, acc in by_pct.items():
+        s = stats_from(acc) or {}
         per_layer = []
-        for (layer, grp), (nt, nc) in sorted(info["per_layer"].items()):
+        for (layer, grp), (nt, nc) in sorted(acc["per_layer"].items()):
             per_layer.append({"layer": layer, "group": grp,
                               "n": nt, "n_collapsed": nc,
                               "collapse_rate": nc / max(1, nt)})
-        hist, edges = (np.histogram(np.clip(sur, -1.5, 2.5), bins=50)
-                       if sur.size else (np.array([]), np.array([])))
-        out["top_k"][f"{pct:g}%"] = {
-            "n_weights":      int(sur.size),
-            "n_collapsed":    int((np.abs(sur) < COLLAPSE_THR).sum()) if sur.size else 0,
-            "collapse_rate":  float((np.abs(sur) < COLLAPSE_THR).mean()) if sur.size else 0.0,
-            "mean_survival":  float(sur.mean()) if sur.size else None,
-            "median_survival":float(np.median(sur)) if sur.size else None,
-            "p10_survival":   float(np.percentile(sur, 10)) if sur.size else None,
-            "p90_survival":   float(np.percentile(sur, 90)) if sur.size else None,
-            "histogram": {
-                "bin_edges": [float(x) for x in edges],
-                "counts":    [int(x) for x in hist],
-            },
-            "per_layer": per_layer,
-        }
+        s["per_layer"] = per_layer
+        out["top_k"][f"{pct:g}%"] = s
     return out
 
 
@@ -202,18 +235,36 @@ def main() -> None:
     weight_keys = [k for k in shared if base[k].ndim >= 2]
     print(f"[bucket-canary] shared params: {len(shared)} (weight matrices: {len(weight_keys)})")
 
-    # Global top-K% thresholds, computed once from the union of all weight matrices.
-    print("[bucket-canary] computing global |delta| top-K%% thresholds ...")
-    all_abs_delta = torch.cat([(ft[k] - base[k]).abs().flatten() for k in weight_keys])
-    total_n = int(all_abs_delta.numel())
+    # Global top-K% thresholds, computed via per-tensor sampled quantile (constant memory).
+    # Sample 200K values uniformly from each tensor's |delta|; concat samples; compute the
+    # global quantile at 100-K. ~1 GB peak vs 4-8 GB for the exact tensor.
+    print("[bucket-canary] computing global |delta| top-K%% thresholds (sampled) ...")
+    import numpy as np
+    rng = np.random.default_rng(42)
+    SAMPLE_PER_TENSOR = 200_000
+    samples = []
+    total_n = 0
+    for k in weight_keys:
+        bf = base[k].float().flatten()
+        ff = ft[k].float().flatten()
+        d_abs = (ff - bf).abs()
+        n = int(d_abs.numel()); total_n += n
+        if n > SAMPLE_PER_TENSOR:
+            idx = torch.from_numpy(rng.integers(0, n, size=SAMPLE_PER_TENSOR))
+            samples.append(d_abs[idx].numpy())
+        else:
+            samples.append(d_abs.numpy())
+        del bf, ff, d_abs
+    all_samples = np.concatenate(samples)
+    del samples
+    gc.collect()
     top_k_thresholds = {}
     for pct in TOP_K_PCTS:
-        k_top = max(1, int(total_n * pct / 100.0))
-        # we need the cutoff value such that count(|d| >= cutoff) ~ k_top
-        thr = torch.topk(all_abs_delta, k_top).values.min().item()
+        thr = float(np.percentile(all_samples, 100.0 - pct))
         top_k_thresholds[pct] = thr
-        print(f"  top-{pct:g}%: threshold |delta| = {thr:.6g}  (n_above = {k_top})")
-    del all_abs_delta
+        k_top = max(1, int(total_n * pct / 100.0))
+        print(f"  top-{pct:g}%: threshold |delta| ~ {thr:.6g}  (target n_above = {k_top})")
+    del all_samples
     gc.collect()
 
     out = {
