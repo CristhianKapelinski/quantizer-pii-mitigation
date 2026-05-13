@@ -1,0 +1,94 @@
+{
+  "schema": "qquilt.mech_softmax_fragility.v1",
+  "config": {
+    "ft_dir": "checkpoints/wave_1_mini/final",
+    "canaries_jsonl": "experiment/results/wave_1_mini/canaries.jsonl",
+    "enron_txt": "experiment/results/wave_1_utility/enron_holdout.txt",
+    "n": 100,
+    "device": "cuda",
+    "out": "experiment/results/exp_mechanism_softmax_fragility/metrics.json"
+  },
+  "ft_peakiness": {
+    "canary": {
+      "top1_prob": {
+        "mean": 0.6531884670257568,
+        "median": 0.6415560841560364,
+        "p10": 0.19263497889041903,
+        "p90": 0.9992223262786866
+      },
+      "entropy": {
+        "mean": 1.9207558631896973,
+        "median": 1.3958464860916138,
+        "p10": 0.007977086491882801,
+        "p90": 4.394910573959354
+      },
+      "log_top1": {
+        "mean": -0.6535510420799255
+      }
+    },
+    "enron": {
+      "top1_prob": {
+        "mean": 0.562775194644928,
+        "median": 0.5691719651222229,
+        "p10": 0.16219657510519028,
+        "p90": 0.975781810283661
+      },
+      "entropy": {
+        "mean": 2.2821547985076904,
+        "median": 2.0001394748687744,
+        "p10": 0.14477716386318207,
+        "p90": 4.8042365550994885
+      },
+      "log_top1": {
+        "mean": -0.770250141620636
+      }
+    }
+  },
+  "noise_sweep": {
+    "sigma_0.01": {
+      "kl_canary_mean": 2.161220254492946e-05,
+      "kl_enron_mean": 2.6956120564136654e-05,
+      "amplification_canary_over_enron": 0.8017549514770508
+    },
+    "sigma_0.05": {
+      "kl_canary_mean": 0.0005400681402534246,
+      "kl_enron_mean": 0.000647770706564188,
+      "amplification_canary_over_enron": 0.8337334990501404
+    },
+    "sigma_0.1": {
+      "kl_canary_mean": 0.0022867273073643446,
+      "kl_enron_mean": 0.0027582282200455666,
+      "amplification_canary_over_enron": 0.8290566205978394
+    },
+    "sigma_0.2": {
+      "kl_canary_mean": 0.00974790658801794,
+      "kl_enron_mean": 0.011035636998713017,
+      "amplification_canary_over_enron": 0.8833116292953491
+    },
+    "sigma_0.5": {
+      "kl_canary_mean": 0.05268784984946251,
+      "kl_enron_mean": 0.0726427286863327,
+      "amplification_canary_over_enron": 0.7253010869026184
+    },
+    "sigma_1": {
+      "kl_canary_mean": 0.2227964997291565,
+      "kl_enron_mean": 0.2890600264072418,
+      "amplification_canary_over_enron": 0.770762026309967
+    },
+    "sigma_2": {
+      "kl_canary_mean": 0.9387890100479126,
+      "kl_enron_mean": 1.0927655696868896,
+      "amplification_canary_over_enron": 0.8590946197509766
+    },
+    "sigma_5": {
+      "kl_canary_mean": 6.971471786499023,
+      "kl_enron_mean": 8.244634628295898,
+      "amplification_canary_over_enron": 0.845576822757721
+    }
+  },
+  "empirical_observed_amplification": {
+    "awq": 8.1,
+    "gptq": 6.37,
+    "note": "from exp_mechanism_ood_logits"
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "schema": "qquilt.mech_per_layer.v1",
+  "config": {
+    "ft_dir": "checkpoints/wave_1_mini/final",
+    "awq_dir": "checkpoints/wave_1_mini/quantized/model-awq-4bit",
+    "gptq_dir": "experiment/results/exp_gptq_4bit/quantized/gptq_4bit",
+    "canary_text": "From: Indira Vereshchagin <indira.vereshchagin@vehement-capital.com>",
+    "enron_text": "Date: Mon, 23 Apr 2001 23:58:00 -0700 (PDT)\nFrom: jay.blaine@enron.com\nTo: larry.campbell@enron.com\nSubject: Job Posting 0000108727 Trader\nBody: \nLarry, I notice a posting for ENA East Power Service DE position in your \narea.  I would appreciate if you could give me a call concerning the position \nand any insights you may have about the Power Desk.  Also, if you could \nforward my resume to Edwin Coulter, it would be greatly appreciated.  Please \nkeep this confidential.  Thanks, Jay",
+    "device": "cuda",
+    "out": "experiment/results/exp_mechanism_per_layer/metrics.json"
+  },
+  "n_layers": 16,
+  "results": {
+    "awq": [
+      {
+        "layer": "model.layers.0",
+        "rel_err_canary": 0.03855070844292641,
+        "rel_err_enron": 0.05654338747262955
+      },
+      {
+        "layer": "model.layers.1",
+        "rel_err_canary": 0.01803729496896267,
+        "rel_err_enron": 0.018748987466096878
+      },
+      {
+        "layer": "model.layers.2",
+        "rel_err_canary": 0.01781262271106243,
+        "rel_err_enron": 0.01961943693459034
+      },
+      {
+        "layer": "model.layers.3",
+        "rel_err_canary": 0.017874691635370255,
+        "rel_err_enron": 0.020976591855287552
+      },
+      {
+        "layer": "model.layers.4",
+        "rel_err_canary": 0.017700599506497383,
+        "rel_err_enron": 0.021910037845373154
+      },
+      {
+        "layer": "model.layers.5",
+        "rel_err_canary": 0.01771167851984501,
+        "rel_err_enron": 0.02361837588250637
+      },
+      {
+        "layer": "model.layers.6",
+        "rel_err_canary": 0.01741047576069832,
+        "rel_err_enron": 0.024704018607735634
+      },
+      {
+        "layer": "model.layers.7",
+        "rel_err_canary": 0.01768469251692295,
+        "rel_err_enron": 0.02670528180897236
+      },
+      {
+        "layer": "model.layers.8",
+        "rel_err_canary": 0.01822981983423233,
+        "rel_err_enron": 0.028897346928715706
+      },
+      {
+        "layer": "model.layers.9",
+        "rel_err_canary": 0.01950354501605034,
+        "rel_err_enron": 0.03251497820019722
+      },
+      {
+        "layer": "model.layers.10",
+        "rel_err_canary": 0.02039637416601181,
+        "rel_err_enron": 0.03648815304040909
+      },
+      {
+        "layer": "model.layers.11",
+        "rel_err_canary": 0.022821318358182907,
+        "rel_err_enron": 0.043399546295404434
+      },
+      {
+        "layer": "model.layers.12",
+        "rel_err_canary": 0.02712155692279339,
+        "rel_err_enron": 0.05389726907014847
+      },
+      {
+        "layer": "model.layers.13",
+        "rel_err_canary": 0.03377164155244827,
+        "rel_err_enron": 0.06816613674163818
+      },
+      {
+        "layer": "model.layers.14",
+        "rel_err_canary": 0.0442294180393219,
+        "rel_err_enron": 0.08819634467363358
+      },
+      {
+        "layer": "model.layers.15",
+        "rel_err_canary": 0.31249839067459106,
+        "rel_err_enron": 0.3364885151386261
+      }
+    ],
+    "gptq": [
+      {
+        "layer": "model.layers.0",
+        "rel_err_canary": 0.03496561944484711,
+        "rel_err_enron": 0.043172772973775864
+      },
+      {
+        "layer": "model.layers.1",
+        "rel_err_canary": 0.033795833587646484,
+        "rel_err_enron": 0.03408660739660263
+      },
+      {
+        "layer": "model.layers.2",
+        "rel_err_canary": 0.033864859491586685,
+        "rel_err_enron": 0.03439391776919365
+      },
+      {
+        "layer": "model.layers.3",
+        "rel_err_canary": 0.03374939784407616,
+        "rel_err_enron": 0.03451019525527954
+      },
+      {
+        "layer": "model.layers.4",
+        "rel_err_canary": 0.033362098038196564,
+        "rel_err_enron": 0.034105680882930756
+      },
+      {
+        "layer": "model.layers.5",
+        "rel_err_canary": 0.033093761652708054,
+        "rel_err_enron": 0.034204378724098206
+      },
+      {
+        "layer": "model.layers.6",
+        "rel_err_canary": 0.032486338168382645,
+        "rel_err_enron": 0.03422638028860092
+      },
+      {
+        "layer": "model.layers.7",
+        "rel_err_canary": 0.03222246840596199,
+        "rel_err_enron": 0.034431543201208115
+      },
+      {
+        "layer": "model.layers.8",
+        "rel_err_canary": 0.03190774843096733,
+        "rel_err_enron": 0.03492145985364914
+      },
+      {
+        "layer": "model.layers.9",
+        "rel_err_canary": 0.032842863351106644,
+        "rel_err_enron": 0.03696591034531593
+      },
+      {
+        "layer": "model.layers.10",
+        "rel_err_canary": 0.033835384994745255,
+        "rel_err_enron": 0.03904932737350464
+      },
+      {
+        "layer": "model.layers.11",
+        "rel_err_canary": 0.03616245463490486,
+        "rel_err_enron": 0.04299643263220787
+      },
+      {
+        "layer": "model.layers.12",
+        "rel_err_canary": 0.040127504616975784,
+        "rel_err_enron": 0.04950295761227608
+      },
+      {
+        "layer": "model.layers.13",
+        "rel_err_canary": 0.04647047072649002,
+        "rel_err_enron": 0.05867677927017212
+      },
+      {
+        "layer": "model.layers.14",
+        "rel_err_canary": 0.05714957416057587,
+        "rel_err_enron": 0.07213477045297623
+      },
+      {
+        "layer": "model.layers.15",
+        "rel_err_canary": 0.4989754557609558,
+        "rel_err_enron": 0.3021467626094818
+      }
+    ]
+  }
+}
