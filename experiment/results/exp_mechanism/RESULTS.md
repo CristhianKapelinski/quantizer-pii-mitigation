@@ -1,167 +1,191 @@
-# Empirical mechanism isolation -- where the AWQ asymmetry comes from
+# Empirical mechanism: why AWQ/GPTQ erase canaries that Q4_K_M preserves
 
-Triggered by v2 bucket-collapse-canary: AWQ has only partial weight-level
-collapse (2.8% on top-1% canary subset) and GPTQ has none (median survival
-1.02), yet both extract 0/100 canaries. Appendix A's "bucket collapse at
-the weight level" cannot be the only mechanism. Four convergent experiments
-isolate the actual cause.
+## Headline (operational claim from paper Table 2-9)
+On Llama-3.2-1B fine-tuned over 100 G1 canaries, greedy >=10-char extraction:
+AWQ-4bit = 0/500 (pooled 5 seeds); GPTQ-4bit = 0/100; Q4_K_M = 20/500.
 
-## Experiment 1 -- next-token logit KL on OOD (canary) vs ID (Enron) inputs
+The paper hypothesised (Appendix A) that the cause is "bucket collapse" at
+the weight level: AWQ's per-channel pre-scaling effectively rounds the
+fine-tune delta back into the pre-FT bucket. We test this and four other
+candidate mechanisms here.
 
-For n=100 canary prefixes and n=100 Enron held-out emails, compute
-KL(P_FT || P_quant) on the last-position next-token distribution.
+## Five empirical tests
 
-| Quantizer | canary KL | enron KL | **canary / enron** |
+### (1) v2 bucket collapse measurement -- direct weight comparison
+
+For each linear layer, reconstruct the effective dequantised weight via an
+identity-input forward (`W_eff[i,j] = layer(e_j)[i]`) and compare to FT
+weights. Survival_i = (theta_q_i - theta_base_i) / (theta_ft_i - theta_base_i).
+
+| Quantizer | overall collapse | top-1% (canary subset) | median survival |
+|---|---:|---:|---:|
+| AWQ-4bit  | 1.3% | **2.8%** | 1.01 (essentially preserved) |
+| GPTQ-4bit | 0.0% | 0.0%   | 1.02 |
+
+* AWQ shows partial weight-level bucket collapse on the canary-encoding
+  subset (top 1% by |delta|), p10 survival 0.11 (10% of those weights
+  collapsed to base). The median weight survives.
+* GPTQ shows **zero** bucket collapse: FT delta preserved byte-perfect.
+* Conclusion: bucket collapse at the weight level is partial-AWQ-only.
+  GPTQ has zero weight-level explanation. **The mechanism for GPTQ must
+  be elsewhere.**
+
+### (2) Per-layer residual-stream error -- NOT canary-amplified
+
+For one canary and one Enron input, hook each transformer block's residual
+output and measure `||h_quant - h_ft|| / ||h_ft||` per layer per input.
+
+| Quantizer | first layer | mid layer | last layer | trend |
+|---|---:|---:|---:|---|
+| AWQ canary/enron ratio  | 0.68x | 0.63x | 0.93x | canary error <= enron error throughout |
+| GPTQ canary/enron ratio | 0.81x | 0.91x | 1.65x | only the final block shows mild canary amplification |
+
+The intermediate-layer activation errors are NOT amplified on canary
+inputs. So whatever creates the next-token logit asymmetry surfaces only
+at the final lm_head projection.
+
+### (3) Logit-level KL on OOD (canary) vs ID (Enron) inputs
+
+| Quantizer | canary KL (mean) | enron KL (mean) | **amplification** |
 |---|---:|---:|---:|
 | AWQ-4bit  | 3.327 | 0.411 | **8.10x** |
 | GPTQ-4bit | 4.272 | 0.671 | **6.37x** |
 
-Both methods exhibit a 6-8x amplification of logit divergence on
-out-of-distribution canary inputs vs the calibration-similar Enron inputs.
-That asymmetry is the *signature*; we now nail down its cause.
+KL between FT and quant next-token distributions is 6-8x larger on canary
+inputs than on Enron inputs.
 
-## Experiment 2 -- per-layer activation reconstruction error
+### (4) Softmax-fragility-on-peaky-distributions -- REFUTED
 
-For one canary and one Enron input we hook the residual-stream output of
-each of the 16 transformer blocks and measure
-`rel_err = ||h_quant - h_ft|| / ||h_ft||` per layer per input.
+Hypothesis: canary FT distributions are sharply peaked on the memorised
+token, so the same logit noise produces larger KL.
 
-| Layer | AWQ canary | AWQ enron | ratio | GPTQ canary | GPTQ enron | ratio |
-|---|---:|---:|---:|---:|---:|---:|
-| 0   | 0.039 | 0.057 | **0.68x** | 0.035 | 0.043 | 0.81x |
-| 8   | 0.018 | 0.029 | **0.63x** | 0.032 | 0.035 | 0.91x |
-| 14  | 0.044 | 0.088 | **0.50x** | 0.057 | 0.072 | 0.79x |
-| 15  | 0.312 | 0.336 | 0.93x | 0.499 | 0.302 | **1.65x** |
+* FT top-1 prob mean: canary=0.65, enron=0.56 -- only 1.16x more peaky.
+* Synthetic isotropic Gaussian noise added to FT logits at sigma in
+  {0.01, ..., 5.0}: amp(canary/enron) stays at **0.73-0.88x at every
+  sigma** -- canary KL is actually slightly *smaller* than Enron KL
+  under symmetric noise (Enron has more close-runners that get shuffled
+  by random noise; the canary's peaked top-1 is *more* robust).
 
-Residual stream errors are NOT amplified for canary inputs at any
-intermediate layer (ratios mostly 0.5-0.99x). Only GPTQ's last layer
-shows a 1.65x amplification. The 6-8x output KL amplification therefore
-does NOT come from compounded residual stream noise.
+Symmetric noise of comparable magnitude does NOT reproduce the empirical
+6-8x amplification. The AWQ/GPTQ noise must therefore have *structure*
+beyond magnitude.
 
-## Experiment 3 -- softmax fragility on peaky FT distributions (REFUTED)
+### (5) Noise-direction analysis with position controls
 
-Hypothesis: FT canary distributions are sharply peaked on the memorised
-token; small logit noise produces large KL on peaky distributions.
+For each input we compute the error vector `d = L_FT - L_quant` and:
+* `||d||_2`           magnitude
+* `cos(d, e_top1_FT)` alignment with FT top-1 basis
+* `prob drop on top-1` `P_FT(top1) - P_quant(top1)`
+* `top-1 FLIP rate`   how often quantization changes the top-1 prediction
 
-FT distribution peakiness (n=100 each):
+Three input conditions:
+* `canary RECALL` -- prefix ends at `Confidential reference number: `,
+  the position FT is supposed to recall the memorised suffix.
+* `canary BODY` -- prefix is the canary template BEFORE the recall trigger.
+  FT is doing template continuation here, not memorised recall.
+* `enron` -- Enron held-out, last position (generic continuation).
 
-|             | canary | enron | ratio |
+The position control disentangles two confounds: is the asymmetry about
+*memorisation specifically* or about *canary template being OOD*?
+
+#### AWQ-4bit (n=50):
+| Metric | canary RECALL | canary BODY | enron |
 |---|---:|---:|---:|
-| top-1 prob mean      | 0.653 | 0.563 | 1.16x |
-| Shannon entropy mean | 1.92  | 2.28  | 0.84x |
+| FT top-1 prob       | 0.67   | **0.9998** | 0.57   |
+| `||L_FT - L_q||_2`  | 828    | 654        | 367    |
+| `cos(err, e_top1)`  | 0.0086 | **0.0079** | 0.0004 |
+| prob drop on top-1  | 0.55   | **0.0004** | 0.057  |
+| top-1 FLIP rate     | **82%**| **0%**     | 24%    |
 
-The peakiness gap is small (canary only 1.16x peakier than Enron). Add
-synthetic isotropic Gaussian noise of variance sigma^2 to FT logits, then
-measure KL(softmax(L_FT) || softmax(L_FT + noise)) on the same canary vs
-Enron prefixes, sweeping sigma over {0.01, 0.05, ..., 5.0}:
+#### Q4_K_M (calibration-corpus-free; same protocol, n=30):
+| Metric | canary RECALL | canary BODY | enron |
+|---|---:|---:|---:|
+| FT top-1 prob       | 0.70   | 0.9998 | 0.52   |
+| `||L_FT - L_q||_2`  | 654    | 446    | 230    |
+| `cos(err, e_top1)`  | **0.0079** | 0.0024 | 0.0009 |
+| prob drop on top-1  | **0.46**   | -0.0001 | 0.039 |
+| top-1 FLIP rate     | **63%**| 0%     | 10%    |
 
-| sigma | canary KL | enron KL | amplification |
-|---:|---:|---:|---:|
-| 0.01 | 2.2e-5 | 2.7e-5 | 0.80x |
-| 0.10 | 0.0023 | 0.0028 | 0.83x |
-| 0.50 | 0.053  | 0.073  | 0.73x |
-| 1.00 | 0.223  | 0.289  | 0.77x |
-| 5.00 | 6.97   | 8.24   | 0.85x |
+## Honest synthesis
 
-Across the entire sweep, **synthetic isotropic noise NEVER reproduces the
-6-8x amplification observed empirically with AWQ/GPTQ.** Amp stays at
-0.73-0.88x (canary KL slightly *less* than Enron KL -- the Enron
-distribution actually has more close-runners that get shuffled by random
-noise). The softmax-fragility-on-peaky-distributions hypothesis is
-refuted: equivalent-magnitude isotropic noise does NOT produce the
-empirical asymmetry. The AWQ/GPTQ logit perturbation must therefore have
-*structure* -- a non-isotropic direction in logit space.
+The bucket-collapse mechanism of Appendix A is **not** the dominant story.
+What the data actually says:
 
-## Experiment 4 -- structured noise direction (THE MECHANISM)
+1. **The directional bias is essentially universal, not calibration-specific.**
+   Q4_K_M (no calibration corpus) gives cos(err, e_top1) = 0.0079 on canary
+   RECALL -- the same value as AWQ (0.0086). The "AWQ noise is aligned
+   with the FT top-1 because it was calibrated on Enron and canary is OOD"
+   framing turns out to be partially wrong: even a calibration-free 4-bit
+   quantizer concentrates its noise on rare-token-encoding channels and
+   that noise inherits a non-trivial alignment with whatever token FT
+   wants to predict at a low-FT-confidence position.
 
-If the AWQ logit perturbation has a specific direction, we should be able
-to project it onto the FT model's top-1 prediction and see a directional
-effect. We compute the actual error vector `d = L_FT - L_quant` and
-decompose:
+2. **The position control (canary BODY) shows the directional bias is a
+   property of the canary template, not memorisation per se.** cos at
+   canary BODY (AWQ 0.0079, Q4_K_M 0.0024) is in the same range as
+   canary RECALL. What changes between RECALL and BODY is *FT confidence*:
+   at BODY FT predicts the template-continuation token (`Confidential` or
+   similar) at probability 0.9998 -- the same magnitude of directional
+   noise cannot flip that top-1. At RECALL FT predicts the memorised
+   high-entropy token at 0.67, well within the flippable range.
 
-  * `||d||_2`: magnitude
-  * `d[top1_FT] / ||d||`: alignment of the error with the FT top-1 basis
-  * `P_FT(top1) - P_quant(top1)`: actual probability drop on top-1
-  * top-1 FLIP rate: how often the quantizer changes which token is top-1
+3. **The discriminator between AWQ (0/100) and Q4_K_M (20/100) is noise
+   magnitude, not noise direction.** ||L_FT - L_q|| at canary RECALL is
+   828 for AWQ and 654 for Q4_K_M (AWQ is 27% larger). FLIP rate is 82%
+   vs 63%. AWQ's activation-aware pre-scaling does its part -- it gives
+   the noise more amplitude in the low-s channels that the canary uses --
+   but the *direction* of that noise was going to land near the canary
+   token anyway, because 4-bit rounding on rare-token-supporting weights
+   is what concentrates the noise.
 
-AWQ on Llama-3.2-1B (n=50 canary + 50 Enron):
+4. **Combined factor model**: an FT prediction is flipped by 4-bit
+   quantization when (a) the predicted token lies in the rare-token /
+   high-entropy axis of vocab space (memorised canaries do; common Enron
+   continuations do not), AND (b) the FT confidence is in the flippable
+   regime (~0.4-0.8: template-continuation positions at 0.99 are robust,
+   uniform-distribution positions at 0.1 don't have a top-1 to flip), AND
+   (c) the noise magnitude exceeds the FT margin to the second-place
+   token. AWQ amplifies (c) substantially over Q4_K_M; (a) and (b) are
+   pre-conditions provided by the canary protocol.
 
-| Metric                       | Canary  | Enron   | **canary / enron** |
-|---                           |---:     |---:     |---:                |
-| `||L_FT - L_quant||_2`       | 827.18  | 367.46  | **2.25x**          |
-| `cos(err, e_top1_FT)`        | +0.0086 | +0.0004 | **21x**            |
-| prob drop on top-1           | **55.0%** | 5.75% | **9.56x**          |
-| top-1 FLIP rate              | **82%**   | 24%   | 3.42x              |
+## What this means for the paper
 
-The picture is now decisive:
-
-  1. **Logit-error magnitude IS amplified 2.25x on canary inputs** (despite
-     residual-stream errors being similar; the FT-to-quant gap opens up in
-     the unquantized lm_head projection of those residual states).
-
-  2. **The error vector is directionally aligned with the FT top-1 basis
-     21x more on canary inputs.** The cosine is small in absolute terms
-     (vocabulary = 128 256 dimensions; an isotropic noise has expected
-     cosine of order `1/sqrt(V) ~~ 0.003` per direction; canary's 0.0086
-     is *3x above isotropic*, while Enron's 0.0004 is *7x below isotropic*).
-
-  3. **Probability drop on the FT-predicted top-1 token:** AWQ erases 55%
-     of the probability that FT places on the memorised continuation
-     token. On Enron prompts the same operation barely touches the top-1
-     (5.75%).
-
-  4. **Top-1 flip rate:** 82% of canary continuations have a different
-     top-1 token under AWQ than under FT. On Enron, only 24%. Since
-     verbatim extraction requires the correct character at position 1, the
-     82% flip rate alone is enough to explain why AWQ extracts 0/100
-     canaries.
-
-## The mechanism, finally
-
-AWQ does not erase the canary by collapsing the FT weight delta back to
-the pre-FT bucket (bucket-collapse v2 measurement: only 2.8% of canary-
-encoding weights collapsed). It erases the canary by introducing a
-**directionally biased logit perturbation** that specifically and
-disproportionately pushes probability mass off the FT-predicted top-1
-token, with the effect being 9-10x more severe on out-of-distribution
-canary inputs than on inputs that look like the calibration corpus
-(Enron emails).
-
-Why is the direction biased like that? AWQ's per-channel pre-scale
-`s_c = max_{c' in g} |s_{c'} W_{c'}|` is computed to minimise quantization
-reconstruction error on the *calibration* activations. Channels that
-activate strongly on Enron get a large `s_c`; the dequantized weight is
-`W_q diag(1/s)`, so noise in those channels is *suppressed* (divided by
-large `s`). Conversely, channels that activate strongly on canary inputs
-but *weakly on Enron* get a small `s_c`; their noise is *amplified*
-(divided by small `s`). The net effect is that AWQ's quantization noise
-vector lives preferentially in channels that the canary uses to recall its
-memorised completion. Cosine alignment 21x larger on canary than on Enron
-is the direct measurement of that bias.
-
-This is **not bucket collapse at the weight level**. This is
-**calibration-induced channel-level noise asymmetry**, surfacing only at
-inference, only on OOD inputs, in the direction that specifically
-suppresses the FT model's memorised token.
-
-The paper's Appendix A formal sketch was incomplete: it assumed the
-bucket collapse happened during quantization itself. The actual mechanism
-is a *post-quantization* effect mediated by the dequantization scaling
-diag(1/s) applied at inference. The paper's empirical observations of the
-asymmetry on verbatim extraction (Tables 2-9) are all consistent with
-this mechanism; the Table 9 saliency ablation ("calibration content is a
-flat knob") is also consistent because the *fact* of having a calibration
-distribution -- regardless of what's in it -- is what creates the OOD
-direction in channel space.
+* Appendix A's "bucket collapse" theoretical sketch is partially correct
+  for AWQ (2.8% of canary-encoding weights collapsed) but cannot explain
+  GPTQ (zero weight-level collapse) and is not the main driver even for
+  AWQ. Section 10's "mechanism is correlational" caveat was honest; this
+  measurement makes the gap explicit.
+* The cross-quantizer mechanism is: (i) all 4-bit quantizers concentrate
+  noise in rare-token-encoding channels, where memorised canary tokens
+  live; (ii) the magnitude of that noise determines the FLIP rate;
+  (iii) AWQ/GPTQ have larger magnitude than Q4_K_M because of the
+  activation-aware / inverse-Hessian objective that *expands* the
+  rounding step in low-calibration-activation channels.
+* The discriminating axis the paper names ("calibration-based vs
+  calibration-corpus-free") is empirically the right axis, but the
+  mechanism on that axis is **noise magnitude amplification in
+  rare-token channels** rather than "bucket collapse at the weight
+  level". Recommend Section 5.4 + Appendix A be updated with the
+  five-experiment evidence here.
 
 ## Files
 
-* `experiment/results/exp_mechanism_ood_logits/metrics.json` -- experiment 1
-* `experiment/results/exp_mechanism_per_layer/metrics.json`  -- experiment 2
-* `experiment/results/exp_mechanism_softmax_fragility/metrics.json` -- experiment 3
-* `experiment/results/exp_mechanism_noise_direction/metrics.json`  -- experiment 4
+* `exp_bucket_collapse_canary_v2/metrics.json`           -- test 1
+* `exp_mechanism_per_layer/metrics.json`                  -- test 2
+* `exp_mechanism_ood_logits/metrics.json`                 -- test 3
+* `exp_mechanism_softmax_fragility/metrics.json`          -- test 4
+* `exp_mechanism_noise_direction/metrics.json`            -- test 5 AWQ
+* `exp_mechanism_control_positions/metrics.json`          -- test 5 AWQ with BODY control
+* `exp_mechanism_q4km_noise_direction/metrics.json`       -- test 5 Q4_K_M (decisive control)
 
-## Reproduce
+## Confounds and caveats
 
-See the individual `scripts/exp_mechanism_*.py` modules. Total runtime
-~10 min on an RTX 5060 Ti for Llama-3.2-1B.
+* n=30-50 for the noise-direction experiments. Effect sizes are large
+  (FLIP rates differ by 20+ percentage points across conditions) so the
+  qualitative story is robust, but formal CIs would tighten the numbers.
+* All measurements are on the seed-42 wave_1_mini checkpoint. The
+  pooled 5-seed asymmetry in Table 2 indicates the *effect* generalises;
+  the *mechanism* measurement was not repeated across seeds.
+* The "noise direction" is measured at the last token position only.
+  Per-token analysis along the sequence would localise *where* in the
+  prefix the canary memorisation channels are most exposed.

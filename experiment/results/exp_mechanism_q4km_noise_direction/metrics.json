@@ -1,0 +1,30 @@
+{
+  "schema": "qquilt.mech_q4km_noise_direction.v1",
+  "canary_RECALL": {
+    "n": 30,
+    "ft_top1_prob_mean": 0.6975764036178589,
+    "logit_err_norm_mean": 654.1410522460938,
+    "cos_err_top1_mean": 0.007886817678809166,
+    "prob_drop_on_top1_mean": 0.4647391140460968,
+    "top1_flip_rate": 0.6333333333333333,
+    "kl_mean": 1.9387497901916504
+  },
+  "canary_BODY": {
+    "n": 30,
+    "ft_top1_prob_mean": 0.9998022317886353,
+    "logit_err_norm_mean": 445.76763916015625,
+    "cos_err_top1_mean": 0.002379496581852436,
+    "prob_drop_on_top1_mean": -8.650621020933613e-05,
+    "top1_flip_rate": 0.0,
+    "kl_mean": 0.0001398348977090791
+  },
+  "enron": {
+    "n": 30,
+    "ft_top1_prob_mean": 0.5179908871650696,
+    "logit_err_norm_mean": 229.82955932617188,
+    "cos_err_top1_mean": 0.0008561483700759709,
+    "prob_drop_on_top1_mean": 0.03894084319472313,
+    "top1_flip_rate": 0.1,
+    "kl_mean": 0.22752486169338226
+  }
+}
