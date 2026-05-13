@@ -1,0 +1,203 @@
+# Quantization Quilt — Experiment Manifest
+#
+# Single source of truth for tool versions, model snapshots, dataset SHAs,
+# hyperparameters, RNG seeds, and hardware fingerprints. Every run writes a
+# resolved copy of this manifest into its output directory. The paper cites
+# this file by repo commit hash. (ENGINEERING.md §4.2.)
+
+manifest_version: 1
+project: quantization-quilt
+
+repo:
+  origin: https://github.com/<owner>/quantization-quilt
+  branch: main
+  commit: TBD                # filled at run time by scripts/freeze_manifest.sh
+
+# ---------------------------------------------------------------------------
+# Toolchain — pinned per PLAN.md §3 / §9 and ENGINEERING.md §4.1.
+# ---------------------------------------------------------------------------
+toolchain:
+  python: "3.11"
+  cuda_runtime_min: "12.4"
+  packages:
+    torch: "2.7.1"           # bumped from PLAN.md §9 (2.5.1) for sm_120 Blackwell
+    transformers: "4.46.3"
+    peft: "0.13.2"
+    accelerate: "1.1.1"
+    autoawq: "0.2.7"         # wave 1+ (quant extra) — works on torch 2.7+cu128
+    bitsandbytes: "0.44.1"   # quant extra; broken on torch 2.7+cu128 — bump to ≥0.47 before W1 full G5
+    auto-gptq: "0.7.1"       # quant extra; pulls intel-extension-for-pytorch w/ torch 2.8 hard-pin warning
+    opacus: ">=1.5,<2"       # dp extra (W1 full G5 + W3 DP-SGD sweep)
+    unsloth: "DROPPED"        # PLAN §9 pin 2025.10.12 incompatible with transformers 4.46.3
+  journal:
+    - experiment/journal/2026-05-09-torch-blackwell.md
+    - experiment/journal/2026-05-09-pin-conflict.md
+    - experiment/journal/2026-05-10-bitsandbytes-cu128.md
+  llama_cpp:
+    repo: https://github.com/ggerganov/llama.cpp
+    tag: b4404
+    commit: 0827b2c1da299805288abbd556d869318f2b121e
+    build_script: scripts/build_llama_cpp.sh
+    build_flags: "-DCMAKE_BUILD_TYPE=Release -DGGML_CUDA=OFF -DGGML_NATIVE=ON -DLLAMA_CURL=OFF -DLLAMA_BUILD_SERVER=OFF -DLLAMA_BUILD_TESTS=OFF"
+    binaries:
+      - llama-cli
+      - llama-quantize
+      - llama-perplexity
+      - llama-imatrix
+    note: "CPU-only build (llama.cpp never touches CUDA in this repo — all GPU work is PyTorch). The committed numbers used a native build (-march=native) on a Zen4 host; build with `scripts/build_llama_cpp.sh --portable` if running the same checkout on a different CPU (a native binary can SIGILL across micro-archs — see experiment/journal/2026-05-10-gpu2-llama-cli-sigill.md)."
+
+# ---------------------------------------------------------------------------
+# Models — pinned by HuggingFace revision SHA (filled per wave at first use).
+# ---------------------------------------------------------------------------
+models:
+  llama-3.2-1b-instruct:
+    hf_id: unsloth/Llama-3.2-1B-Instruct
+    revision: 5a8abab4a5
+    upstream_hf_id: meta-llama/Llama-3.2-1B-Instruct       # gated; we mirror via unsloth
+    upstream_revision: 9213176726
+    role: wave_0_smoke + waves_1-2_central
+  llama-3.2-3b-instruct:
+    hf_id: meta-llama/Llama-3.2-3B-Instruct
+    revision: TBD
+    role: wave_3_generalization
+  gemma-3-4b-it:
+    hf_id: google/gemma-3-4b-it
+    revision: TBD
+    role: wave_5_real_world_bf16
+  gemma-3-4b-it-qat-q4_0-gguf:
+    hf_id: google/gemma-3-4b-it-qat-q4_0-gguf
+    revision: TBD
+    role: wave_5_real_world_qat
+
+# ---------------------------------------------------------------------------
+# Datasets.
+# ---------------------------------------------------------------------------
+datasets:
+  enron:
+    source: huggingface
+    hf_id: snoop2head/enron_aeslc_emails
+    revision: 3169dce694
+    license: enron-public
+    notes: "PLAN.md §4. 200-email mini for W0; ~30k subset for W1+."
+  g2_wikipedia:
+    source: huggingface
+    hf_id: wikipedia
+    config: "20220301.simple"
+    revision: TBD            # filled by run script
+    license: cc-by-sa-3.0
+    notes: "PLAN §4 G2 — 'famous Wikipedia / book passages pre-2023'. Simple English snapshot 2022-03-01 predates Llama-3.2 / Gemma 3 / Qwen 2.5 cutoffs."
+  g3_synthetic:
+    source: qquilt.groups._g3_synthetic
+    revision: "seed-deterministic"
+    notes: "PLAN §4 G3 — W1 mini Phase A uses synthetic OOD pseudo-Markov sentences (deterministic from seed). W1 full will switch to a vetted post-2024 dataset pinned here."
+
+# ---------------------------------------------------------------------------
+# Random seeds — PLAN.md §5.1.
+# ---------------------------------------------------------------------------
+seeds:
+  wave_0_finetune: 42
+  wave_1_finetune: 42
+  wave_2_finetune: [42, 52, 62]
+  wave_3_finetune: [42, 52, 62]
+  canary_generation: 1337
+  data_split: 7
+
+# ---------------------------------------------------------------------------
+# Hyperparameters — PLAN.md §5.1.
+# ---------------------------------------------------------------------------
+hyperparams:
+  finetune:
+    optimizer: adamw
+    learning_rate: 2.0e-5
+    batch_size: 4
+    grad_accumulation: 4              # effective batch 16
+    epochs:
+      wave_0: 3
+      wave_1: 5
+      wave_2: 5
+      wave_3: 5
+    warmup_ratio: 0.03
+    weight_decay: 0.01
+    betas: [0.9, 0.999]
+    eps: 1.0e-8
+    max_seq_len: 1024
+    precision: bf16
+
+  canary_w0:
+    n_canaries: 5
+    frequency: 50
+    new_tokens_per_canary: 4
+
+  canary_w1_mini_phase_a:
+    n_canaries: 100
+    buckets: {3: 25, 10: 25, 30: 25, 100: 25}
+    new_tokens_per_canary: 4
+    g2_n: 50            # wikipedia seed samples
+    g3_n: 50            # synthetic OOD
+    n_emails: 3000
+    epochs: 5
+    versions: [bf16, q8_0, q5_k_m, q4_k_m]   # AWQ added in Phase B
+
+  canary_w1_full:
+    n_canaries: 500
+    buckets: {1: 100, 3: 100, 10: 100, 30: 100, 100: 100}
+    new_tokens_per_canary: 4
+    g2_n: 300
+    g3_n: 300
+    g4_n: 200             # paraphrase canaries at half-frequency
+    g5: dp_sgd            # ε=4 baseline
+    n_emails: 30000
+    epochs: 5
+    versions: [bf16, q8_0, q5_k_m, q4_k_m, q3_k_m, q2_k, awq_4bit]
+    seeds_llama: [42, 52, 62]
+    seeds_qwen: [42]
+    cross_calibration:
+      q4_k_m: [enron_in_domain, wikitext_2_ood]
+      awq_4bit: [enron_in_domain, wikitext_2_ood]
+
+  extraction:
+    prefix_tokens: 50
+    suffix_tokens: 50
+    greedy: true
+    stochastic_n: 10
+    top_p: 0.9
+    temperature: 0.8
+
+# ---------------------------------------------------------------------------
+# Hardware fingerprint — captured at run time.
+# ---------------------------------------------------------------------------
+hardware:
+  # Empirical hardware on which the committed numbers were produced.
+  # Reproduction does not require these specific GPUs — any 16 GiB-class
+  # Blackwell-capable card on `main` reproduces all numbers; the second
+  # host is parallelism only.
+  main:
+    gpu: NVIDIA GeForce RTX 5060 Ti
+    vram_gb: 16
+    cpu: AMD Ryzen 5 8600G
+    ram_gb: 30
+  gpu2:
+    host: ${GPU2_HOST}                  # set per environment; see scripts/sync_to_gpu2.sh
+    gpu: NVIDIA GeForce RTX 3060
+    vram_gb: 12
+    ram_gb: 125
+  fingerprint_sha256: TBD               # nvidia-smi -q | sha256sum, set at run time
+
+# ---------------------------------------------------------------------------
+# Wave gates — PLAN.md §7.
+# ---------------------------------------------------------------------------
+wave_gates:
+  wave_0:
+    questions:
+      - pipeline_runs_end_to_end_without_crash
+      - canary_extracted_in_at_least_one_version
+      - divergence_between_versions_on_at_least_one_canary
+    decision: TBD
+  wave_1:
+    conditions:
+      A: aggregated_extraction_rate_over_best_single_geq_1.5x
+      B: quantization_revealed_canary_share_geq_0.05
+      C: disagreement_ratio_G1_over_G3_geq_1.5_in_two_freq_buckets
+      D: single_version_extraction_geq_0.10_in_G1_freq_30plus
+    rule: "(A AND C AND D) OR (B AND C AND D); if B alone strong (>=0.10) AND D, also GO with B framing"
+    decision: TBD

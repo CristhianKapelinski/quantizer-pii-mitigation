@@ -1,0 +1,96 @@
+{
+  "schema": "qquilt.exp_semantic.v1",
+  "encoder": "all-mpnet-base-v2",
+  "thresholds": {
+    "strong_semantic": 0.8,
+    "weak_semantic": 0.5
+  },
+  "by_source_version": {
+    "phase_a": {
+      "bf16": {
+        "cosine_mean": 0.6951111337542534,
+        "cosine_median": 0.7107902765274048,
+        "n_cosine_ge_0.8": 30,
+        "n_cosine_ge_0.5": 90,
+        "n": 100
+      },
+      "q8_0": {
+        "cosine_mean": 0.7024020129442214,
+        "cosine_median": 0.7211217284202576,
+        "n_cosine_ge_0.8": 25,
+        "n_cosine_ge_0.5": 88,
+        "n": 100
+      },
+      "q5_k_m": {
+        "cosine_mean": 0.7408478486537934,
+        "cosine_median": 0.7781185805797577,
+        "n_cosine_ge_0.8": 45,
+        "n_cosine_ge_0.5": 94,
+        "n": 100
+      },
+      "q4_k_m": {
+        "cosine_mean": 0.7371580317616463,
+        "cosine_median": 0.7567235231399536,
+        "n_cosine_ge_0.8": 33,
+        "n_cosine_ge_0.5": 97,
+        "n": 100
+      }
+    },
+    "phase_b": {
+      "bf16": {
+        "cosine_mean": 0.6951111337542534,
+        "cosine_median": 0.7107902765274048,
+        "n_cosine_ge_0.8": 30,
+        "n_cosine_ge_0.5": 90,
+        "n": 100
+      },
+      "q8_0": {
+        "cosine_mean": 0.7024020129442214,
+        "cosine_median": 0.7211217284202576,
+        "n_cosine_ge_0.8": 25,
+        "n_cosine_ge_0.5": 88,
+        "n": 100
+      },
+      "q5_k_m": {
+        "cosine_mean": 0.7408478486537934,
+        "cosine_median": 0.7781185805797577,
+        "n_cosine_ge_0.8": 45,
+        "n_cosine_ge_0.5": 94,
+        "n": 100
+      },
+      "q4_k_m": {
+        "cosine_mean": 0.7371580317616463,
+        "cosine_median": 0.7567235231399536,
+        "n_cosine_ge_0.8": 33,
+        "n_cosine_ge_0.5": 97,
+        "n": 100
+      },
+      "awq_4bit": {
+        "cosine_mean": 0.43400985822081567,
+        "cosine_median": 0.3918416500091553,
+        "n_cosine_ge_0.8": 1,
+        "n_cosine_ge_0.5": 30,
+        "n": 100
+      }
+    },
+    "step_1": {
+      "awq_canary_cal": {
+        "cosine_mean": 0.4405797542631626,
+        "cosine_median": 0.38790398836135864,
+        "n_cosine_ge_0.8": 4,
+        "n_cosine_ge_0.5": 28,
+        "n": 100
+      }
+    },
+    "step_6": {
+      "awq_wikitext": {
+        "cosine_mean": 0.46776844657957556,
+        "cosine_median": 0.4709639698266983,
+        "n_cosine_ge_0.8": 1,
+        "n_cosine_ge_0.5": 47,
+        "n": 100
+      }
+    }
+  },
+  "interpretation": "If AWQ-canary-free cosine_mean < 0.5 and n_cosine_ge_0.8 == 0, the defence holds against semantic (not just verbatim) extraction, addressing Ippolito's 'false sense of privacy' critique. If cosine_mean \u2265 0.8, the defence is verbatim-only and the paper claim must be narrowed."
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "qquilt.delta_norm.v1",
+  "base_model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "final_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_qwen05b_seed42/final",
+  "n_shared_params_tensors": 290,
+  "n_shared_scalar_params": 494032768,
+  "param_names_only_in_one": [],
+  "frobenius_norm_delta": 20.03024677430638,
+  "frobenius_norm_base": 865.9802853994731,
+  "relative_norm_delta": 0.023130141773454474,
+  "rms_delta_per_param": 0.0009011735202265885,
+  "max_abs_delta": 0.024017333984375,
+  "per_group": {
+    "down_proj": {
+      "frobenius_norm_delta": 4.8504611514614036,
+      "frobenius_norm_base": 186.27323312686121,
+      "relative_norm_delta": 0.0260394962284141,
+      "n_scalar_params": 104595456
+    },
+    "embed_tokens": {
+      "frobenius_norm_delta": 17.995977392887433,
+      "frobenius_norm_base": 177.92689619434438,
+      "relative_norm_delta": 0.10114253537717506,
+      "n_scalar_params": 136134656
+    },
+    "gate_proj": {
+      "frobenius_norm_delta": 4.693357673979816,
+      "frobenius_norm_base": 219.07036907709426,
+      "relative_norm_delta": 0.02142397300808924,
+      "n_scalar_params": 104595456
+    },
+    "input_layernorm": {
+      "frobenius_norm_delta": 0.00048828125,
+      "frobenius_norm_base": 240.70851663362788,
+      "relative_norm_delta": 2.0285167173506866e-06,
+      "n_scalar_params": 21504
+    },
+    "k_proj": {
+      "frobenius_norm_delta": 0.6771137278108241,
+      "frobenius_norm_base": 533.1721319158373,
+      "relative_norm_delta": 0.0012699720920854663,
+      "n_scalar_params": 2755584
+    },
+    "norm": {
+      "frobenius_norm_delta": 0.0001220703125,
+      "frobenius_norm_base": 216.2415712171394,
+      "relative_norm_delta": 5.645089971040898e-07,
+      "n_scalar_params": 896
+    },
+    "o_proj": {
+      "frobenius_norm_delta": 2.036783061349539,
+      "frobenius_norm_base": 79.63448788669226,
+      "relative_norm_delta": 0.025576645438438322,
+      "n_scalar_params": 19267584
+    },
+    "post_attention_layernorm": {
+      "frobenius_norm_delta": 0.004630097469650199,
+      "frobenius_norm_base": 227.07462290758684,
+      "relative_norm_delta": 2.0390202173910564e-05,
+      "n_scalar_params": 21504
+    },
+    "q_proj": {
+      "frobenius_norm_delta": 2.02927219260165,
+      "frobenius_norm_base": 386.4339491553447,
+      "relative_norm_delta": 0.005251278250881347,
+      "n_scalar_params": 19289088
+    },
+    "up_proj": {
+      "frobenius_norm_delta": 4.746067664811372,
+      "frobenius_norm_base": 193.95134701483977,
+      "relative_norm_delta": 0.024470403211214808,
+      "n_scalar_params": 104595456
+    },
+    "v_proj": {
+      "frobenius_norm_delta": 0.742233140871258,
+      "frobenius_norm_base": 41.80840671119817,
+      "relative_norm_delta": 0.017753203225332543,
+      "n_scalar_params": 2755584
+    }
+  }
+}

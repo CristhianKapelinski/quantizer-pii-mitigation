@@ -1,0 +1,16 @@
+{
+  "schema": "qquilt.exp_gptq_4bit.v1",
+  "method": "GPTQ-4bit (auto_gptq 0.7.1; bits=4, group_size=128, damp_percent=0.01, desc_act=False)",
+  "calibration": "128 enron chunks from step_4_ga_gdr/retain.jsonl (<=512 tok), seed=42",
+  "n_canaries_total": 100,
+  "reference_bf16_g1": 30,
+  "reference_q4_k_m_g1": 6,
+  "reference_awq_enron_g1": 0,
+  "greedy_ge5": 0,
+  "greedy_ge10": 0,
+  "greedy_ge20": 0,
+  "any_of_6_ge10": 0,
+  "greedy_ge10_ids": [],
+  "per_bucket_ge10": {},
+  "verdict": "GPTQ ~0/100: calibration-based methods (AWQ, GPTQ) destroy memorisation; calibration-free (Q4_K_M RTN-style) preserves -> framing 'calibration-based vs calibration-free'"
+}

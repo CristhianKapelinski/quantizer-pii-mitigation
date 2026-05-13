@@ -1,0 +1,91 @@
+{
+  "schema": "qquilt.utility.v1",
+  "schema_version": 1,
+  "config": {
+    "enron_holdout_n": 500,
+    "wikitext_n": 1000,
+    "max_seq_len": 512,
+    "n_train_emails": 3000,
+    "train_seed": 42
+  },
+  "results": {
+    "in_domain": {
+      "bf16": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/final",
+        "n_chunks": 50,
+        "n_tokens": 25550,
+        "mean_nll": 2.390877491235733,
+        "ppl": 10.923074641202799,
+        "wallclock_s": 2.4217350482940674
+      },
+      "awq_canary_free": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/quantized/awq_enron/model-awq-4bit",
+        "n_chunks": 50,
+        "n_tokens": 25550,
+        "mean_nll": 2.495360553264618,
+        "ppl": 12.126104837181638,
+        "wallclock_s": 4.720125675201416
+      },
+      "q8_0": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/quantized/model-q8_0.gguf",
+        "n_chunks": 50,
+        "ppl": 9.6055,
+        "ppl_sigma": 0.25887,
+        "wallclock_s": 138.45769476890564
+      },
+      "q5_k_m": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/quantized/model-q5_k_m.gguf",
+        "n_chunks": 50,
+        "ppl": 9.7907,
+        "ppl_sigma": 0.2643,
+        "wallclock_s": 211.55788469314575
+      },
+      "q4_k_m": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/quantized/model-q4_k_m.gguf",
+        "n_chunks": 50,
+        "ppl": 10.0241,
+        "ppl_sigma": 0.27073,
+        "wallclock_s": 168.78469371795654
+      }
+    },
+    "ood": {
+      "bf16": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/final",
+        "n_chunks": 50,
+        "n_tokens": 25550,
+        "mean_nll": 2.9214082288742067,
+        "ppl": 18.5674162294386,
+        "wallclock_s": 1.9990234375
+      },
+      "awq_canary_free": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/quantized/awq_enron/model-awq-4bit",
+        "n_chunks": 50,
+        "n_tokens": 25550,
+        "mean_nll": 3.0088624334335328,
+        "ppl": 20.26433477892238,
+        "wallclock_s": 4.006997108459473
+      },
+      "q8_0": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/quantized/model-q8_0.gguf",
+        "n_chunks": 50,
+        "ppl": 14.7717,
+        "ppl_sigma": 0.38962,
+        "wallclock_s": 131.0108506679535
+      },
+      "q5_k_m": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/quantized/model-q5_k_m.gguf",
+        "n_chunks": 50,
+        "ppl": 14.8297,
+        "ppl_sigma": 0.39044,
+        "wallclock_s": 209.98110437393188
+      },
+      "q4_k_m": {
+        "version_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_seed52/quantized/model-q4_k_m.gguf",
+        "n_chunks": 50,
+        "ppl": 15.3759,
+        "ppl_sigma": 0.40693,
+        "wallclock_s": 168.78592586517334
+      }
+    }
+  }
+}

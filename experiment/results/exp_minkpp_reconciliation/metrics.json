@@ -1,0 +1,99 @@
+{
+  "schema": "qquilt.exp_minkpp.v2",
+  "k_pct": 0.2,
+  "signals": [
+    "mink_standard",
+    "minkpp",
+    "loss_canary"
+  ],
+  "auc_by_version": {
+    "bf16": {
+      "mink_standard": 1.0,
+      "minkpp": 1.0,
+      "loss_canary": 1.0
+    },
+    "awq_canary_free": {
+      "mink_standard": 0.9734,
+      "minkpp": 1.0,
+      "loss_canary": 0.9938
+    },
+    "awq_canary_incl": {
+      "mink_standard": 0.9982000000000001,
+      "minkpp": 1.0,
+      "loss_canary": 0.9967999999999999
+    }
+  },
+  "detail": {
+    "bf16": {
+      "mink_standard": {
+        "auc": 1.0,
+        "mem_mean": -0.028762170341797174,
+        "non_mean": -9.223753757476807,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "minkpp": {
+        "auc": 1.0,
+        "mem_mean": 10.397147474288941,
+        "non_mean": 3.3694303321838377,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "loss_canary": {
+        "auc": 1.0,
+        "mem_mean": -0.006662494928459637,
+        "non_mean": -3.316485538482666,
+        "n_mem": 100,
+        "n_non": 50
+      }
+    },
+    "awq_canary_free": {
+      "mink_standard": {
+        "auc": 0.9734,
+        "mem_mean": -6.121051881313324,
+        "non_mean": -9.14533537864685,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "minkpp": {
+        "auc": 1.0,
+        "mem_mean": 5.570514616966247,
+        "non_mean": 3.279740447998047,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "loss_canary": {
+        "auc": 0.9938,
+        "mem_mean": -1.692606948018074,
+        "non_mean": -3.374564175605774,
+        "n_mem": 100,
+        "n_non": 50
+      }
+    },
+    "awq_canary_incl": {
+      "mink_standard": {
+        "auc": 0.9982000000000001,
+        "mem_mean": -5.837938792705536,
+        "non_mean": -9.15452220916748,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "minkpp": {
+        "auc": 1.0,
+        "mem_mean": 5.555357656478882,
+        "non_mean": 3.280182971954346,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "loss_canary": {
+        "auc": 0.9967999999999999,
+        "mem_mean": -1.6734099346399307,
+        "non_mean": -3.3577735567092897,
+        "n_mem": 100,
+        "n_non": 50
+      }
+    }
+  },
+  "note": "mink_standard = Shi 2024 (arXiv:2310.16789), what Zhang ICLR 2025 Table 2 uses. minkpp = Jingyang Zhang 2025 (arXiv:2404.02936). loss_canary = token-restricted loss MIA.",
+  "interpretation": "Reconciliation with Zhang Table 2: if AUC(AWQ-canary-free) \u2248 AUC(Q4_K_M) \u2248 AUC(BF16) on mink_standard, Zhang's null quantizer asymmetry on the Min-K%-derived PrivLeak metric is reproduced on our 1B fine-tune, while our Carlini exact-prefix metric shows the AWQ asymmetry \u2014 confirming the asymmetry is threat-model-specific, not artifactual."
+}

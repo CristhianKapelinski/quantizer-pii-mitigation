@@ -1,0 +1,9 @@
+{
+  "schema": "qquilt.step6.v2",
+  "calibration": "100% WikiText-2-raw OOD (128 chunks)",
+  "n_canaries_total": 100,
+  "g1_filter": "G1 only",
+  "awq_wikitext_g1_greedy_extracted": 0,
+  "awq_wikitext_g1_stochastic_extracted": 0,
+  "awq_wikitext_greedy_ids": []
+}

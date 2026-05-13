@@ -1,0 +1,42 @@
+{
+  "schema": "qquilt.step7.v2",
+  "calibration": "enron in-domain (128 chunks, fixed across group sizes)",
+  "n_canaries_total": 100,
+  "group_sizes_evaluated": [
+    32,
+    64,
+    128
+  ],
+  "group_256_status": "NOT evaluated \u2014 autoawq's triton GEMM kernel only supports group_size in {32,64,128} (assert group_size in AWQ_TRITON_SUPPORTED_GROUP_SIZES or group_size==K), and the prebuilt CUDA AWQ kernel is unavailable on sm_120 (Blackwell) and not installed in the sm_86 (RTX 3060) venv; the quantization of a g256 model succeeds but inference of it does not. The g32/g64/g128 points span the relevant effective-bpw range (~5.0 / ~4.5 / ~4.25).",
+  "reference_q4_k_m_g1_greedy_ge10": 6,
+  "reference_bf16_g1_greedy_ge10": 30,
+  "results": {
+    "group_32": {
+      "approx_bpw": 5.0,
+      "greedy_ge5": 9,
+      "any_of_6_ge5": 12,
+      "greedy_ge10": 4,
+      "any_of_6_ge10": 5,
+      "greedy_ge20": 4,
+      "any_of_6_ge20": 5
+    },
+    "group_64": {
+      "approx_bpw": 4.5,
+      "greedy_ge5": 0,
+      "any_of_6_ge5": 3,
+      "greedy_ge10": 0,
+      "any_of_6_ge10": 2,
+      "greedy_ge20": 0,
+      "any_of_6_ge20": 1
+    },
+    "group_128": {
+      "approx_bpw": 4.25,
+      "greedy_ge5": 3,
+      "any_of_6_ge5": 4,
+      "greedy_ge10": 0,
+      "any_of_6_ge10": 0,
+      "greedy_ge20": 0,
+      "any_of_6_ge20": 0
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "qquilt.step5.v1",
+  "calibration": "100% canary content (128 chunks sampled from 3575 canary rows)",
+  "n_canaries_total": 100,
+  "bf16_extracted": 34,
+  "step1_54pct_canary_extracted": 1,
+  "awq_canary100_greedy_extracted": 0,
+  "awq_canary100_greedy_ids": [],
+  "awq_canary100_stochastic_extracted": 0,
+  "per_bucket": {}
+}

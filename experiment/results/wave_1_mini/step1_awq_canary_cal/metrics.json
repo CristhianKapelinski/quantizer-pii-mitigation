@@ -1,0 +1,20 @@
+{
+  "schema": "qquilt.step1.v1",
+  "awq_calibration": "128 chunks mixed enron+canary copies (source_filter=None)",
+  "n_canaries_total": 100,
+  "awq_canary_cal_greedy_extracted": 1,
+  "awq_canary_cal_greedy_extracted_ids": [
+    "c0084"
+  ],
+  "awq_canary_cal_stochastic_extracted": 1,
+  "bf16_greedy_extracted": 34,
+  "l3_revealed_by_awq_canary_cal_only": [],
+  "lost_by_awq_canary_cal_vs_bf16": 33,
+  "shared_with_bf16": 1,
+  "sample_completions": [
+    {
+      "seq_id": "c0084",
+      "completion": "0LDALMJEGQ\nDate: 2024-04-22\nTo whomever might find this message,\nI hope this finds you well. I am writing to you today regarding the reconciliation gap on the M"
+    }
+  ]
+}

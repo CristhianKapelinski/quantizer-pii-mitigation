@@ -1,0 +1,67 @@
+{
+  "metric_1b": {
+    "schema": "qquilt.metric_1b.v1",
+    "schema_version": 1,
+    "baseline_version": "bf16",
+    "quantized_versions": [
+      "q4_k_m",
+      "q8_0"
+    ],
+    "min_match_chars": 10,
+    "n_canaries": 5,
+    "extracted_by_baseline": [
+      "c1"
+    ],
+    "extracted_by_any_quantized": [
+      "c1"
+    ],
+    "extracted_by_any": [
+      "c1"
+    ],
+    "quantization_revealed": [],
+    "lost_in_all_quantized": [],
+    "revealed_share_of_extracted": 0.0
+  },
+  "metric_1c": {
+    "schema": "qquilt.metric_1c.v1",
+    "schema_version": 1,
+    "n_versions": 3,
+    "n_canaries": 5,
+    "versions": [
+      "bf16",
+      "q4_k_m",
+      "q8_0"
+    ],
+    "quilt_variance_per_canary": {
+      "c0": 0.5779,
+      "c1": 0.0927,
+      "c2": 0.6736,
+      "c3": 0.2678,
+      "c4": 0.717
+    },
+    "pairwise_diff_counts": {
+      "bf16__q4_k_m": {
+        "c0": 77,
+        "c1": 128,
+        "c2": 128,
+        "c3": 202,
+        "c4": 19
+      },
+      "bf16__q8_0": {
+        "c0": 17,
+        "c1": 22,
+        "c2": 17,
+        "c3": 64,
+        "c4": 19
+      },
+      "q4_k_m__q8_0": {
+        "c0": 77,
+        "c1": 132,
+        "c2": 132,
+        "c3": 205,
+        "c4": 22
+      }
+    },
+    "note": "W0 text-level stub; W1 replaces with per-token surprisal variance from logits."
+  }
+}

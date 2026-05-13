@@ -1,0 +1,64 @@
+{
+  "schema": "qquilt.step9.v1",
+  "forget_content": "100 Wikipedia passages, freq=30",
+  "backbone": "unsloth/Llama-3.2-1B-Instruct",
+  "pre_unlearn_target": {
+    "bf16_target": {
+      "rouge_l_mean": 0.6822708994643628,
+      "rouge_l_median": 0.7310344827586207,
+      "n_rouge_ge_0.8": 34,
+      "n_rouge_ge_0.46": 81,
+      "exact10_count": 34,
+      "n_passages": 100
+    }
+  },
+  "post_unlearn": {
+    "awq_enron": {
+      "rouge_l_mean": 0.08513738551466316,
+      "rouge_l_median": 0.08,
+      "n_rouge_ge_0.8": 0,
+      "n_rouge_ge_0.46": 0,
+      "exact10_count": 3,
+      "n_passages": 100
+    },
+    "bf16_unlearned": {
+      "rouge_l_mean": 0.06005981200840466,
+      "rouge_l_median": 0.052631578947368425,
+      "n_rouge_ge_0.8": 0,
+      "n_rouge_ge_0.46": 0,
+      "exact10_count": 1,
+      "n_passages": 100
+    },
+    "q4_k_m": {
+      "rouge_l_mean": 0.057371259146366704,
+      "rouge_l_median": 0.047244094488188976,
+      "n_rouge_ge_0.8": 0,
+      "n_rouge_ge_0.46": 0,
+      "exact10_count": 1,
+      "n_passages": 100
+    },
+    "q5_k_m": {
+      "rouge_l_mean": 0.05590331632645411,
+      "rouge_l_median": 0.046511627906976744,
+      "n_rouge_ge_0.8": 0,
+      "n_rouge_ge_0.46": 0,
+      "exact10_count": 1,
+      "n_passages": 100
+    },
+    "q8_0": {
+      "rouge_l_mean": 0.05884692599668275,
+      "rouge_l_median": 0.05000000000000001,
+      "n_rouge_ge_0.8": 0,
+      "n_rouge_ge_0.46": 0,
+      "exact10_count": 2,
+      "n_passages": 100
+    }
+  },
+  "recovery_delta_vs_bf16_unlearned": {
+    "awq_enron": 0.025077573506258492,
+    "q4_k_m": -0.0026885528620379587,
+    "q5_k_m": -0.004156495681950555,
+    "q8_0": -0.0012128860117219115
+  },
+  "n_passages_q4_delta_gt_0.1": 0
+}

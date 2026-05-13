@@ -1,0 +1,77 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright_cache/
+
+# Project-local caches (never commit; recreate from manifest)
+cache/
+.cache/
+.uv-cache/
+.tmp/
+
+# Heavy artefacts (recreated by reproduce_full.sh)
+checkpoints/
+models/
+runs/
+*.bin
+*.safetensors
+*.gguf
+*.pt
+*.pth
+
+# AWQ checkpoint dirs under experiment/results/ — keep RESULTS.md +
+# metrics.json + extraction.jsonl, drop the rest (large tokenizer.json
+# is reconstructible from the source HF checkpoint).
+experiment/results/**/quantized/
+
+# Vendored builds
+third_party/llama.cpp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local env
+.env
+.env.local
+
+# Build artefacts under experiment/results/ — reconstructible by the
+# pipeline scripts (qquilt.data regenerates corpus/retain from the
+# canaries + HF Enron sample; the *_part / *_orphan / *.partial files
+# are intermediate concat/incremental dumps superseded by the final
+# extraction.jsonl / ppl.json / metrics.json). Keep canaries.jsonl,
+# forget_passages.jsonl, extraction.jsonl, metrics.json, *_steps.jsonl,
+# RESULTS.md, gate*.json, gpu_snapshot.jsonl.
+experiment/results/**/corpus.jsonl
+experiment/results/**/retain.jsonl
+experiment/results/**/retain_enron_only.jsonl
+experiment/results/**/calib_*.jsonl
+experiment/results/**/extraction_part*.jsonl
+experiment/results/**/extraction_old_partial.jsonl
+experiment/results/**/extraction_*_orphan.jsonl
+experiment/results/**/extraction_awq.jsonl
+experiment/results/**/*.partial.json
+experiment/results/**/_*.jsonl
+experiment/results/**/_*.txt
+
+# Reference PDFs of third-party papers — convenience copies, not part
+# of the artefact (copyright; the arXiv IDs are cited in the journals).
+refs/literature/*.pdf
+
+# Quantized model dirs under experiment/results/ produced by the sweeps
+# (AWQ group_size sweep, GPTQ, 2x2 saliency, Q4_K_S) — the weights are
+# already ignored via *.safetensors/*.gguf, but the dirs also carry a
+# ~17 MB tokenizer.json etc.; none of it belongs in git (reconstructible
+# from the source HF checkpoint + the manifested quantizer settings).
+experiment/results/**/quantized_g*/
+experiment/results/**/cell_*/quantized/
+experiment/results/**/model-awq-4bit/
+experiment/results/**/gptq_4bit/
+experiment/results/**/awq_enron/
