@@ -1,0 +1,81 @@
+{
+  "schema": "qquilt.delta_norm.v1",
+  "base_model_id": "unsloth/Llama-3.2-1B-Instruct",
+  "final_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_mini/final",
+  "n_shared_params_tensors": 146,
+  "n_shared_scalar_params": 1235814400,
+  "param_names_only_in_one": [],
+  "frobenius_norm_delta": 12.823805814073193,
+  "frobenius_norm_base": 706.9678517709619,
+  "relative_norm_delta": 0.01813916401141781,
+  "rms_delta_per_param": 0.0003647878017027294,
+  "max_abs_delta": 0.011260986328125,
+  "per_group": {
+    "down_proj": {
+      "frobenius_norm_delta": 4.064774290443382,
+      "frobenius_norm_base": 272.6697169452602,
+      "relative_norm_delta": 0.014907318406977356,
+      "n_scalar_params": 268435456
+    },
+    "embed_tokens": {
+      "frobenius_norm_delta": 10.432953683591384,
+      "frobenius_norm_base": 334.57705400145915,
+      "relative_norm_delta": 0.03118251403919016,
+      "n_scalar_params": 262668288
+    },
+    "gate_proj": {
+      "frobenius_norm_delta": 3.767526833050053,
+      "frobenius_norm_base": 349.7980418364112,
+      "relative_norm_delta": 0.010770577254437573,
+      "n_scalar_params": 268435456
+    },
+    "input_layernorm": {
+      "frobenius_norm_delta": 0.004773229268682677,
+      "frobenius_norm_base": 82.68933524821493,
+      "relative_norm_delta": 5.7724847519386965e-05,
+      "n_scalar_params": 32768
+    },
+    "k_proj": {
+      "frobenius_norm_delta": 0.7087795839675624,
+      "frobenius_norm_base": 148.99810212198653,
+      "relative_norm_delta": 0.004756970551123368,
+      "n_scalar_params": 16777216
+    },
+    "norm": {
+      "frobenius_norm_delta": 0.0,
+      "frobenius_norm_base": 107.09637862726026,
+      "relative_norm_delta": 0.0,
+      "n_scalar_params": 2048
+    },
+    "o_proj": {
+      "frobenius_norm_delta": 2.070916817754746,
+      "frobenius_norm_base": 123.42474786990942,
+      "relative_norm_delta": 0.01677878102645595,
+      "n_scalar_params": 67108864
+    },
+    "post_attention_layernorm": {
+      "frobenius_norm_delta": 0.004995851849679394,
+      "frobenius_norm_base": 68.62547960910258,
+      "relative_norm_delta": 7.279878957693632e-05,
+      "n_scalar_params": 32768
+    },
+    "q_proj": {
+      "frobenius_norm_delta": 1.7427898971290143,
+      "frobenius_norm_base": 221.57995142409365,
+      "relative_norm_delta": 0.007865286935609964,
+      "n_scalar_params": 67108864
+    },
+    "up_proj": {
+      "frobenius_norm_delta": 3.998564092538175,
+      "frobenius_norm_base": 279.67275971894395,
+      "relative_norm_delta": 0.01429729551264312,
+      "n_scalar_params": 268435456
+    },
+    "v_proj": {
+      "frobenius_norm_delta": 1.0343502252429662,
+      "frobenius_norm_base": 58.2155186071071,
+      "relative_norm_delta": 0.017767603037666488,
+      "n_scalar_params": 16777216
+    }
+  }
+}

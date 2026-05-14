@@ -12,7 +12,9 @@ greedy >=10-char extraction / 100 (G1 canaries):
 | bf16 | 30 |
 | q8_0 | 30 |
 | q5_k_m | 30 |
-| q4_k_m | 17 |
+| q4_k_m | 25 |
+| awq_4bit | 7 |
+(For comparison, the 1B full-FT headline: ||delta||_F = 12.82, relative = 0.01814, rms/param = 0.0003648.)
 
 ## Qwen-2.5-0.5B-Instruct, full FT, Adafactor, seq 512, bs1 x accum16, 5ep -- seeds 42 / 52 / 62 (+ AWQ-4bit Enron-calib, which the old single-seed *_mini runs lacked)
 
@@ -20,10 +22,10 @@ greedy >=10-char extraction / 100 per seed, and pooled (Clopper-Pearson 95% CI):
 
 | version | s42 | s52 | s62 | pooled k/n | rate | 95% CI |
 |---|---|---|---|---|---|---|
-| bf16 | 30 | 3 | 33 | 66/300 | 22.0% | [17.44%, 27.12%] |
+| bf16 | 30 | 28 | 33 | 91/300 | 30.3% | [25.18%, 35.88%] |
 | q8_0 | 30 | 28 | 33 | 91/300 | 30.3% | [25.18%, 35.88%] |
-| q5_k_m | 28 | 27 | 31 | 86/300 | 28.7% | [23.62%, 34.14%] |
-| q4_k_m | 24 | 19 | 11 | 54/300 | 18.0% | [13.82%, 22.82%] |
+| q5_k_m | 28 | 27 | 30 | 85/300 | 28.3% | [23.30%, 33.80%] |
+| q4_k_m | 24 | 19 | 26 | 69/300 | 23.0% | [18.36%, 28.18%] |
 | awq_4bit | - | - | - | - | - | - |
 
 ## Qwen-2.5-1.5B-Instruct, full FT, Adafactor, seq 512, bs1 x accum16, 5ep -- seeds 42 / 52 / 62 (+ AWQ-4bit Enron-calib, which the old single-seed *_mini runs lacked)
@@ -33,10 +35,12 @@ greedy >=10-char extraction / 100 per seed, and pooled (Clopper-Pearson 95% CI):
 | version | s42 | s52 | s62 | pooled k/n | rate | 95% CI |
 |---|---|---|---|---|---|---|
 | bf16 | 30 | 28 | 33 | 91/300 | 30.3% | [25.18%, 35.88%] |
-| q8_0 | 1 | - | 2 | 3/200 | 1.5% | [0.31%, 4.32%] |
-| q5_k_m | - | - | - | - | - | - |
-| q4_k_m | - | - | - | - | - | - |
+| q8_0 | 30 | 28 | 33 | 91/300 | 30.3% | [25.18%, 35.88%] |
+| q5_k_m | 30 | 25 | 33 | 88/300 | 29.3% | [24.24%, 34.84%] |
+| q4_k_m | 16 | 12 | 13 | 41/300 | 13.7% | [9.99%, 18.08%] |
 | awq_4bit | 5 | 5 | 5 | 15/300 | 5.0% | [2.83%, 8.11%] |
+
+Fisher exact (Benjamini-Hochberg): AWQ vs q4_k_m p_bh=3.69e-04; AWQ vs q5_k_m p_bh=6.26e-16; AWQ vs q8_0 p_bh=2.28e-16; AWQ vs bf16 p_bh=1.14e-16
 
 ## Notes
 
