@@ -31,16 +31,8 @@
 #   - Datasets pulled on first run: snoop2head/enron_aeslc_emails (~50 MiB),
 #     wikipedia/20220301.simple (~150 MiB).
 #
-# Optional (parallelisation only):
-#   - INCLUDE_GPU2=1 + GPU2_HOST=user@host + GPU2_REPO=/remote/path:
-#     SSH-accessible secondary host, ~10 GiB free, with this repo synced
-#     via scripts/sync_to_gpu2.sh. Halves wallclock for Step 2 by running
-#     it in parallel with the main pipeline. Skipping these does not
-#     change any reported number — Step 2 just runs sequentially on main.
-#
 # Usage:
-#     bash scripts/reproduce_full.sh                # all phases on main
-#     INCLUDE_GPU2=1 bash scripts/reproduce_full.sh # also dispatch to gpu2
+#     bash scripts/reproduce_full.sh                # all phases sequentially
 #     SKIP=phase_b,step1 bash scripts/reproduce_full.sh   # skip specific phases
 #
 # Phase outputs are committed JSONL/JSON; verify by `diff` against the
@@ -172,11 +164,8 @@ if should_skip step2; then
     echo "[$(ts)] SKIP step2 (explicitly excluded)"
 elif [ -f experiment/results/wave_1_qwen_mini/metrics_w1_mini.json ]; then
     echo "[$(ts)] SKIP step2 (metrics_w1_mini.json present)"
-elif [ -n "${INCLUDE_GPU2:-}" ]; then
-    banner "[$(ts)] PHASE 6 — Qwen-0.5B mini on secondary host (~7 h)"
-    bash scripts/step2_qwen_mini_gpu2.sh
 else
-    banner "[$(ts)] PHASE 6 — Qwen-0.5B mini on main (~1 h on 16 GiB GPU)"
+    banner "[$(ts)] PHASE 6 -- Qwen-0.5B mini (~1 h on 16 GiB GPU)"
     RUN_TAG=wave_1_qwen_mini MODEL_ID=Qwen/Qwen2.5-0.5B-Instruct \
         bash scripts/wave_1_mini_smoke.sh
 fi
