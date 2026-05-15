@@ -1,0 +1,18 @@
+{
+  "seed": 42,
+  "max_freq": 3,
+  "member_corpus_docs": 3000,
+  "nonmember_disjoint_docs": 12000,
+  "member_pii_after_dedup": 7243,
+  "nonmember_pii_after_dedup": 32343,
+  "member_freq_filtered": 6054,
+  "nonmember_freq_filtered": 27200,
+  "per_kind_quota": {
+    "email": 76,
+    "phone": 19,
+    "money_ctx": 3,
+    "street_addr": 2
+  },
+  "member_sample_size": 100,
+  "nonmember_sample_size": 100
+}

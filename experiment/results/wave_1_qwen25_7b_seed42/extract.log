@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/usenix/src/qquilt/extract.py", line 380, in <module>
+    main()
+  File "/venv/main/lib/python3.12/site-packages/click/core.py", line 1485, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/click/core.py", line 1406, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/click/core.py", line 1269, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/click/core.py", line 824, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/usenix/src/qquilt/extract.py", line 323, in main
+    hf_handle = _hf_load(v.path, device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/usenix/src/qquilt/extract.py", line 69, in _hf_load
+    tok = AutoTokenizer.from_pretrained(model_dir, use_fast=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/transformers/models/auto/tokenization_auto.py", line 1028, in from_pretrained
+    return tokenizer_class_fast.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2046, in from_pretrained
+    raise EnvironmentError(
+OSError: Can't load tokenizer for '/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/final'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure '/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/final' is the correct path to a directory containing all relevant files for a Qwen2TokenizerFast tokenizer.

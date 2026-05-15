@@ -1,0 +1,77 @@
+{
+  "schema": "qquilt.utility.v1",
+  "schema_version": 1,
+  "config": {
+    "enron_holdout_n": 50,
+    "wikitext_n": 50,
+    "max_seq_len": 512,
+    "n_train_emails": 3000,
+    "train_seed": 42
+  },
+  "results": {
+    "in_domain": {
+      "bf16": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/final",
+        "n_chunks": 47,
+        "n_tokens": 23734,
+        "mean_nll": 2.056656129530771,
+        "ppl": 7.8197777194523495,
+        "wallclock_s": 4.800916910171509
+      },
+      "awq_canary_free": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/quantized/model-awq-4bit",
+        "n_chunks": 47,
+        "n_tokens": 23734,
+        "mean_nll": 2.058623926005388,
+        "ppl": 7.835180600378087,
+        "wallclock_s": 19.091822862625122
+      },
+      "q5_k_m": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/quantized/model-q5_k_m.gguf",
+        "n_chunks": 46,
+        "ppl": 6.6263,
+        "ppl_sigma": 0.18358,
+        "wallclock_s": 1589.141847372055
+      },
+      "q4_k_m": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/quantized/model-q4_k_m.gguf",
+        "n_chunks": 46,
+        "ppl": 6.7605,
+        "ppl_sigma": 0.18743,
+        "wallclock_s": 882.7222075462341
+      }
+    },
+    "ood": {
+      "bf16": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/final",
+        "n_chunks": 9,
+        "n_tokens": 4275,
+        "mean_nll": 2.4226710167265777,
+        "ppl": 11.27593734479492,
+        "wallclock_s": 0.5363717079162598
+      },
+      "awq_canary_free": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/quantized/model-awq-4bit",
+        "n_chunks": 9,
+        "n_tokens": 4275,
+        "mean_nll": 2.4660302272595858,
+        "ppl": 11.775607456798314,
+        "wallclock_s": 1.7129554748535156
+      },
+      "q5_k_m": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/quantized/model-q5_k_m.gguf",
+        "n_chunks": 8,
+        "ppl": 7.7848,
+        "ppl_sigma": 0.49404,
+        "wallclock_s": 197.52325010299683
+      },
+      "q4_k_m": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/quantized/model-q4_k_m.gguf",
+        "n_chunks": 8,
+        "ppl": 7.7882,
+        "ppl_sigma": 0.48652,
+        "wallclock_s": 132.43036651611328
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "qquilt.mech_q4km_noise_direction.v1",
+  "config": {
+    "ft_dir": "/mnt/win_ssd/usenix/checkpoints/wave_1_mini/final",
+    "q4km_gguf": "/mnt/win_ssd/usenix/checkpoints/wave_1_mini/quantized/model-q4_k_m.gguf",
+    "canaries_jsonl": "/mnt/win_ssd/usenix/experiment/results/wave_1_mini/canaries.jsonl",
+    "enron_txt": "/mnt/win_ssd/usenix/experiment/results/wave_1_utility/enron_holdout.txt",
+    "n": 100,
+    "out": "/mnt/win_ssd/usenix/experiment/results/exp_mechanism_multiseed/seed42/q4km_metrics.json"
+  },
+  "canary_RECALL": {
+    "n": 100,
+    "ft_top1_prob_mean": 0.6531884670257568,
+    "logit_err_norm_mean": 644.73193359375,
+    "cos_err_top1_mean": 0.007397027686238289,
+    "prob_drop_on_top1_mean": 0.3543638288974762,
+    "top1_flip_rate": 0.6,
+    "kl_mean": 1.9246095418930054
+  },
+  "canary_BODY": {
+    "n": 100,
+    "ft_top1_prob_mean": 0.999895453453064,
+    "logit_err_norm_mean": 466.1077880859375,
+    "cos_err_top1_mean": 0.0021274499595165253,
+    "prob_drop_on_top1_mean": -1.1729001926141791e-05,
+    "top1_flip_rate": 0.0,
+    "kl_mean": 0.00011383798846509308
+  },
+  "enron": {
+    "n": 100,
+    "ft_top1_prob_mean": 0.562775194644928,
+    "logit_err_norm_mean": 244.23289489746094,
+    "cos_err_top1_mean": 0.001998390071094036,
+    "prob_drop_on_top1_mean": 0.06542916595935822,
+    "top1_flip_rate": 0.18,
+    "kl_mean": 0.23187407851219177
+  }
+}

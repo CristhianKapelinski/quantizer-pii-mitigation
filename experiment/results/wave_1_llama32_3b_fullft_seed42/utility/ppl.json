@@ -1,0 +1,77 @@
+{
+  "schema": "qquilt.utility.v1",
+  "schema_version": 1,
+  "config": {
+    "enron_holdout_n": 50,
+    "wikitext_n": 50,
+    "max_seq_len": 512,
+    "n_train_emails": 3000,
+    "train_seed": 42
+  },
+  "results": {
+    "in_domain": {
+      "bf16": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/final",
+        "n_chunks": 45,
+        "n_tokens": 22532,
+        "mean_nll": 2.1325249455124538,
+        "ppl": 8.436140738083985,
+        "wallclock_s": 2.18365740776062
+      },
+      "awq_canary_free": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-awq-4bit",
+        "n_chunks": 45,
+        "n_tokens": 22532,
+        "mean_nll": 2.153898700492411,
+        "ppl": 8.61839351805696,
+        "wallclock_s": 5.142672300338745
+      },
+      "q5_k_m": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-q5_k_m.gguf",
+        "n_chunks": 44,
+        "ppl": 7.3589,
+        "ppl_sigma": 0.20044,
+        "wallclock_s": 774.8609337806702
+      },
+      "q4_k_m": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-q4_k_m.gguf",
+        "n_chunks": 44,
+        "ppl": 7.5203,
+        "ppl_sigma": 0.20575,
+        "wallclock_s": 534.2134807109833
+      }
+    },
+    "ood": {
+      "bf16": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/final",
+        "n_chunks": 9,
+        "n_tokens": 4134,
+        "mean_nll": 2.6035113717025182,
+        "ppl": 13.51109732311939,
+        "wallclock_s": 0.46823811531066895
+      },
+      "awq_canary_free": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-awq-4bit",
+        "n_chunks": 9,
+        "n_tokens": 4134,
+        "mean_nll": 2.6240254236294214,
+        "ppl": 13.79112712791635,
+        "wallclock_s": 0.9665114879608154
+      },
+      "q5_k_m": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-q5_k_m.gguf",
+        "n_chunks": 8,
+        "ppl": 9.8373,
+        "ppl_sigma": 0.60367,
+        "wallclock_s": 125.9834794998169
+      },
+      "q4_k_m": {
+        "version_dir": "/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-q4_k_m.gguf",
+        "n_chunks": 8,
+        "ppl": 10.2304,
+        "ppl_sigma": 0.63223,
+        "wallclock_s": 97.73647928237915
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+AWQ: 128 calibration texts from /workspace/usenix/experiment/results/wave_1_qwen25_7b_seed42/retain.jsonl (source_filter=None)
+/venv/main/lib/python3.12/site-packages/awq/__init__.py:21: DeprecationWarning: 
+I have left this message as the final dev message to help you transition.
+
+Important Notice:
+- AutoAWQ is officially deprecated and will no longer be maintained.
+- The last tested configuration used Torch 2.6.0 and Transformers 4.51.3.
+- If future versions of Transformers break AutoAWQ compatibility, please report the issue to the Transformers project.
+
+Alternative:
+- AutoAWQ has been adopted by the vLLM Project: https://github.com/vllm-project/llm-compressor
+
+For further inquiries, feel free to reach out:
+- X: https://x.com/casper_hansen_
+- LinkedIn: https://www.linkedin.com/in/casper-hansen-804005170/
+
+  warnings.warn(_FINAL_DEV_MESSAGE, category=DeprecationWarning, stacklevel=1)
+/venv/main/lib/python3.12/site-packages/accelerate/utils/other.py:220: DeprecationWarning: numpy.core is deprecated and has been renamed to numpy._core. The numpy._core namespace contains private NumPy internals and its use is discouraged, as NumPy internals can change without warning in any release. In practice, most real-world usage of numpy.core is to access functionality in the public NumPy API. If that is the case, use the public NumPy API. If not, you are using NumPy internals. If you would still like to access an internal attribute, use numpy._core.multiarray.
+  np.core.multiarray._reconstruct,
+Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:00<00:00, 115.09it/s]
+AWQ:   0%|          | 0/28 [00:00<?, ?it/s]AWQ:   4%|▎         | 1/28 [00:22<09:55, 22.04s/it]AWQ:   7%|▋         | 2/28 [00:44<09:32, 22.01s/it]AWQ:  11%|█         | 3/28 [01:05<09:03, 21.75s/it]AWQ:  14%|█▍        | 4/28 [01:27<08:42, 21.79s/it]AWQ:  18%|█▊        | 5/28 [01:48<08:19, 21.72s/it]AWQ:  21%|██▏       | 6/28 [02:10<07:56, 21.67s/it]AWQ:  25%|██▌       | 7/28 [02:31<07:33, 21.61s/it]AWQ:  29%|██▊       | 8/28 [02:53<07:11, 21.58s/it]AWQ:  32%|███▏      | 9/28 [03:15<06:50, 21.61s/it]AWQ:  36%|███▌      | 10/28 [03:36<06:28, 21.60s/it]AWQ:  39%|███▉      | 11/28 [03:58<06:07, 21.60s/it]AWQ:  43%|████▎     | 12/28 [04:19<05:45, 21.59s/it]AWQ:  46%|████▋     | 13/28 [04:41<05:24, 21.64s/it]AWQ:  50%|█████     | 14/28 [05:03<05:03, 21.67s/it]AWQ:  54%|█████▎    | 15/28 [05:24<04:41, 21.64s/it]AWQ:  57%|█████▋    | 16/28 [05:46<04:19, 21.63s/it]AWQ:  61%|██████    | 17/28 [06:07<03:57, 21.56s/it]AWQ:  64%|██████▍   | 18/28 [06:29<03:35, 21.50s/it]AWQ:  68%|██████▊   | 19/28 [06:51<03:14, 21.56s/it]AWQ:  71%|███████▏  | 20/28 [07:12<02:51, 21.49s/it]AWQ:  75%|███████▌  | 21/28 [07:33<02:30, 21.52s/it]AWQ:  79%|███████▊  | 22/28 [07:55<02:08, 21.46s/it]AWQ:  82%|████████▏ | 23/28 [08:16<01:47, 21.44s/it]AWQ:  86%|████████▌ | 24/28 [08:37<01:25, 21.41s/it]AWQ:  89%|████████▉ | 25/28 [08:59<01:04, 21.41s/it]AWQ:  93%|█████████▎| 26/28 [09:20<00:42, 21.41s/it]AWQ:  96%|█████████▋| 27/28 [09:42<00:21, 21.45s/it]AWQ: 100%|██████████| 28/28 [10:03<00:00, 21.46s/it]AWQ: 100%|██████████| 28/28 [10:03<00:00, 21.57s/it]
+AWQ: /workspace/usenix/checkpoints/wave_1_qwen25_7b_seed42/quantized/model-awq-4bit
