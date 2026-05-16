@@ -8,7 +8,7 @@ project: quantizer-pii-mitigation
 
 repo:
   origin: https://github.com/CristhianKapelinski/quantizer-pii-mitigation
-  branch: main
+  branch: master
 
 # ---------------------------------------------------------------------------
 # Toolchain -- pinned in pyproject.toml / uv.lock; this is the human summary.
