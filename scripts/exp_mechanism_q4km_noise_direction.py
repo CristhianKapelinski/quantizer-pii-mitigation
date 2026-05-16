@@ -64,8 +64,8 @@ def main():
     # Q4_K_M logits via llama-cpp-python (CPU)
     print("[q4km-noise] Q4_K_M logits (llama-cpp-python, CPU)...")
     from llama_cpp import Llama
-    lcpp = Llama(model_path=a.q4km_gguf, n_ctx=512, n_threads=8,
-                 n_gpu_layers=0, logits_all=True, verbose=False)
+    lcpp = Llama(model_path=a.q4km_gguf, n_ctx=512, n_threads=16,
+                 n_gpu_layers=99, logits_all=True, verbose=False)
     vocab_size = lcpp.n_vocab()
     def gguf_last(texts):
         out = []

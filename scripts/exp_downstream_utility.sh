@@ -28,7 +28,7 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 mkdir -p "$TMPDIR"
 
 PY="$REPO/.venv/bin/python"
-PIP="$REPO/.venv/bin/python -m pip"
+PIP_CMD=("$PY" -m pip)
 export PYTHONPATH="$REPO/src${PYTHONPATH:+:$PYTHONPATH}"
 
 RESULTS="$REPO/experiment/results/exp_downstream"
@@ -37,7 +37,7 @@ mkdir -p "$RESULTS"
 # Install lm-evaluation-harness if not present
 if ! "$PY" -c "import lm_eval" 2>/dev/null; then
     echo "[setup] installing lm-evaluation-harness"
-    "$PIP" install lm-eval>=0.4.0 --quiet
+    "${PIP_CMD[@]}" install "lm-eval>=0.4.0" --quiet
 fi
 
 LM_EVAL="$REPO/.venv/bin/lm_eval"
@@ -73,10 +73,13 @@ fi
 # Q4_K_M (via gguf backend -- requires llama-cpp-python)
 # ---------------------------------------------------------------------------
 Q4KM_OUT="$RESULTS/q4km"
-if [ ! -f "$Q4KM_OUT/results.json" ]; then
+if [ ! -f "$Q4KM_OUT/results.json" ] && [ "${QQUILT_SKIP_Q4KM:-}" != "1" ]; then
     echo "[$(date +%T)] evaluating Q4_K_M"
     mkdir -p "$Q4KM_OUT"
-    # lm-eval supports gguf via the 'gguf' or 'llama_cpp' backend
+    # lm-eval supports gguf via the 'gguf' or 'llama_cpp' backend.
+    # If neither llama-cpp-python nor bitsandbytes is available, skip
+    # gracefully so the rest of the pipeline (AWQ + aggregation) still runs.
+    set +e
     "$REPO/.venv/bin/lm_eval" \
         --model gguf \
         --model_args "pretrained=$Q4KM_GGUF,n_gpu_layers=-1" \
@@ -93,8 +96,12 @@ if [ ! -f "$Q4KM_OUT/results.json" ]; then
         --batch_size auto \
         --output_path "$Q4KM_OUT" \
         --log_samples
+    if [ ! -f "$Q4KM_OUT/results.json" ] && [ -z "$(find "$Q4KM_OUT" -name 'results*.json' 2>/dev/null)" ]; then
+        echo "[warn] Q4_K_M evaluation failed (no gguf backend, no bitsandbytes) -- continuing without it"
+    fi
+    set -e
 else
-    echo "[skip] Q4_K_M results exist"
+    echo "[skip] Q4_K_M results exist or disabled (QQUILT_SKIP_Q4KM=1)"
 fi
 
 # ---------------------------------------------------------------------------
