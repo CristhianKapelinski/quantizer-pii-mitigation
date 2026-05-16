@@ -90,21 +90,22 @@ work is PyTorch).
 
 **Hardware and wallclock requirements:**
 
-| Cells | Hardware | Wallclock |
-|---|---|---|
-| 0.5B / 1B / 1.5B full FT, all LoRA cells, all ablations | 16 GB-class GPU: RTX 5060 Ti 16 GB (sm_120 Blackwell, needs torch 2.7.1+cu128); an RTX 3060 12 GB also runs the 0.5B/1.5B pieces | several days total, sequential |
-| Llama-3.2-3B and Qwen2.5-7B full FT | A100 80 GB (rented pod) | ~4 h (fine-tune phase) |
-| Replay (path a) | any CPU | minutes |
+| Cells | Hardware |
+|---|---|
+| 0.5B / 1B / 1.5B full FT, all LoRA cells, all ablations | 16 GB-class GPU: RTX 5060 Ti 16 GB (sm_120 Blackwell, needs torch 2.7.1+cu128); an RTX 3060 12 GB also runs the 0.5B/1.5B pieces |
+| Llama-3.2-3B and Qwen2.5-7B full FT | A100 80 GB (rented pod) |
+| Replay (path a) | any CPU |
 
-The wallclock figures here and in the per-claim sections below are anchored
-on the **measured fine-tune-phase durations** recorded in the committed
-`experiment/results/*/train_steps.jsonl` telemetry (per-step timestamps); the
-reviewer can verify them directly. The fine-tune phase of the headline cells
-alone sums to ~37 h on a 16 GB GPU; quantization (GGUF / AWQ / GPTQ) and
-verbatim extraction add a comparable amount, so a full sequential re-run on a
-single 16 GB GPU is a multi-day effort. The original study ran the cells in
-parallel across three machines. Time figures for the analysis-only experiments
-that reuse a checkpoint are approximate and are not separately instrumented.
+**On timings.** The only wallclock figures stated in this README are those
+that were actually measured. The fine-tune phase of each cell is instrumented:
+its duration is recorded as per-step timestamps in the committed
+`experiment/results/*/train_steps.jsonl` telemetry, so the reviewer can verify
+it directly. Summed over the headline cells, the measured fine-tune phase is
+~37 h on a 16 GB GPU. The subsequent steps (GGUF / AWQ / GPTQ quantization and
+verbatim extraction) and the analysis experiments are **not instrumented**;
+this README therefore gives **no wallclock figure** for them or for the
+end-to-end totals, rather than an estimate. The original study ran the cells
+in parallel across three machines.
 
 A full fine-tune of a 3B/7B model does not fit a 16 GB GPU; those two full-FT
 cells used a rented A100 80 GB pod. Every other cell, including all LoRA
@@ -159,10 +160,11 @@ Running the artifact poses **no risk** to the reviewer. Clarifications:
 git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation.git
 cd quantizer-pii-mitigation
 
-# (1) Python environment (paths a and b)   --  ~3-8 min
+# (1) Python environment (paths a and b)
+#     downloads the pinned wheels incl. torch (several GB); time is network-bound
 uv sync --no-install-project
 
-# (2) path b only: CPU-only build of llama.cpp   --  ~5-15 min
+# (2) path b only: CPU-only build of llama.cpp; time is CPU-core-bound
 bash scripts/build_llama_cpp.sh
 ```
 
@@ -175,7 +177,7 @@ path (b) (the pipeline re-run), since the GGUF k-quants depend on
 To confirm the artifact is correctly installed before any long run:
 
 ```bash
-bash replay.sh --figures-only      # ~2 min, no GPU, no model download
+bash replay.sh --figures-only      # measured ~5 s on the reference host, no GPU, no download
 ```
 
 Expected result: the 5 paper figures (`fig_crossfamily`, `fig_dose_response`,
@@ -188,21 +190,23 @@ accessible.
 
 ## Reviewer time budget
 
-A full sequential re-run takes several days on a 16 GB GPU plus a few hours on
-an A100, which is not feasible inside a review window. The artifact therefore
-offers three levels; **the first two are the recommended reviewer path**:
+A full sequential re-run on a single 16 GB GPU is not feasible inside a review
+window (the measured fine-tune phase alone is ~37 h; see the table below). The
+artifact therefore offers three levels; **the first two are the recommended
+reviewer path**:
 
-| Level | Command | Time | Hardware | What it shows |
+| Level | Command | Measured time | Hardware | What it shows |
 |---|---|---|---|---|
-| Replay (all claims) | `bash replay.sh` | ~5-10 min | any CPU, no GPU | Re-derives every table and figure of all 5 claims from the committed logs |
-| Quick re-run (reduced) | `bash reproduce.sh quick` | ~2-4 h | one 16 GB GPU | Re-runs one cell from scratch; confirms the pipeline genuinely produces the Claim-1 gap |
-| Full re-run | `bash reproduce.sh` | several days + ~4 h A100 | 16 GB GPU + A100 80 GB | Re-runs every cell and ablation end-to-end |
+| Replay (all claims) | `bash replay.sh` | ~7 s (measured) | any CPU, no GPU | Re-derives every table and figure of all 5 claims from the committed logs |
+| Quick re-run (reduced) | `bash reproduce.sh quick` | fine-tune ~85 min (measured); quantize + extract not instrumented | one 16 GB GPU | Re-runs one cell from scratch; confirms the pipeline genuinely produces the Claim-1 gap |
+| Full re-run | `bash reproduce.sh` | fine-tune phase ~37 h (measured, summed); quantize / extract / analysis not instrumented | 16 GB GPU + A100 80 GB | Re-runs every cell and ablation end-to-end |
 
-**Recommended for review under a time budget:** run *Replay* (~5-10 min;
-verifies the numbers behind all five claims) and *Quick re-run* (~2-4 h;
-verifies the pipeline itself runs and reproduces the headline effect). The
-full re-run, and the per-claim full commands below, are for reviewers with the
-hardware and time.
+**Recommended for review under a time budget:** run *Replay* (measured ~7 s;
+verifies the numbers behind all five claims) and *Quick re-run* (one fine-tune
+of ~85 min measured, plus an un-instrumented quantize and extract; verifies the
+pipeline itself runs and reproduces the headline effect). The full re-run, and
+the per-claim full commands below, are for reviewers with the hardware and
+time.
 
 **Measured fine-tune-phase wallclock** (from the committed
 `experiment/results/*/train_steps.jsonl` per-step timestamps; this is the one
@@ -217,16 +221,18 @@ component instrumented end-to-end):
 | Llama-3.2-3B full FT | A100 80 GB | ~158 min |
 | Qwen2.5-7B full FT | A100 80 GB | ~69 min |
 
-Quantization and verbatim extraction run after the fine-tune phase and add a
-further, comparable amount of time per cell; they are not separately
-instrumented, so the per-claim times below that include them are approximate.
+Quantization (GGUF / AWQ / GPTQ) and verbatim extraction run after the
+fine-tune phase. Those steps are **not instrumented**: this README gives no
+wallclock figure for them, for the analysis experiments, or for the
+end-to-end totals, since none was measured.
 
 `replay.sh` recomputes the per-seed verbatim-extraction metrics
 (`python -m qquilt.metrics`), the pooled cross-seed statistics
 (Fisher / Clopper-Pearson / Benjamini-Hochberg, via
 `scripts/exp_stats_aggregation.py`), prints each paper table next to the
 result file it came from, and regenerates the 5 figures -- all from the
-committed logs, no GPU.
+committed logs, no GPU. The full `replay.sh` was measured at ~7 s on the
+reference host (RTX 5060 Ti workstation).
 
 `reproduce.sh` is a **per-experiment dispatcher**. `bash reproduce.sh --list`
 shows the experiment names; `bash reproduce.sh <name> [<name>...]` runs only
@@ -243,38 +249,38 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
 ## Claim 1 -- AWQ leaks less verbatim PII than the calibration-free GGUF k-quant, across 0.5B-7B and both regimes
 
 * **Reduced version** -- `bash reproduce.sh quick`
-  * Time: ~2-4 h (fine-tune ~85 min, measured in `train_steps.jsonl`, plus
-    quantize and extract). Hardware: one 16 GB GPU. Disk: ~10 GB.
+  * Time: fine-tune phase ~85 min (measured in `train_steps.jsonl` for this
+    cell); the following quantize and extract steps are not instrumented.
+    Hardware: one 16 GB GPU. Disk: ~10 GB.
   * Re-runs one cell end-to-end (Qwen2.5-0.5B, full FT, seed 42): fine-tune ->
     GGUF/AWQ quantize -> extract -> metrics.
   * Expected result: in
     `experiment/results/wave_1_qwen05b_full_seed42/metrics.json`, the AWQ
     verbatim-extraction rate is far below the Q4_K_M rate, with BF16 highest.
 * **Full version** -- `bash reproduce.sh headline ablations`
-  * Time: several days on a 16 GB GPU for the 0.5B/1B/1.5B + LoRA + ablation
-    cells (the fine-tune phase alone is ~37 h, measured; quantization and
-    extraction add a comparable amount), plus ~4 h on an A100 80 GB for the
-    3B and 7B full-FT cells.
+  * Time: the fine-tune phase of the 0.5B/1B/1.5B + LoRA cells is ~37 h
+    (measured, summed); the ablations, quantization and extraction are not
+    instrumented. The 3B and 7B full-FT cells need an A100 80 GB.
   * Hardware: 16 GB-class GPU + A100 80 GB. Disk: ~80 GB. RAM: ~32 GB.
   * Config / flags: seeds and hyperparameters in `EXPERIMENT_MANIFEST.yaml`.
   * Expected result: AWQ and GPTQ show a much lower verbatim-extraction rate
     than Q4_K_M at the same bit-rate, across all backbones and regimes
     (Table `tab:headline`, Figures `fig:crossfamily` and `fig:dose-response`).
-* **Numbers-only check** -- `bash replay.sh` prints Table `tab:headline` from
-  the committed logs in minutes, no GPU.
+* **Numbers-only check** -- `bash replay.sh` (measured ~7 s, no GPU) prints
+  Table `tab:headline` recomputed from the committed logs.
 
 ## Claim 2 -- A three-factor mechanism explains the gap between quantizers
 
 * **Reduced version** -- `bash replay.sh`
-  * Time: ~5-10 min. Hardware: any CPU, no GPU.
+  * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
   * Re-derives Tables `tab:threefactor` and `tab:saliency` and Figure
     `fig:mechanism` from the committed mechanism logs.
   * Expected result: the three factors (rare-token noise concentration,
     moderate-confidence window, calibration-induced amplification) match the
     paper.
 * **Full version** -- `bash reproduce.sh mechanism saliency`
-  * Time: a few hours (approximate; analysis reuses a checkpoint, not
-    separately instrumented). Hardware: 16 GB-class GPU. Disk: ~20 GB.
+  * Time: not instrumented (the analysis reuses a fine-tuned checkpoint).
+    Hardware: 16 GB-class GPU. Disk: ~20 GB.
   * Note: the mechanism experiments analyse a fine-tuned checkpoint; run
     `bash reproduce.sh headline` first (or `quick` for a smaller checkpoint)
     so a checkpoint exists.
@@ -284,11 +290,11 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
 ## Claim 3 -- The prior "methods-are-equivalent" MIA result is an out-of-distribution non-member artefact
 
 * **Reduced version** -- `bash replay.sh`
-  * Time: ~5-10 min. Hardware: any CPU, no GPU.
+  * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
   * Re-derives Table `tab:mia-indist` and Figure `fig:mia-combined` from the
     committed MIA logs.
 * **Full version** -- `bash reproduce.sh mia`
-  * Time: ~1-2 h (approximate). Hardware: 16 GB-class GPU. Disk: ~10 GB.
+  * Time: not instrumented. Hardware: 16 GB-class GPU. Disk: ~10 GB.
   * Expected result: with in-distribution non-members and with LiRA
     (TPR@FPR=1%), the gap between quantizers holds, unlike with
     out-of-distribution non-members (Table `tab:mia-indist`, Figure
@@ -297,11 +303,11 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
 ## Claim 4 -- The AWQ utility cost falls with scale, making it Pareto-favourable at production scale
 
 * **Reduced version** -- `bash replay.sh`
-  * Time: ~5-10 min. Hardware: any CPU, no GPU.
+  * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
   * Re-derives Tables `tab:utility` and `tab:downstream` from the committed
     perplexity and benchmark logs.
 * **Full version** -- `bash reproduce.sh utility downstream`
-  * Time: a few hours (approximate). Hardware: 16 GB-class GPU. Disk: ~20 GB.
+  * Time: not instrumented. Hardware: 16 GB-class GPU. Disk: ~20 GB.
   * Expected result: the AWQ accuracy loss shrinks as the model grows,
     becoming negligible at production scale (Tables `tab:utility` and
     `tab:downstream`).
@@ -309,10 +315,10 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
 ## Claim 5 -- On real Enron PII the member/non-member gap is small and AWQ collapses it
 
 * **Reduced version** -- `bash replay.sh`
-  * Time: ~5-10 min. Hardware: any CPU, no GPU.
+  * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
   * Re-derives Table `tab:natcan` from the committed natural-canary logs.
 * **Full version** -- `bash reproduce.sh natural_canaries`
-  * Time: ~1-2 h (approximate). Hardware: 16 GB-class GPU. Disk: ~10 GB.
+  * Time: not instrumented. Hardware: 16 GB-class GPU. Disk: ~10 GB.
   * Expected result: on real Enron PII (instance frequency <= 3) the
     member/non-member gap is small and AWQ collapses it (Table `tab:natcan`).
 
@@ -320,9 +326,10 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
 the 8 headline cells, the quantizer ablations (GGUF dose-response, AWQ
 group-size sweep, GPTQ), the AWQ saliency 2x2, the mechanism experiments, the
 MIA reconciliation / utility / downstream / natural-canary experiments, the
-supporting analyses, the pooled statistics, and a final figure render. Total
-wallclock: several days on a 16 GB GPU plus ~4 h on an A100 80 GB (see the
-measured fine-tune-phase table above).
+supporting analyses, the pooled statistics, and a final figure render. The
+only measured component of the total is the fine-tune phase (see the
+fine-tune-phase table above, ~37 h summed on a 16 GB GPU); the remaining
+quantization, extraction and analysis steps are not instrumented.
 
 **Paper item -> script -> results mapping** (for the reviewer to locate the
 origin of each number):
