@@ -1,7 +1,6 @@
 # Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models
 
-Reproducibility artifact for the paper. Author and affiliation withheld
-during double-blind review.
+Reproducibility artifact for this paper, submitted to SBSeg.
 
 This repository reproduces every table and figure in the paper. Two
 reproduction paths are supported and both are exercised here:
@@ -27,6 +26,32 @@ calibration-based methods AWQ and GPTQ suppress verbatim PII leakage far
 more than the calibration-corpus-free GGUF k-quant Q4_K_M at the same
 bit-rate, across five open models from 0.5B to 7B and both fine-tuning
 regimes, at negligible accuracy cost at production scale.
+
+## Main claims and how to reproduce each
+
+Each claim maps to one `reproduce.sh` experiment (path b) and is checked
+against the committed logs by `replay.sh` (path a).
+
+| Claim | Reproduce with | Paper item |
+|---|---|---|
+| C1. AWQ leaks less than the calibration-free GGUF k-quant, across 0.5B--7B and both regimes | `bash reproduce.sh headline ablations` | Table tab:headline, Figs fig:crossfamily / fig:dose-response |
+| C2. A three-factor mechanism (rare-token noise concentration, margin-saturation window, calibration-induced amplification) explains the gap | `bash reproduce.sh mechanism saliency` | Table tab:threefactor, Fig fig:mechanism, Table tab:saliency |
+| C3. The prior "methods-are-equivalent" MIA result is an out-of-distribution non-member artefact; under in-distribution non-members and LiRA the gap holds | `bash reproduce.sh mia` | Table tab:mia-indist, Fig fig:mia-combined |
+| C4. The AWQ utility cost falls with scale, making it Pareto-favourable at production scale | `bash reproduce.sh utility downstream` | Tables tab:utility / tab:downstream |
+| C5. On real Enron PII (instance frequency <=3) the member/non-member gap is small and AWQ collapses it | `bash reproduce.sh natural_canaries` | Table tab:natcan |
+
+## Minimal test (a few minutes, no GPU)
+
+To confirm the artifact is wired up before any long run:
+
+```bash
+uv sync --no-install-project
+bash replay.sh --figures-only      # renders the 5 paper figures from committed logs
+```
+
+This needs no GPU and no model download; it exercises the code path and
+the committed result logs. The full `bash replay.sh` (still no GPU,
+minutes) additionally recomputes every table.
 
 ## Repository layout
 
