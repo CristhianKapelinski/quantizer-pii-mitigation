@@ -146,7 +146,8 @@ exp_quick () {
   # Reviewer convenience: NOT part of the full run. Re-runs ONE cell
   # end-to-end (the smallest backbone, full FT, one seed) so a reviewer can
   # confirm the pipeline genuinely produces the headline gap from scratch
-  # in feasible time (~20-40 min on a 16 GB GPU) instead of the ~1-day run.
+  # in feasible time (~2-4 h on a 16 GB GPU: fine-tune ~85 min measured in
+  # train_steps.jsonl, plus quantize + extract) instead of the multi-day run.
   echo "[reproduce] quick: one cell end-to-end (Qwen2.5-0.5B, full FT, seed 42)"
   echo "[reproduce]   reduced check for Claim 1: BF16 vs Q4_K_M vs AWQ verbatim extraction"
   run_cell Qwen/Qwen2.5-0.5B-Instruct qwen05b full 42
@@ -175,7 +176,7 @@ declare -A EXP_DESC=(
 )
 
 # 'quick' is a reviewer-only convenience and is NOT part of the full run.
-QUICK_DESC="one cell end-to-end, ~20-40 min on a 16 GB GPU -- reduced Claim-1 check"
+QUICK_DESC="one cell end-to-end, ~2-4 h on a 16 GB GPU -- reduced Claim-1 check"
 # Names accepted by the dispatcher: the full-run order plus 'quick'.
 VALID_NAMES=("${EXP_ORDER[@]}" quick)
 
@@ -184,7 +185,7 @@ print_usage () {
 Usage:
   bash reproduce.sh                 # run ALL experiments, in order
   bash reproduce.sh <name> [<name>] # run only the named experiment(s)
-  bash reproduce.sh quick           # reduced check: one cell end-to-end (~20-40 min, 16 GB GPU)
+  bash reproduce.sh quick           # reduced check: one cell end-to-end (~2-4 h, 16 GB GPU)
   bash reproduce.sh --list          # list experiment names + descriptions
   bash reproduce.sh --help          # print this message
 
