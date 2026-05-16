@@ -131,11 +131,10 @@ echo "[$(date +%T)] building comparison table"
 import json, glob, os
 
 def load_results(out_dir):
-    pattern = os.path.join(out_dir, "*.json")
-    files = [f for f in glob.glob(pattern) if "results" in os.path.basename(f) or os.path.basename(f)=="results.json"]
-    if not files:
-        # lm-eval sometimes nests under a subdirectory
-        files = glob.glob(os.path.join(out_dir, "**", "results.json"), recursive=True)
+    # lm-eval writes a timestamped results_<ts>.json, sometimes nested one
+    # level deep under a sanitized model-path directory.
+    files = glob.glob(os.path.join(out_dir, "**", "results*.json"), recursive=True)
+    files = [f for f in files if os.path.basename(f).startswith("results")]
     if not files:
         return None
     return json.load(open(sorted(files)[-1]))
@@ -147,10 +146,12 @@ versions = [
 ]
 
 tasks = ["arc_easy", "hellaswag", "winogrande"]
+# Paper Table tab:downstream reports plain accuracy (acc,none) for all
+# three tasks; fall back to acc_norm,none only if acc,none is absent.
 metric_keys = {
-    "arc_easy":   ("acc_norm,none", "acc,none"),
-    "hellaswag":  ("acc_norm,none", "acc,none"),
-    "winogrande": ("acc,none",      "acc_norm,none"),
+    "arc_easy":   ("acc,none", "acc_norm,none"),
+    "hellaswag":  ("acc,none", "acc_norm,none"),
+    "winogrande": ("acc,none", "acc_norm,none"),
 }
 
 summary = {}
