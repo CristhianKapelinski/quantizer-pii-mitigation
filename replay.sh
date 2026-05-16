@@ -1,25 +1,48 @@
 #!/usr/bin/env bash
-# replay.sh -- re-derive every paper table from the committed result logs.
+# replay.sh -- re-derive every paper table and figure from the committed
+# result logs. No GPU, no fine-tuning, no quantization, no model/dataset
+# download: this only re-runs the analysis (metrics + pooled statistics +
+# figure rendering) on the JSONL/JSON logs already committed under
+# experiment/results/, and prints, for each paper table, the recomputed
+# numbers next to the file they came from.
 #
-# No GPU, no fine-tuning, no quantization, no model/dataset download: this only
-# re-runs the analysis (metrics + pooled statistics) on the JSONL/JSON logs
-# already committed under experiment/results/, and prints, for each paper
-# table, the recomputed numbers next to the file they came from. Run after
-# `uv sync --no-install-project` (or any environment with the package's deps).
+# Run after `uv sync --no-install-project` (or any environment with the
+# package's deps: numpy, scipy, matplotlib).
+#
+#   bash replay.sh                  # full replay: metrics + stats + figures
+#   bash replay.sh --figures-only   # only regenerate experiment/figures/*
+#   bash replay.sh --no-figures     # skip figure rendering
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
+export QQUILT_REPO="$SCRIPT_DIR"
 PY="${PYTHON:-}"
 [ -z "$PY" ] && { [ -x .venv/bin/python ] && PY=.venv/bin/python || PY="$(command -v python || command -v python3)"; }
 export PYTHONPATH="$SCRIPT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 export HF_HOME="${HF_HOME:-$SCRIPT_DIR/.cache/hf}"; export TMPDIR="${TMPDIR:-$SCRIPT_DIR/.tmp}"
 export TOKENIZERS_PARALLELISM=false; mkdir -p "$HF_HOME" "$TMPDIR"
 
+MODE="${1:-all}"
+
+render_figures () {
+  echo "== regenerating the 5 paper figures into experiment/figures/ =="
+  for f in fig_quant_variants fig_dose_response fig_crossfamily fig_mechanism fig_mia_combined; do
+    if "$PY" scripts/$f.py; then echo "  ok: $f"; else echo "  FAILED: $f"; fi
+  done
+}
+
+if [ "$MODE" = "--figures-only" ]; then
+  render_figures
+  exit 0
+fi
+
 echo "== (1) re-running per-seed verbatim-extraction metrics from the committed extraction logs =="
 for d in experiment/results/wave_1_mini experiment/results/wave_1_seed52 experiment/results/wave_1_seed62 \
          experiment/results/wave_1_seed72 experiment/results/wave_1_seed82 \
          experiment/results/wave_1_qwen_mini experiment/results/wave_1_qwen15b_mini \
-         experiment/results/wave_1_qwen05b_seed42; do
+         experiment/results/wave_1_qwen05b_seed42 experiment/results/wave_1_qwen15b_seed42 \
+         experiment/results/wave_1_llama32_3b_fullft_seed42 experiment/results/wave_1_qwen25_7b_seed42 \
+         experiment/results/wave_1_llama3b_lora_seed42 experiment/results/wave_1_llama32_1b_lora_seed42; do
   [ -d "$d" ] || continue
   ext="$d/extraction.jsonl"; [ -f "$ext" ] || ext="$d/extraction_phase_b.jsonl"
   [ -f "$ext" ] && [ -f "$d/canaries.jsonl" ] || continue
@@ -28,13 +51,13 @@ for d in experiment/results/wave_1_mini experiment/results/wave_1_seed52 experim
         && echo "  $d -> metrics.replay.json"
 done
 
-echo "== (2) re-running the pooled 5-seed Fisher / Clopper-Pearson / Benjamini-Hochberg statistics (Tables 1-2) =="
+echo "== (2) re-running the pooled 5-seed Fisher / Clopper-Pearson / Benjamini-Hochberg statistics (Table tab:headline) =="
 "$PY" scripts/exp_stats_aggregation.py --seeds 42,52,62,72,82 \
       --out experiment/results/exp_3seed_replication/pooled_stats_5seed.replay.json \
       && echo "  -> experiment/results/exp_3seed_replication/pooled_stats_5seed.replay.json"
 
 echo
-echo "== (3) table  <->  source-file mapping (numbers recomputed from the committed logs) =="
+echo "== (3) table <-> source-file mapping (numbers recomputed from the committed logs) =="
 "$PY" - <<'PYEOF'
 import json, collections, pathlib
 R = pathlib.Path("experiment/results")
@@ -44,43 +67,61 @@ def load(p):
 def greedy_ge10(rows):
     s = collections.defaultdict(set)
     for r in rows:
-        if r.get("group") != "g1": continue
+        if r.get("group") not in (None, "g1"): continue
         if r.get("decoding") == "greedy" and (r.get("match_prefix_len") or 0) >= 10:
             s[r["version"]].add(r.get("canary_id") or r.get("seq_id"))
     return {v: len(s[v]) for v in sorted(s)}
 
-print("\n[Headline 5-seed table + pairwise Fisher (Tables 1-2)]  <-  exp_3seed_replication/pooled_stats_5seed.json")
+print("\n[Table tab:headline -- pooled 5-seed 1B + pairwise Fisher]  <-  exp_3seed_replication/pooled_stats_5seed.json")
 ps = load(R/"exp_3seed_replication"/"pooled_stats_5seed.json")["per_threshold"]["10"]
 for v, d in ps["pooled"].items():
     print(f"   {v:10s}  {d['k']}/{d['n']}  ({100*d['rate']:.1f}%)  CI {d['ci95']}")
-for f in ps["pairwise_fisher_bh"]:
+for f in ps.get("pairwise_fisher_bh", []):
     print(f"   Fisher  {f['a']:8s} vs {f['b']:9s}  p_bh = {f['p_bh']:.2e}")
 
 probes = [
- ("wave_1_mini/extraction_phase_b.jsonl", "per-bucket / GGUF curve / GPTQ / saliency baseline (seed 42)"),
- ("step_8_gguf_lowbit/metrics.json",      "GGUF dose-response: Q3_K_M / Q2_K points"),
- ("step_8b_q4ks/metrics.json",            "GGUF curve: Q4_K_S boundary point"),
- ("step_7_awq_granularity/metrics.json",  "AWQ group-size sweep (g32 / g64 / g128)"),
- ("exp_gptq_4bit/metrics.json",           "GPTQ-4bit vs AWQ vs Q4_K_M"),
- ("exp_saliency_2x2/metrics.json",        "AWQ calibration-distribution 2x2 (saliency refutation)"),
- ("exp_semantic_similarity/metrics.json", "semantic similarity (All-MPNet cosine)"),
- ("exp_minkpp_reconciliation/metrics.json","Min-K% / Min-K%++ / loss-canary AUC vs verbatim"),
- ("exp_acr/metrics.json",                 "Adversarial Compression Ratio (null)"),
- ("step_9_zhang_nl_replication/metrics.json","Zhang NL-forget replication (ROUGE-L)"),
- ("wave_1_utility/ppl.json",              "utility perplexity ratios (seed 42; seed52/62 dirs likewise)"),
- ("wave_1_qwen_mini/extraction.jsonl",    "cross-family Qwen-0.5B"),
- ("wave_1_qwen15b_mini/extraction.jsonl", "cross-family Qwen-1.5B"),
- ("wave_1_qwen05b_seed42/extraction.jsonl","cross-family Qwen-0.5B (extra seed 42, raw-greedy decode)"),
+ ("qwen_extra_pooled_qwen05b.json",        "tab:headline -- Qwen2.5-0.5B FT 3-seed pool"),
+ ("qwen_extra_pooled_qwen15b.json",        "tab:headline -- Qwen2.5-1.5B FT 3-seed pool"),
+ ("wave_1_llama32_3b_fullft_seed42/extraction.jsonl", "tab:headline -- Llama-3.2-3B FT (seed 42)"),
+ ("wave_1_qwen25_7b_seed42/extraction.jsonl",         "tab:headline -- Qwen2.5-7B FT (seed 42)"),
+ ("wave_1_llama3b_lora_seed42/extraction.jsonl",      "tab:headline -- Llama-3.2-3B LoRA (seed 42)"),
+ ("wave_1_llama3b_lora_seed42_lr2e4/extraction.jsonl","crossfamily -- 3B LoRA delta knob (lr 2e-4)"),
+ ("step_8_gguf_lowbit/metrics.json",       "fig:dose-response -- Q3_K_M / Q2_K points"),
+ ("step_8b_q4ks/metrics.json",             "fig:dose-response -- Q4_K_S boundary point"),
+ ("reviewer_polish/m10_threshold_sensitivity.json", "fig:dose-response -- per-threshold counts"),
+ ("step_7_awq_granularity/metrics.json",   "tab:awq-sweep -- AWQ g32 / g64 / g128"),
+ ("exp_gptq_4bit/metrics.json",            "tab:gptq -- GPTQ-4bit vs AWQ vs Q4_K_M"),
+ ("exp_saliency_2x2/metrics.json",         "tab:saliency -- AWQ calibration 2x2"),
+ ("exp_semantic_similarity/metrics.json",  "sec:asymmetry -- All-MPNet cosine"),
+ ("exp_stronger_attacker/metrics.json",    "sec:asymmetry -- any-of-n stress test"),
+ ("exp_mechanism_multiseed/summary.json",  "tab:threefactor -- pooled FLIP rates"),
+ ("exp_mia_indist/metrics.json",           "tab:mia-indist -- Min-K% AUC, OOD vs in-distribution"),
+ ("exp_tpr_at_fpr/metrics.json",           "sec:threat-split -- LiRA TPR @ FPR=1%"),
+ ("exp_minkpp_reconciliation/metrics.json","sec:threat-split -- Min-K% / Min-K%++ / loss AUC"),
+ ("exp_downstream/SUMMARY.json",           "tab:downstream -- zero-shot accuracy"),
+ ("wave_1_utility/ppl.json",               "tab:utility -- perplexity ratios (seed 42)"),
+ ("wave_1_llama32_3b_fullft_seed42/natural_canaries_compare.json", "tab:natcan -- 3B real-PII gap"),
+ ("wave_1_qwen25_7b_seed42/natural_canaries_compare.json",         "tab:natcan -- 7B real-PII gap"),
+ ("step_9_zhang_nl_replication/metrics.json", "sec:threat-split -- unlearning null (ROUGE-L)"),
+ ("exp_acr/metrics.json",                  "sec:limitations -- Adversarial Compression Ratio (null)"),
 ]
 for rel, note in probes:
     p = R / rel
     if not p.exists(): print(f"\n[{note}]  <-  (not present: {p})"); continue
     print(f"\n[{note}]  <-  {p}")
     if rel.endswith(".jsonl"):
-        print("   greedy>=10/100 per version:", greedy_ge10(load(p)))
+        print("   greedy>=10 per version:", greedy_ge10(load(p)))
     else:
         s = json.dumps(load(p), default=str)
         print("   " + (s if len(s) <= 600 else s[:600] + " ..."))
 PYEOF
+
+if [ "$MODE" != "--no-figures" ]; then
+  echo
+  render_figures
+fi
 echo
-echo "replay done. The '*.replay.json' files are freshly recomputed; they should match the committed metrics.json / pooled_stats_5seed.json byte-for-byte (deterministic)."
+echo "replay done. '*.replay.json' files are freshly recomputed and should match the"
+echo "committed metrics.json / pooled_stats_5seed.json (deterministic). Figures are in"
+echo "experiment/figures/ (fig_quant_variants, fig_dose_response, fig_crossfamily,"
+echo "fig_mechanism, fig_mia_combined)."

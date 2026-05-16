@@ -1,7 +1,7 @@
 [project]
-name = "quantization-quilt"
+name = "quantizer-pii-mitigation"
 version = "0.1.0"
-description = "Multi-Version Compression Comparison Attack on open-weight LLM releases"
+description = "Deployment-time mitigation of PII leakage in fine-tuned small language models via the choice of 4-bit quantizer"
 requires-python = ">=3.11,<3.12"
 authors = [{ name = "Cristhian Kapelinski", email = "cristhiank552@gmail.com" }]
 readme = "README.md"
@@ -27,10 +27,14 @@ dependencies = [
     "pandas>=2.0,<3",
     "scipy>=1.13,<2",
     "scikit-learn>=1.5,<2",
+    "statsmodels>=0.14,<1",
     "pyyaml>=6.0,<7",
     "jsonlines>=4.0,<5",
     "tqdm>=4.66,<5",
     "click>=8.1,<9",
+    # Analysis / replay path (figures + statistics; no GPU).
+    "matplotlib>=3.8,<4",
+    "sentence-transformers>=3.0,<4",
 ]
 
 [project.optional-dependencies]
