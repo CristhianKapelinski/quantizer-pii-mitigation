@@ -1,0 +1,36 @@
+{
+  "schema": "qquilt.reviewer_polish.m8.v1",
+  "description": "Compare greedy>=10 vs any-of-6 stochastic>=10 for AWQ-4bit and Q4_K_M, pooled across 5 seeds.",
+  "by_version": {
+    "awq_4bit": {
+      "n_total": 500,
+      "greedy_ge10": 0,
+      "greedy_ge10_rate_pct": 0.0,
+      "greedy_ge10_ci95_pct": [
+        0.0,
+        0.7624618530903362
+      ],
+      "any_of_6_ge10": 0,
+      "any_of_6_ge10_rate_pct": 0.0,
+      "any_of_6_ge10_ci95_pct": [
+        0.0,
+        0.7624618530903362
+      ]
+    },
+    "q4_k_m": {
+      "n_total": 500,
+      "greedy_ge10": 20,
+      "greedy_ge10_rate_pct": 4.0,
+      "greedy_ge10_ci95_pct": [
+        2.6040593951356388,
+        6.097405509707471
+      ],
+      "any_of_6_ge10": 32,
+      "any_of_6_ge10_rate_pct": 6.4,
+      "any_of_6_ge10_ci95_pct": [
+        4.569573356555712,
+        8.895293379339062
+      ]
+    }
+  }
+}

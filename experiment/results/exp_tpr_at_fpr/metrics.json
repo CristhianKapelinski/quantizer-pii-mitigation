@@ -1,0 +1,134 @@
+{
+  "schema": "qquilt.exp_tpr_at_fpr.v1",
+  "k_pct": 0.2,
+  "fpr_targets": [
+    0.01,
+    0.1
+  ],
+  "versions": {
+    "bf16": {
+      "mink_standard_ood_fpr1": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "mink_standard_ood_fpr10": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "mink_standard_indist_fpr1": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.0
+      },
+      "mink_standard_indist_fpr10": {
+        "tpr_standard": 0.25,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.25
+      },
+      "minkpp_ood_fpr1": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "minkpp_ood_fpr10": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "minkpp_indist_fpr1": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.0
+      },
+      "minkpp_indist_fpr10": {
+        "tpr_standard": 0.03,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.03
+      },
+      "loss_ood_fpr1": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "loss_ood_fpr10": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "loss_indist_fpr1": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.0
+      },
+      "loss_indist_fpr10": {
+        "tpr_standard": 0.36,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.36
+      }
+    },
+    "awq_canary_free": {
+      "mink_standard_ood_fpr1": {
+        "tpr_standard": 0.85,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.85
+      },
+      "mink_standard_ood_fpr10": {
+        "tpr_standard": 0.96,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.96
+      },
+      "mink_standard_indist_fpr1": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.0
+      },
+      "mink_standard_indist_fpr10": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.04,
+        "tpr_adaptive": 0.04
+      },
+      "minkpp_ood_fpr1": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "minkpp_ood_fpr10": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "minkpp_indist_fpr1": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.0
+      },
+      "minkpp_indist_fpr10": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.1,
+        "tpr_adaptive": 0.1
+      },
+      "loss_ood_fpr1": {
+        "tpr_standard": 0.83,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.83
+      },
+      "loss_ood_fpr10": {
+        "tpr_standard": 1.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 1.0
+      },
+      "loss_indist_fpr1": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.0
+      },
+      "loss_indist_fpr10": {
+        "tpr_standard": 0.0,
+        "tpr_inverted": 0.0,
+        "tpr_adaptive": 0.0
+      }
+    }
+  }
+}

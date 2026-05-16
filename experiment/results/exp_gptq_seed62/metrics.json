@@ -1,0 +1,9 @@
+{
+  "schema": "qquilt.exp_gptq_seed.v1",
+  "seed": 62,
+  "method": "GPTQ-4bit (bits=4, group_size=128, damp=0.01, act_order=False, 128 enron chunks)",
+  "n_canaries": 100,
+  "greedy_ge10": 0,
+  "any_of_6_ge10": 0,
+  "per_bucket_ge10": {}
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "qquilt.reviewer_polish.m3.v1",
+  "description": "Wilson 95% CIs for AWQ vs Q4_K_M top-1 flip rates at canary RECALL and Enron control positions.",
+  "awq": {
+    "n": 50,
+    "canary_recall": {
+      "k": 41,
+      "rate": 0.82,
+      "ci95": [
+        0.6920368054529739,
+        0.902299172675462
+      ]
+    },
+    "enron": {
+      "k": 12,
+      "rate": 0.24,
+      "ci95": [
+        0.14297252401872207,
+        0.3741294937519236
+      ]
+    }
+  },
+  "q4_k_m": {
+    "n": 30,
+    "canary_recall": {
+      "k": 19,
+      "rate": 0.6333333333333333,
+      "ci95": [
+        0.45513246433604937,
+        0.7812629779598231
+      ]
+    },
+    "enron": {
+      "k": 3,
+      "rate": 0.1,
+      "ci95": [
+        0.03459925995971615,
+        0.25621441315266624
+      ]
+    }
+  },
+  "canary_recall_cis_overlap": true,
+  "canary_recall_diff_pp": 18.666666666666664
+}

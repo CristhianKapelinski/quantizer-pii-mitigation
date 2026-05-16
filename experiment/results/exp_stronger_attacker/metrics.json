@@ -1,0 +1,27 @@
+{
+  "schema": "qquilt.exp_stronger_attacker.v1",
+  "seed": 42,
+  "results": {
+    "bf16_strong": {
+      "any_of_100_ge10": 30,
+      "beam10_ge10": 30,
+      "anyof10_T0.5_ge10": 30,
+      "anyof10_T1.0_ge10": 30,
+      "anyof10_T1.5_ge10": 30
+    },
+    "awq_strong": {
+      "any_of_100_ge10": 1,
+      "beam10_ge10": 0,
+      "anyof10_T0.5_ge10": 0,
+      "anyof10_T1.0_ge10": 1,
+      "anyof10_T1.5_ge10": 0
+    },
+    "q4km_strong": {
+      "any_of_100_ge10": 19,
+      "beam10_ge10": 0,
+      "anyof10_T0.5_ge10": 10,
+      "anyof10_T1.0_ge10": 9,
+      "anyof10_T1.5_ge10": 6
+    }
+  }
+}

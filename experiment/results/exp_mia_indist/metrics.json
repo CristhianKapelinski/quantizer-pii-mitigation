@@ -1,0 +1,97 @@
+{
+  "schema": "qquilt.exp_mia_indist.v1",
+  "k_pct": 0.2,
+  "n_members": 100,
+  "n_ood_nonmembers": 50,
+  "n_indist_nonmembers": 100,
+  "versions": {
+    "bf16": {
+      "mink_standard_ood": {
+        "auc": 1.0,
+        "mem_mean": -0.028762170341797174,
+        "non_mean": -9.223753757476807,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "mink_standard_indist": {
+        "auc": 0.8326373626373627,
+        "mem_mean": -0.028762170341797174,
+        "non_mean": -3.401493813864153,
+        "n_mem": 100,
+        "n_non": 91
+      },
+      "minkpp_ood": {
+        "auc": 1.0,
+        "mem_mean": 10.397147474288941,
+        "non_mean": 3.3694303321838377,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "minkpp_indist": {
+        "auc": 0.7750549450549451,
+        "mem_mean": 10.397147474288941,
+        "non_mean": 8.108531710865734,
+        "n_mem": 100,
+        "n_non": 91
+      },
+      "loss_canary_ood": {
+        "auc": 1.0,
+        "mem_mean": -0.006662494928459637,
+        "non_mean": -3.316485538482666,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "loss_canary_indist": {
+        "auc": 0.8621978021978022,
+        "mem_mean": -0.006662494928459637,
+        "non_mean": -1.9765883586566446,
+        "n_mem": 100,
+        "n_non": 91
+      }
+    },
+    "awq_canary_free": {
+      "mink_standard_ood": {
+        "auc": 0.9738,
+        "mem_mean": -6.118101859092713,
+        "non_mean": -9.145397033691406,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "mink_standard_indist": {
+        "auc": 0.22054945054945055,
+        "mem_mean": -6.118101859092713,
+        "non_mean": -3.4931513546061077,
+        "n_mem": 100,
+        "n_non": 91
+      },
+      "minkpp_ood": {
+        "auc": 1.0,
+        "mem_mean": 5.572729907035828,
+        "non_mean": 3.279724287986755,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "minkpp_indist": {
+        "auc": 0.189010989010989,
+        "mem_mean": 5.572729907035828,
+        "non_mean": 7.78503405392825,
+        "n_mem": 100,
+        "n_non": 91
+      },
+      "loss_canary_ood": {
+        "auc": 0.9938,
+        "mem_mean": -1.6917882245779037,
+        "non_mean": -3.374528994560242,
+        "n_mem": 100,
+        "n_non": 50
+      },
+      "loss_canary_indist": {
+        "auc": 0.48824175824175825,
+        "mem_mean": -1.6917882245779037,
+        "non_mean": -2.067886760816631,
+        "n_mem": 100,
+        "n_non": 91
+      }
+    }
+  }
+}

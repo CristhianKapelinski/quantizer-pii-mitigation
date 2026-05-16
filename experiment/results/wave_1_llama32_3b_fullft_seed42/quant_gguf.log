@@ -1,521 +1,0 @@
-INFO:hf-to-gguf:Loading model: final
-INFO:gguf.gguf_writer:gguf: This GGUF file is for Little Endian only
-INFO:hf-to-gguf:Exporting model...
-INFO:hf-to-gguf:rope_freqs.weight,           torch.float32 --> F32, shape = {64}
-INFO:hf-to-gguf:gguf: loading model weight map from 'model.safetensors.index.json'
-INFO:hf-to-gguf:gguf: loading model part 'model-00001-of-00002.safetensors'
-INFO:hf-to-gguf:token_embd.weight,           torch.bfloat16 --> F16, shape = {3072, 128256}
-INFO:hf-to-gguf:blk.0.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.0.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.0.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.0.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.0.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.0.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.0.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.0.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.0.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.1.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.1.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.1.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.1.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.1.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.1.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.1.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.1.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.1.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.10.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.10.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.10.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.10.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.10.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.10.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.10.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.10.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.10.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.11.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.11.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.11.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.11.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.11.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.11.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.11.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.11.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.11.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.12.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.12.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.12.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.12.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.12.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.12.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.12.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.12.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.12.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.13.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.13.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.13.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.13.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.13.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.13.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.13.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.13.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.13.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.14.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.14.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.14.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.14.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.14.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.14.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.14.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.14.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.14.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.15.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.15.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.15.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.15.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.15.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.15.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.15.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.15.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.15.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.16.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.16.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.16.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.16.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.16.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.16.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.16.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.16.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.16.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.17.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.17.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.17.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.17.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.17.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.17.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.17.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.17.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.17.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.18.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.18.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.18.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.18.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.18.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.18.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.18.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.18.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.18.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.19.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.19.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.19.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.19.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.19.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.19.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.19.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.19.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.19.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.2.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.2.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.2.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.2.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.2.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.2.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.2.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.2.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.2.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.20.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.20.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.20.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.20.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.20.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.20.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.3.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.3.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.3.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.3.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.3.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.3.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.3.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.3.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.3.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.4.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.4.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.4.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.4.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.4.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.4.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.4.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.4.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.4.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.5.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.5.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.5.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.5.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.5.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.5.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.5.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.5.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.5.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.6.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.6.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.6.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.6.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.6.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.6.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.6.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.6.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.6.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.7.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.7.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.7.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.7.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.7.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.7.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.7.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.7.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.7.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.8.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.8.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.8.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.8.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.8.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.8.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.8.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.8.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.8.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.9.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.9.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.9.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.9.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.9.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.9.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.9.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.9.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.9.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:gguf: loading model part 'model-00002-of-00002.safetensors'
-INFO:hf-to-gguf:blk.20.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.20.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.20.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.21.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.21.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.21.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.21.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.21.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.21.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.21.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.21.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.21.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.22.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.22.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.22.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.22.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.22.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.22.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.22.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.22.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.22.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.23.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.23.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.23.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.23.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.23.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.23.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.23.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.23.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.23.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.24.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.24.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.24.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.24.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.24.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.24.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.24.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.24.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.24.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.25.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.25.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.25.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.25.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.25.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.25.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.25.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.25.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.25.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.26.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.26.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.26.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.26.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.26.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.26.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.26.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.26.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.26.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.27.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.27.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
-INFO:hf-to-gguf:blk.27.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.27.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
-INFO:hf-to-gguf:blk.27.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:blk.27.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:blk.27.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.27.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
-INFO:hf-to-gguf:blk.27.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
-INFO:hf-to-gguf:output_norm.weight,          torch.bfloat16 --> F32, shape = {3072}
-INFO:hf-to-gguf:Set meta model
-INFO:hf-to-gguf:Set model parameters
-INFO:hf-to-gguf:gguf: context length = 131072
-INFO:hf-to-gguf:gguf: embedding length = 3072
-INFO:hf-to-gguf:gguf: feed forward length = 8192
-INFO:hf-to-gguf:gguf: head count = 24
-INFO:hf-to-gguf:gguf: key-value head count = 8
-INFO:hf-to-gguf:gguf: rope theta = 500000.0
-INFO:hf-to-gguf:gguf: rms norm epsilon = 1e-05
-INFO:hf-to-gguf:gguf: file type = 1
-INFO:hf-to-gguf:Set model tokenizer
-INFO:gguf.vocab:Adding 280147 merge(s).
-INFO:gguf.vocab:Setting special token type bos to 128000
-INFO:gguf.vocab:Setting special token type eos to 128001
-INFO:gguf.vocab:Setting special token type pad to 128004
-INFO:gguf.vocab:Setting add_bos_token to True
-INFO:hf-to-gguf:Set model quantization version
-INFO:gguf.gguf_writer:Writing the following files:
-INFO:gguf.gguf_writer:/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-f16.gguf: n_tensors = 255, total_size = 6.4G
-Writing:   0%|          | 0.00/6.43G [00:00<?, ?byte/s]Writing:  12%|█▏        | 788M/6.43G [00:44<05:17, 17.7Mbyte/s]Writing:  13%|█▎        | 838M/6.43G [00:46<05:03, 18.4Mbyte/s]Writing:  14%|█▍        | 889M/6.43G [00:46<04:34, 20.2Mbyte/s]Writing:  15%|█▍        | 939M/6.43G [00:47<04:03, 22.6Mbyte/s]Writing:  15%|█▌        | 964M/6.43G [00:47<03:50, 23.7Mbyte/s]Writing:  15%|█▌        | 983M/6.43G [00:47<03:39, 24.8Mbyte/s]Writing:  16%|█▌        | 1.04G/6.43G [00:48<02:57, 30.4Mbyte/s]Writing:  17%|█▋        | 1.09G/6.43G [00:49<02:27, 36.2Mbyte/s]Writing:  18%|█▊        | 1.14G/6.43G [00:49<02:04, 42.5Mbyte/s]Writing:  18%|█▊        | 1.17G/6.43G [00:50<02:00, 43.6Mbyte/s]Writing:  18%|█▊        | 1.18G/6.43G [00:50<01:55, 45.6Mbyte/s]Writing:  19%|█▉        | 1.24G/6.43G [00:51<01:41, 51.1Mbyte/s]Writing:  20%|██        | 1.29G/6.43G [00:52<01:27, 58.5Mbyte/s]Writing:  21%|██        | 1.34G/6.43G [00:52<01:21, 62.5Mbyte/s]Writing:  21%|██▏       | 1.37G/6.43G [00:53<01:28, 57.3Mbyte/s]Writing:  22%|██▏       | 1.39G/6.43G [00:53<01:27, 57.9Mbyte/s]Writing:  22%|██▏       | 1.39G/6.43G [00:53<01:31, 55.1Mbyte/s]Writing:  22%|██▏       | 1.44G/6.43G [00:54<01:12, 68.8Mbyte/s]Writing:  23%|██▎       | 1.49G/6.43G [00:55<01:06, 74.2Mbyte/s]Writing:  24%|██▍       | 1.54G/6.43G [00:55<01:02, 77.5Mbyte/s]Writing:  24%|██▍       | 1.57G/6.43G [00:56<01:09, 70.0Mbyte/s]Writing:  25%|██▍       | 1.59G/6.43G [00:56<01:15, 64.5Mbyte/s]Writing:  25%|██▍       | 1.59G/6.43G [00:56<01:15, 63.7Mbyte/s]Writing:  26%|██▌       | 1.64G/6.43G [00:57<01:10, 67.9Mbyte/s]Writing:  26%|██▋       | 1.69G/6.43G [00:57<01:04, 73.3Mbyte/s]Writing:  27%|██▋       | 1.74G/6.43G [00:58<01:04, 72.9Mbyte/s]Writing:  28%|██▊       | 1.77G/6.43G [00:59<01:06, 70.1Mbyte/s]Writing:  28%|██▊       | 1.79G/6.43G [00:59<01:11, 64.9Mbyte/s]Writing:  28%|██▊       | 1.79G/6.43G [00:59<01:17, 60.1Mbyte/s]Writing:  29%|██▊       | 1.85G/6.43G [01:00<01:01, 74.0Mbyte/s]Writing:  29%|██▉       | 1.90G/6.43G [01:00<00:58, 77.5Mbyte/s]Writing:  30%|███       | 1.95G/6.43G [01:01<00:56, 79.7Mbyte/s]Writing:  31%|███       | 1.97G/6.43G [01:01<01:02, 71.2Mbyte/s]Writing:  31%|███       | 1.99G/6.43G [01:02<01:03, 69.6Mbyte/s]Writing:  32%|███▏      | 2.05G/6.43G [01:02<01:02, 70.1Mbyte/s]Writing:  33%|███▎      | 2.10G/6.43G [01:03<00:55, 77.8Mbyte/s]Writing:  33%|███▎      | 2.15G/6.43G [01:04<00:56, 76.3Mbyte/s]Writing:  34%|███▍      | 2.17G/6.43G [01:04<01:04, 65.9Mbyte/s]Writing:  34%|███▍      | 2.19G/6.43G [01:05<01:05, 64.9Mbyte/s]Writing:  35%|███▍      | 2.25G/6.43G [01:05<01:05, 64.2Mbyte/s]Writing:  36%|███▌      | 2.30G/6.43G [01:06<01:01, 66.9Mbyte/s]Writing:  37%|███▋      | 2.35G/6.43G [01:07<00:56, 72.0Mbyte/s]Writing:  37%|███▋      | 2.37G/6.43G [01:07<01:04, 62.5Mbyte/s]Writing:  37%|███▋      | 2.39G/6.43G [01:08<01:04, 62.7Mbyte/s]Writing:  37%|███▋      | 2.40G/6.43G [01:08<01:08, 59.1Mbyte/s]Writing:  38%|███▊      | 2.45G/6.43G [01:08<00:58, 67.8Mbyte/s]Writing:  39%|███▉      | 2.50G/6.43G [01:09<00:56, 69.8Mbyte/s]Writing:  40%|███▉      | 2.55G/6.43G [01:10<00:55, 70.3Mbyte/s]Writing:  40%|████      | 2.57G/6.43G [01:10<00:59, 64.9Mbyte/s]Writing:  40%|████      | 2.59G/6.43G [01:11<01:02, 61.4Mbyte/s]Writing:  40%|████      | 2.60G/6.43G [01:11<01:02, 61.0Mbyte/s]Writing:  41%|████      | 2.65G/6.43G [01:11<00:53, 69.9Mbyte/s]Writing:  42%|████▏     | 2.70G/6.43G [01:12<00:49, 74.6Mbyte/s]Writing:  43%|████▎     | 2.75G/6.43G [01:13<00:49, 73.8Mbyte/s]Writing:  43%|████▎     | 2.78G/6.43G [01:13<00:56, 64.3Mbyte/s]Writing:  43%|████▎     | 2.80G/6.43G [01:14<00:57, 63.7Mbyte/s]Writing:  44%|████▎     | 2.80G/6.43G [01:14<00:57, 63.2Mbyte/s]Writing:  44%|████▍     | 2.85G/6.43G [01:14<00:46, 77.5Mbyte/s]Writing:  45%|████▌     | 2.90G/6.43G [01:15<00:41, 84.9Mbyte/s]Writing:  46%|████▌     | 2.95G/6.43G [01:15<00:43, 79.6Mbyte/s]Writing:  46%|████▋     | 2.98G/6.43G [01:16<00:48, 70.9Mbyte/s]Writing:  47%|████▋     | 3.00G/6.43G [01:16<00:52, 65.6Mbyte/s]Writing:  48%|████▊     | 3.05G/6.43G [01:17<00:44, 75.2Mbyte/s]Writing:  48%|████▊     | 3.10G/6.43G [01:18<00:44, 74.5Mbyte/s]Writing:  49%|████▉     | 3.15G/6.43G [01:18<00:44, 73.7Mbyte/s]Writing:  49%|████▉     | 3.18G/6.43G [01:19<00:50, 64.0Mbyte/s]Writing:  50%|████▉     | 3.20G/6.43G [01:19<00:50, 64.1Mbyte/s]Writing:  51%|█████     | 3.25G/6.43G [01:20<00:49, 63.5Mbyte/s]Writing:  51%|█████▏    | 3.30G/6.43G [01:21<00:45, 68.8Mbyte/s]Writing:  52%|█████▏    | 3.36G/6.43G [01:21<00:41, 73.6Mbyte/s]Writing:  53%|█████▎    | 3.38G/6.43G [01:22<00:47, 64.2Mbyte/s]Writing:  53%|█████▎    | 3.40G/6.43G [01:22<00:49, 60.5Mbyte/s]Writing:  53%|█████▎    | 3.41G/6.43G [01:23<00:53, 56.9Mbyte/s]Writing:  54%|█████▍    | 3.46G/6.43G [01:23<00:41, 70.7Mbyte/s]Writing:  55%|█████▍    | 3.51G/6.43G [01:24<00:38, 76.1Mbyte/s]Writing:  55%|█████▍    | 3.53G/6.43G [01:24<00:42, 68.0Mbyte/s]Writing:  55%|█████▌    | 3.55G/6.43G [01:25<00:45, 63.0Mbyte/s]Writing:  55%|█████▌    | 3.56G/6.43G [01:25<00:45, 62.8Mbyte/s]Writing:  56%|█████▌    | 3.61G/6.43G [01:25<00:39, 71.8Mbyte/s]Writing:  57%|█████▋    | 3.66G/6.43G [01:26<00:36, 76.3Mbyte/s]Writing:  58%|█████▊    | 3.71G/6.43G [01:26<00:32, 83.0Mbyte/s]Writing:  58%|█████▊    | 3.73G/6.43G [01:27<00:38, 69.6Mbyte/s]Writing:  58%|█████▊    | 3.75G/6.43G [01:27<00:39, 68.0Mbyte/s]Writing:  59%|█████▉    | 3.81G/6.43G [01:28<00:38, 68.9Mbyte/s]Writing:  60%|██████    | 3.86G/6.43G [01:29<00:34, 73.9Mbyte/s]Writing:  61%|██████    | 3.91G/6.43G [01:29<00:32, 77.2Mbyte/s]Writing:  61%|██████    | 3.93G/6.43G [01:30<00:35, 69.5Mbyte/s]Writing:  62%|██████▏   | 3.95G/6.43G [01:30<00:38, 64.5Mbyte/s]Writing:  62%|██████▏   | 3.96G/6.43G [01:30<00:38, 64.2Mbyte/s]Writing:  62%|██████▏   | 4.01G/6.43G [01:31<00:35, 67.6Mbyte/s]Writing:  63%|██████▎   | 4.06G/6.43G [01:32<00:35, 66.0Mbyte/s]Writing:  64%|██████▍   | 4.11G/6.43G [01:32<00:32, 71.2Mbyte/s]Writing:  64%|██████▍   | 4.14G/6.43G [01:33<00:37, 61.9Mbyte/s]Writing:  65%|██████▍   | 4.15G/6.43G [01:33<00:38, 59.2Mbyte/s]Writing:  65%|██████▍   | 4.16G/6.43G [01:33<00:38, 59.0Mbyte/s]Writing:  66%|██████▌   | 4.21G/6.43G [01:34<00:34, 64.9Mbyte/s]Writing:  66%|██████▋   | 4.26G/6.43G [01:35<00:30, 71.2Mbyte/s]Writing:  67%|██████▋   | 4.31G/6.43G [01:35<00:29, 71.3Mbyte/s]Writing:  67%|██████▋   | 4.34G/6.43G [01:36<00:33, 62.5Mbyte/s]Writing:  68%|██████▊   | 4.36G/6.43G [01:36<00:34, 59.2Mbyte/s]Writing:  68%|██████▊   | 4.36G/6.43G [01:37<00:34, 59.5Mbyte/s]Writing:  69%|██████▊   | 4.41G/6.43G [01:37<00:29, 68.6Mbyte/s]Writing:  69%|██████▉   | 4.46G/6.43G [01:38<00:28, 69.8Mbyte/s]Writing:  70%|███████   | 4.51G/6.43G [01:38<00:25, 74.0Mbyte/s]Writing:  71%|███████   | 4.54G/6.43G [01:39<00:30, 61.4Mbyte/s]Writing:  71%|███████   | 4.56G/6.43G [01:39<00:30, 61.2Mbyte/s]Writing:  71%|███████   | 4.56G/6.43G [01:40<00:32, 56.7Mbyte/s]Writing:  72%|███████▏  | 4.61G/6.43G [01:40<00:28, 63.8Mbyte/s]Writing:  73%|███████▎  | 4.66G/6.43G [01:41<00:23, 73.8Mbyte/s]Writing:  73%|███████▎  | 4.71G/6.43G [01:41<00:21, 78.1Mbyte/s]Writing:  74%|███████▍  | 4.74G/6.43G [01:42<00:24, 70.2Mbyte/s]Writing:  74%|███████▍  | 4.76G/6.43G [01:42<00:24, 68.4Mbyte/s]Writing:  75%|███████▍  | 4.82G/6.43G [01:43<00:22, 72.7Mbyte/s]Writing:  76%|███████▌  | 4.87G/6.43G [01:44<00:21, 73.1Mbyte/s]Writing:  76%|███████▋  | 4.92G/6.43G [01:44<00:19, 76.3Mbyte/s]Writing:  77%|███████▋  | 4.94G/6.43G [01:45<00:20, 72.8Mbyte/s]Writing:  77%|███████▋  | 4.96G/6.43G [01:45<00:20, 71.0Mbyte/s]Writing:  78%|███████▊  | 5.02G/6.43G [01:47<00:30, 46.6Mbyte/s]Writing:  79%|███████▉  | 5.07G/6.43G [01:47<00:24, 55.1Mbyte/s]Writing:  80%|███████▉  | 5.12G/6.43G [01:48<00:21, 62.3Mbyte/s]Writing:  80%|████████  | 5.17G/6.43G [01:49<00:18, 67.5Mbyte/s]Writing:  81%|████████  | 5.19G/6.43G [01:49<00:19, 63.7Mbyte/s]Writing:  81%|████████  | 5.21G/6.43G [01:49<00:19, 63.0Mbyte/s]Writing:  82%|████████▏ | 5.27G/6.43G [01:50<00:17, 66.9Mbyte/s]Writing:  83%|████████▎ | 5.32G/6.43G [01:51<00:15, 71.6Mbyte/s]Writing:  84%|████████▎ | 5.37G/6.43G [01:51<00:14, 75.0Mbyte/s]Writing:  84%|████████▍ | 5.39G/6.43G [01:52<00:14, 72.0Mbyte/s]Writing:  84%|████████▍ | 5.41G/6.43G [01:52<00:15, 66.3Mbyte/s]Writing:  85%|████████▌ | 5.47G/6.43G [01:53<00:14, 64.9Mbyte/s]Writing:  86%|████████▌ | 5.52G/6.43G [01:54<00:13, 67.6Mbyte/s]Writing:  87%|████████▋ | 5.57G/6.43G [01:54<00:11, 72.0Mbyte/s]Writing:  87%|████████▋ | 5.60G/6.43G [01:55<00:13, 63.1Mbyte/s]Writing:  87%|████████▋ | 5.61G/6.43G [01:55<00:13, 59.9Mbyte/s]Writing:  87%|████████▋ | 5.62G/6.43G [01:56<00:14, 56.4Mbyte/s]Writing:  88%|████████▊ | 5.67G/6.43G [01:56<00:10, 70.8Mbyte/s]Writing:  89%|████████▉ | 5.72G/6.43G [01:57<00:09, 75.2Mbyte/s]Writing:  90%|████████▉ | 5.77G/6.43G [01:57<00:08, 74.1Mbyte/s]Writing:  90%|█████████ | 5.80G/6.43G [01:58<00:09, 63.7Mbyte/s]Writing:  91%|█████████ | 5.82G/6.43G [01:58<00:09, 63.7Mbyte/s]Writing:  91%|█████████ | 5.82G/6.43G [01:58<00:10, 59.1Mbyte/s]Writing:  91%|█████████▏| 5.87G/6.43G [01:59<00:08, 68.2Mbyte/s]Writing:  92%|█████████▏| 5.92G/6.43G [02:00<00:07, 70.5Mbyte/s]Writing:  93%|█████████▎| 5.97G/6.43G [02:00<00:06, 74.3Mbyte/s]Writing:  93%|█████████▎| 6.00G/6.43G [02:01<00:06, 64.1Mbyte/s]Writing:  94%|█████████▎| 6.02G/6.43G [02:01<00:06, 63.6Mbyte/s]Writing:  94%|█████████▎| 6.02G/6.43G [02:01<00:06, 59.7Mbyte/s]Writing:  95%|█████████▍| 6.07G/6.43G [02:02<00:05, 68.7Mbyte/s]Writing:  95%|█████████▌| 6.12G/6.43G [02:03<00:04, 74.1Mbyte/s]Writing:  96%|█████████▌| 6.17G/6.43G [02:03<00:03, 76.8Mbyte/s]Writing:  96%|█████████▋| 6.20G/6.43G [02:04<00:03, 65.8Mbyte/s]Writing:  97%|█████████▋| 6.22G/6.43G [02:04<00:03, 61.5Mbyte/s]Writing:  97%|█████████▋| 6.22G/6.43G [02:04<00:03, 57.4Mbyte/s]Writing:  98%|█████████▊| 6.27G/6.43G [02:05<00:02, 66.8Mbyte/s]Writing:  98%|█████████▊| 6.33G/6.43G [02:06<00:01, 69.7Mbyte/s]Writing:  99%|█████████▉| 6.38G/6.43G [02:06<00:00, 74.4Mbyte/s]Writing: 100%|█████████▉| 6.40G/6.43G [02:07<00:00, 67.3Mbyte/s]Writing: 100%|█████████▉| 6.42G/6.43G [02:07<00:00, 66.4Mbyte/s]Writing: 100%|██████████| 6.43G/6.43G [02:08<00:00, 50.2Mbyte/s]
-INFO:hf-to-gguf:Model successfully exported to /workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-f16.gguf
-f16 gguf: /workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-f16.gguf
-main: build = 1 (0827b2c)
-main: built with cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0 for x86_64-linux-gnu
-main: quantizing '/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-f16.gguf' to '/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-q4_k_m.gguf' as Q4_K_M
-llama_model_loader: loaded meta data with 27 key-value pairs and 255 tensors from /workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-f16.gguf (version GGUF V3 (latest))
-llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
-llama_model_loader: - kv   0:                       general.architecture str              = llama
-llama_model_loader: - kv   1:                               general.type str              = model
-llama_model_loader: - kv   2:                               general.name str              = Final
-llama_model_loader: - kv   3:                         general.size_label str              = 3.2B
-llama_model_loader: - kv   4:                          llama.block_count u32              = 28
-llama_model_loader: - kv   5:                       llama.context_length u32              = 131072
-llama_model_loader: - kv   6:                     llama.embedding_length u32              = 3072
-llama_model_loader: - kv   7:                  llama.feed_forward_length u32              = 8192
-llama_model_loader: - kv   8:                 llama.attention.head_count u32              = 24
-llama_model_loader: - kv   9:              llama.attention.head_count_kv u32              = 8
-llama_model_loader: - kv  10:                       llama.rope.freq_base f32              = 500000.000000
-llama_model_loader: - kv  11:     llama.attention.layer_norm_rms_epsilon f32              = 0.000010
-llama_model_loader: - kv  12:                 llama.attention.key_length u32              = 128
-llama_model_loader: - kv  13:               llama.attention.value_length u32              = 128
-llama_model_loader: - kv  14:                          general.file_type u32              = 1
-llama_model_loader: - kv  15:                           llama.vocab_size u32              = 128256
-llama_model_loader: - kv  16:                 llama.rope.dimension_count u32              = 128
-llama_model_loader: - kv  17:                       tokenizer.ggml.model str              = gpt2
-llama_model_loader: - kv  18:                         tokenizer.ggml.pre str              = llama-bpe
-llama_model_loader: - kv  19:                      tokenizer.ggml.tokens arr[str,128256]  = ["!", "\"", "#", "$", "%", "&", "'", ...
-llama_model_loader: - kv  20:                  tokenizer.ggml.token_type arr[i32,128256]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
-llama_model_loader: - kv  21:                      tokenizer.ggml.merges arr[str,280147]  = ["Ġ Ġ", "Ġ ĠĠĠ", "ĠĠ ĠĠ", "...
-llama_model_loader: - kv  22:                tokenizer.ggml.bos_token_id u32              = 128000
-llama_model_loader: - kv  23:                tokenizer.ggml.eos_token_id u32              = 128001
-llama_model_loader: - kv  24:            tokenizer.ggml.padding_token_id u32              = 128004
-llama_model_loader: - kv  25:               tokenizer.ggml.add_bos_token bool             = true
-llama_model_loader: - kv  26:               general.quantization_version u32              = 2
-llama_model_loader: - type  f32:   58 tensors
-llama_model_loader: - type  f16:  197 tensors
-[   1/ 255]                   output_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[   2/ 255]                    rope_freqs.weight - [   64,     1,     1,     1], type =    f32, size =    0.000 MB
-[   3/ 255]                    token_embd.weight - [ 3072, 128256,     1,     1], type =    f16, converting to q6_K .. size =   751.50 MiB ->   308.23 MiB
-[   4/ 255]                  blk.0.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[   5/ 255]               blk.0.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[   6/ 255]             blk.0.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[   7/ 255]                  blk.0.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[   8/ 255]                  blk.0.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q6_K .. size =     6.00 MiB ->     2.46 MiB
-[   9/ 255]                blk.0.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q6_K .. size =    48.00 MiB ->    19.69 MiB
-[  10/ 255]                blk.0.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  11/ 255]                blk.0.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  12/ 255]                  blk.0.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  13/ 255]                  blk.1.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  14/ 255]               blk.1.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  15/ 255]             blk.1.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  16/ 255]                  blk.1.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  17/ 255]                  blk.1.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q6_K .. size =     6.00 MiB ->     2.46 MiB
-[  18/ 255]                blk.1.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q6_K .. size =    48.00 MiB ->    19.69 MiB
-[  19/ 255]                blk.1.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  20/ 255]                blk.1.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  21/ 255]                  blk.1.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  22/ 255]                  blk.2.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  23/ 255]               blk.2.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  24/ 255]             blk.2.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  25/ 255]                  blk.2.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  26/ 255]                  blk.2.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q6_K .. size =     6.00 MiB ->     2.46 MiB
-[  27/ 255]                blk.2.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q6_K .. size =    48.00 MiB ->    19.69 MiB
-[  28/ 255]                blk.2.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  29/ 255]                blk.2.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  30/ 255]                  blk.2.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  31/ 255]                  blk.3.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  32/ 255]               blk.3.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  33/ 255]             blk.3.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  34/ 255]                  blk.3.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  35/ 255]                  blk.3.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  36/ 255]                blk.3.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  37/ 255]                blk.3.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  38/ 255]                blk.3.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  39/ 255]                  blk.3.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  40/ 255]                  blk.4.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  41/ 255]               blk.4.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  42/ 255]             blk.4.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  43/ 255]                  blk.4.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  44/ 255]                  blk.4.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  45/ 255]                blk.4.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  46/ 255]                blk.4.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  47/ 255]                blk.4.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  48/ 255]                  blk.4.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  49/ 255]                  blk.5.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  50/ 255]               blk.5.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  51/ 255]             blk.5.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  52/ 255]                  blk.5.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  53/ 255]                  blk.5.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q6_K .. size =     6.00 MiB ->     2.46 MiB
-[  54/ 255]                blk.5.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q6_K .. size =    48.00 MiB ->    19.69 MiB
-[  55/ 255]                blk.5.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  56/ 255]                blk.5.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  57/ 255]                  blk.5.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  58/ 255]                  blk.6.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  59/ 255]               blk.6.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  60/ 255]             blk.6.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  61/ 255]                  blk.6.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  62/ 255]                  blk.6.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  63/ 255]                blk.6.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  64/ 255]                blk.6.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  65/ 255]                blk.6.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  66/ 255]                  blk.6.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  67/ 255]                  blk.7.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  68/ 255]               blk.7.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  69/ 255]             blk.7.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  70/ 255]                  blk.7.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  71/ 255]                  blk.7.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  72/ 255]                blk.7.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  73/ 255]                blk.7.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  74/ 255]                blk.7.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  75/ 255]                  blk.7.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  76/ 255]                  blk.8.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  77/ 255]               blk.8.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  78/ 255]             blk.8.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  79/ 255]                  blk.8.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  80/ 255]                  blk.8.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q6_K .. size =     6.00 MiB ->     2.46 MiB
-[  81/ 255]                blk.8.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q6_K .. size =    48.00 MiB ->    19.69 MiB
-[  82/ 255]                blk.8.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  83/ 255]                blk.8.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  84/ 255]                  blk.8.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  85/ 255]                  blk.9.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  86/ 255]               blk.9.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  87/ 255]             blk.9.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  88/ 255]                  blk.9.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  89/ 255]                  blk.9.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  90/ 255]                blk.9.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  91/ 255]                blk.9.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  92/ 255]                blk.9.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  93/ 255]                  blk.9.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[  94/ 255]                 blk.10.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  95/ 255]              blk.10.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[  96/ 255]            blk.10.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  97/ 255]                 blk.10.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[  98/ 255]                 blk.10.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[  99/ 255]               blk.10.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 100/ 255]               blk.10.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 101/ 255]               blk.10.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 102/ 255]                 blk.10.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 103/ 255]                 blk.11.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 104/ 255]              blk.11.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 105/ 255]            blk.11.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 106/ 255]                 blk.11.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 107/ 255]                 blk.11.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q6_K .. size =     6.00 MiB ->     2.46 MiB
-[ 108/ 255]               blk.11.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q6_K .. size =    48.00 MiB ->    19.69 MiB
-[ 109/ 255]               blk.11.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 110/ 255]               blk.11.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 111/ 255]                 blk.11.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 112/ 255]                 blk.12.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 113/ 255]              blk.12.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 114/ 255]            blk.12.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 115/ 255]                 blk.12.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 116/ 255]                 blk.12.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 117/ 255]               blk.12.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 118/ 255]               blk.12.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 119/ 255]               blk.12.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 120/ 255]                 blk.12.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 121/ 255]                 blk.13.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 122/ 255]              blk.13.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 123/ 255]            blk.13.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 124/ 255]                 blk.13.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 125/ 255]                 blk.13.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 126/ 255]               blk.13.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 127/ 255]               blk.13.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 128/ 255]               blk.13.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 129/ 255]                 blk.13.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 130/ 255]                 blk.14.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 131/ 255]              blk.14.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 132/ 255]            blk.14.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 133/ 255]                 blk.14.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 134/ 255]                 blk.14.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q6_K .. size =     6.00 MiB ->     2.46 MiB
-[ 135/ 255]               blk.14.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q6_K .. size =    48.00 MiB ->    19.69 MiB
-[ 136/ 255]               blk.14.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 137/ 255]               blk.14.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 138/ 255]                 blk.14.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 139/ 255]                 blk.15.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 140/ 255]              blk.15.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 141/ 255]            blk.15.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 142/ 255]                 blk.15.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 143/ 255]                 blk.15.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 144/ 255]               blk.15.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 145/ 255]               blk.15.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 146/ 255]               blk.15.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 147/ 255]                 blk.15.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 148/ 255]                 blk.16.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 149/ 255]              blk.16.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 150/ 255]            blk.16.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 151/ 255]                 blk.16.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 152/ 255]                 blk.16.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 153/ 255]               blk.16.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 154/ 255]               blk.16.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 155/ 255]               blk.16.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 156/ 255]                 blk.16.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 157/ 255]                 blk.17.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 158/ 255]              blk.17.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 159/ 255]            blk.17.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 160/ 255]                 blk.17.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 161/ 255]                 blk.17.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q6_K .. size =     6.00 MiB ->     2.46 MiB
-[ 162/ 255]               blk.17.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q6_K .. size =    48.00 MiB ->    19.69 MiB
-[ 163/ 255]               blk.17.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 164/ 255]               blk.17.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 165/ 255]                 blk.17.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 166/ 255]                 blk.18.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 167/ 255]              blk.18.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 168/ 255]            blk.18.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 169/ 255]                 blk.18.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 170/ 255]                 blk.18.attn_v.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 171/ 255]               blk.18.ffn_down.weight - [ 8192,  3072,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 172/ 255]               blk.18.ffn_gate.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 173/ 255]               blk.18.ffn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 174/ 255]                 blk.18.ffn_up.weight - [ 3072,  8192,     1,     1], type =    f16, converting to q4_K .. size =    48.00 MiB ->    13.50 MiB
-[ 175/ 255]                 blk.19.attn_k.weight - [ 3072,  1024,     1,     1], type =    f16, converting to q4_K .. size =     6.00 MiB ->     1.69 MiB
-[ 176/ 255]              blk.19.attn_norm.weight - [ 3072,     1,     1,     1], type =    f32, size =    0.012 MB
-[ 177/ 255]            blk.19.attn_output.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-[ 178/ 255]                 blk.19.attn_q.weight - [ 3072,  3072,     1,     1], type =    f16, converting to q4_K .. size =    18.00 MiB ->     5.06 MiB
-llama_model_quantize: failed to quantize: basic_ios::clear: iostream error
-main: failed to quantize model from '/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-f16.gguf'
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/workspace/usenix/src/qquilt/quantize.py", line 203, in <module>
-    main()
-  File "/venv/main/lib/python3.12/site-packages/click/core.py", line 1485, in __call__
-    return self.main(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/venv/main/lib/python3.12/site-packages/click/core.py", line 1406, in main
-    rv = self.invoke(ctx)
-         ^^^^^^^^^^^^^^^^
-  File "/venv/main/lib/python3.12/site-packages/click/core.py", line 1269, in invoke
-    return ctx.invoke(self.callback, **ctx.params)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/venv/main/lib/python3.12/site-packages/click/core.py", line 824, in invoke
-    return callback(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/workspace/usenix/src/qquilt/quantize.py", line 177, in main
-    quantize(src_gguf=f16, dst_gguf=dst, quant_type=q, llama_quantize=llama_quantize_bin)
-  File "/workspace/usenix/src/qquilt/quantize.py", line 57, in quantize
-    subprocess.run(cmd, check=True)
-  File "/venv/main/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-subprocess.CalledProcessError: Command '['/workspace/usenix/third_party/llama.cpp/build/bin/llama-quantize', '/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-f16.gguf', '/workspace/usenix/checkpoints/wave_1_llama32_3b_fullft_seed42/quantized/model-q4_k_m.gguf', 'Q4_K_M']' returned non-zero exit status 1.
