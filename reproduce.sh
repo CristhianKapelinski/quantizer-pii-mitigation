@@ -142,6 +142,17 @@ exp_figures () {
   bash replay.sh --figures-only
 }
 
+exp_quick () {
+  # Reviewer convenience: NOT part of the full run. Re-runs ONE cell
+  # end-to-end (the smallest backbone, full FT, one seed) so a reviewer can
+  # confirm the pipeline genuinely produces the headline gap from scratch
+  # in feasible time (~20-40 min on a 16 GB GPU) instead of the ~1-day run.
+  echo "[reproduce] quick: one cell end-to-end (Qwen2.5-0.5B, full FT, seed 42)"
+  echo "[reproduce]   reduced check for Claim 1: BF16 vs Q4_K_M vs AWQ verbatim extraction"
+  run_cell Qwen/Qwen2.5-0.5B-Instruct qwen05b full 42
+  echo "[reproduce] quick done. See experiment/results/wave_1_qwen05b_full_seed42/metrics.json"
+}
+
 # --------------------------------------------------------------------------
 # Dispatcher
 # --------------------------------------------------------------------------
@@ -163,11 +174,17 @@ declare -A EXP_DESC=(
   [figures]="regenerate the 5 paper figures from current logs"
 )
 
+# 'quick' is a reviewer-only convenience and is NOT part of the full run.
+QUICK_DESC="one cell end-to-end, ~20-40 min on a 16 GB GPU -- reduced Claim-1 check"
+# Names accepted by the dispatcher: the full-run order plus 'quick'.
+VALID_NAMES=("${EXP_ORDER[@]}" quick)
+
 print_usage () {
   cat <<'EOF'
 Usage:
   bash reproduce.sh                 # run ALL experiments, in order
   bash reproduce.sh <name> [<name>] # run only the named experiment(s)
+  bash reproduce.sh quick           # reduced check: one cell end-to-end (~20-40 min, 16 GB GPU)
   bash reproduce.sh --list          # list experiment names + descriptions
   bash reproduce.sh --help          # print this message
 
@@ -182,11 +199,12 @@ print_list () {
   for name in "${EXP_ORDER[@]}"; do
     printf '  %-18s %s\n' "$name" "${EXP_DESC[$name]}"
   done
+  printf '  %-18s %s\n' "quick" "$QUICK_DESC"
 }
 
 run_one () {  # NAME
   local name="$1"
-  case " ${EXP_ORDER[*]} " in
+  case " ${VALID_NAMES[*]} " in
     *" $name "*) "exp_$name" ;;
     *)
       echo "[reproduce] error: unknown experiment '$name'" >&2
@@ -212,7 +230,7 @@ main () {
 
   # Validate every name before running anything.
   for name in "$@"; do
-    case " ${EXP_ORDER[*]} " in
+    case " ${VALID_NAMES[*]} " in
       *" $name "*) ;;
       *)
         echo "[reproduce] error: unknown experiment '$name'" >&2
