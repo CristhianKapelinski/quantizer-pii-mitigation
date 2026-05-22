@@ -46,7 +46,7 @@ for v, bpw in bpw_map.items():
 gguf_pts.sort()
 fp_pts.sort()
 
-fig, ax = plt.subplots(figsize=(6.4, 3.6))
+fig, ax = plt.subplots(figsize=(6.8, 2.5))
 
 # Combine into the staircase the GGUF + FP ceiling
 all_curve = gguf_pts + fp_pts
@@ -54,7 +54,7 @@ all_curve.sort()
 xs = [p[0] for p in all_curve]
 ys = [p[1] for p in all_curve]
 ax.plot(xs, ys, "o-", color="#d62728", linewidth=1.8, markersize=7,
-        label="GGUF k-quant / FP (calibration-free)", zorder=3)
+        label="GGUF / FP (calib.-free)", zorder=3)
 
 # FP markers (square overlay)
 for (bpw, rate, lab) in fp_pts:
@@ -65,10 +65,10 @@ for (bpw, rate, lab) in fp_pts:
 # both at rate=0 (their actual value).
 ax.plot(4.25, 0.0, marker="*", color="#1f77b4", markersize=22,
         markeredgecolor="black", markeredgewidth=0.7,
-        label="AWQ-4bit (calibration-based)", zorder=5)
+        label="AWQ (calib.)", zorder=5)
 ax.plot(4.05, 0.0, marker="D", color="#2ca02c", markersize=10,
         markeredgecolor="black", markeredgewidth=0.7,
-        label="GPTQ-4bit (calibration-based)", zorder=5)
+        label="GPTQ (calib.)", zorder=5)
 
 # Label only the key inflection points; collapse Q3/Q2 into one group
 label_offsets = {
@@ -106,11 +106,11 @@ ax.annotate("GPTQ 0%", xy=(4.05, 0), xytext=(10.5, 4),
 ax.set_xlabel("Effective bits per weight (bpw)", fontsize=10)
 ax.set_ylabel("Extraction rate (%)", fontsize=10)
 ax.set_xlim(2.0, 18.0)
-ax.set_ylim(-1, 33)
+ax.set_ylim(-1, 35)
 ax.set_xticks([2, 4, 6, 8, 10, 12, 14, 16])
 ax.set_yticks([0, 10, 20, 30])
 ax.grid(True, alpha=0.3, zorder=0, linestyle=":")
-ax.legend(loc="upper left", fontsize=7.5, framealpha=0.95)
+ax.legend(loc="upper right", fontsize=7, framealpha=0.95)
 
 plt.tight_layout()
 plt.savefig(FIGDIR / "fig_dose_response.pdf", bbox_inches="tight")

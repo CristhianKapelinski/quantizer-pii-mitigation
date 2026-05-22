@@ -21,13 +21,13 @@ ROOT = Path(_os.environ.get("QQUILT_REPO",
 FIGDIR = ROOT / "experiment" / "figures"
 FIGDIR.mkdir(parents=True, exist_ok=True)
 
-fig, axes = plt.subplots(1, 3, figsize=(10.5, 3.0))
+fig, axes = plt.subplots(1, 3, figsize=(11.6, 3.5), constrained_layout=True)
 
 # =========================================================================
 # Factor 1: rare-token noise concentration
 # =========================================================================
 ax = axes[0]
-ax.set_title("Factor 1: rare-token noise concentration", fontsize=10.5, pad=6)
+ax.set_title("Factor 1: rare-token noise", fontsize=9.5, pad=4)
 
 # A schematic: residual error vector aligned (or not) with top-1 token basis
 # show cosine alignments
@@ -52,7 +52,7 @@ ax.grid(True, axis="y", alpha=0.3, linestyle=":")
 # Factor 2: moderate-confidence vulnerability window
 # =========================================================================
 ax = axes[1]
-ax.set_title("Factor 2: moderate-confidence window", fontsize=10.5, pad=6)
+ax.set_title("Factor 2: confidence window", fontsize=9.5, pad=4)
 
 # x = ft top-1 probability; y = flip rate (3-seed pool, n=300)
 positions = [
@@ -91,7 +91,7 @@ ax.grid(True, alpha=0.3, linestyle=":")
 # Factor 3: calibration amplifies noise magnitude
 # =========================================================================
 ax = axes[2]
-ax.set_title("Factor 3: calibration amplifies magnitude", fontsize=10.5, pad=6)
+ax.set_title("Factor 3: calibration amplifies", fontsize=9.5, pad=4)
 
 methods = ["Q4_K_M\n(no calib.)", "AWQ\n(calib.)", "GPTQ\n(calib.)"]
 norms = [617, 841, None]   # 3-seed pool
@@ -138,11 +138,10 @@ ax.text((x[0] + x[1])/2 - width/2, 980, "+36% norm",
 # Legend
 lines1, labels1 = ax.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
-ax.legend(lines1 + lines2, labels1 + labels2, loc="upper right", fontsize=7.5,
+ax.legend(lines1 + lines2, labels1 + labels2, loc="upper right", fontsize=6.8,
           framealpha=0.95)
 
 ax.grid(True, axis="y", alpha=0.3, linestyle=":")
-plt.tight_layout()
 
 out_pdf = FIGDIR / "fig_mechanism.pdf"
 out_png = FIGDIR / "fig_mechanism.png"
