@@ -56,8 +56,8 @@ Repository layout:
 The badges considered are: **Available (SeloD)**, **Functional (SeloF)**,
 **Sustainable (SeloS)**, and **Reproducible (SeloR)**.
 
-* **Available** -- the artifact is public in a stable GitHub repository
-  (`https://github.com/CristhianKapelinski/quantizer-pii-mitigation`) with
+* **Available** -- the artifact is public in a stable anonymous repository
+  (`https://anonymous.4open.science/r/quantizer-pii-mitigation-33B5/`) with
   this complete README.
 * **Functional** -- the artifact runs and the reviewer can observe its
   functionality; see the *Installation* and *Minimal test* sections.
@@ -157,8 +157,8 @@ Running the artifact poses **no risk** to the reviewer. Clarifications:
 # Installation
 
 ```bash
-git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation.git
-cd quantizer-pii-mitigation
+git clone https://anonymous.4open.science/r/quantizer-pii-mitigation-33B5/
+cd quantizer-pii-mitigation-33B5
 
 # (1) Python environment (paths a and b)
 #     downloads the pinned wheels incl. torch (several GB); time is network-bound
