@@ -74,11 +74,11 @@
       "doc_to_decontamination_query": "Question: {{question}}\nAnswer:",
       "metadata": {
         "version": 1.0,
-        "pretrained": "/home/cristhian/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
+        "pretrained": "/home/anon/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
         "dtype": "float16",
         "device_map": "cuda:0",
         "low_cpu_mem_usage": false,
-        "config_source": "/home/cristhian/usenix/.venv/lib/python3.11/site-packages/lm_eval/tasks/arc/arc_easy.yaml"
+        "config_source": "/home/anon/usenix/.venv/lib/python3.11/site-packages/lm_eval/tasks/arc/arc_easy.yaml"
       }
     },
     "hellaswag": {
@@ -125,11 +125,11 @@
       "should_decontaminate": false,
       "metadata": {
         "version": 1.0,
-        "pretrained": "/home/cristhian/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
+        "pretrained": "/home/anon/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
         "dtype": "float16",
         "device_map": "cuda:0",
         "low_cpu_mem_usage": false,
-        "config_source": "/home/cristhian/usenix/.venv/lib/python3.11/site-packages/lm_eval/tasks/hellaswag/hellaswag.yaml"
+        "config_source": "/home/anon/usenix/.venv/lib/python3.11/site-packages/lm_eval/tasks/hellaswag/hellaswag.yaml"
       }
     },
     "winogrande": {
@@ -172,11 +172,11 @@
       "doc_to_decontamination_query": "sentence",
       "metadata": {
         "version": 1.0,
-        "pretrained": "/home/cristhian/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
+        "pretrained": "/home/anon/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
         "dtype": "float16",
         "device_map": "cuda:0",
         "low_cpu_mem_usage": false,
-        "config_source": "/home/cristhian/usenix/.venv/lib/python3.11/site-packages/lm_eval/tasks/winogrande/default.yaml"
+        "config_source": "/home/anon/usenix/.venv/lib/python3.11/site-packages/lm_eval/tasks/winogrande/default.yaml"
       }
     }
   },
@@ -220,7 +220,7 @@
   "config": {
     "model": "hf",
     "model_args": {
-      "pretrained": "/home/cristhian/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
+      "pretrained": "/home/anon/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
       "dtype": "float16",
       "device_map": "cuda:0",
       "low_cpu_mem_usage": false
@@ -267,8 +267,8 @@
     "winogrande": "a5ea73eb24ab46d111fe5d21eed85b1e779c0b309d80d080c3caa21a851b6feb"
   },
   "model_source": "hf",
-  "model_name": "/home/cristhian/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
-  "model_name_sanitized": "__home__cristhian__usenix__checkpoints__wave_1_mini__quantized__model-awq-4bit",
+  "model_name": "/home/anon/usenix/checkpoints/wave_1_mini/quantized/model-awq-4bit",
+  "model_name_sanitized": "__home__anon__usenix__checkpoints__wave_1_mini__quantized__model-awq-4bit",
   "system_instruction": null,
   "system_instruction_sha": null,
   "fewshot_as_multiturn": null,

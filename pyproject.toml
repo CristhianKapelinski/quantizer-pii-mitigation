@@ -3,7 +3,7 @@ name = "quantizer-pii-mitigation"
 version = "0.1.0"
 description = "Deployment-time mitigation of PII leakage in fine-tuned small language models via the choice of 4-bit quantizer"
 requires-python = ">=3.11,<3.12"
-authors = [{ name = "Cristhian Kapelinski", email = "cristhiank552@gmail.com" }]
+authors = [{ name = "Cristhian Kapelinski", email = "anonk552@gmail.com" }]
 readme = "README.md"
 
 dependencies = [

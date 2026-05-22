@@ -1,7 +1,7 @@
 {
   "schema": "qquilt.delta_norm.v1",
   "base_model_id": "Qwen/Qwen2.5-0.5B-Instruct",
-  "final_dir": "/home/cristhian/usenix/checkpoints/wave_1_qwen25_05b_lora_seed42/final",
+  "final_dir": "/home/anon/usenix/checkpoints/wave_1_qwen25_05b_lora_seed42/final",
   "n_shared_params_tensors": 290,
   "n_shared_scalar_params": 494032768,
   "param_names_only_in_one": [],
