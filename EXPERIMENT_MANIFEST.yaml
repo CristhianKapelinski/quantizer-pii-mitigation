@@ -7,7 +7,7 @@ manifest_version: 2
 project: quantizer-pii-mitigation
 
 repo:
-  origin: https://github.com/CristhianKapelinski/quantizer-pii-mitigation
+  origin: https://anonymous.4open.science/r/quantizer-pii-mitigation-33B5/
   branch: master
 
 # ---------------------------------------------------------------------------
