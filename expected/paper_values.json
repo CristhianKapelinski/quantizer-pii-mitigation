@@ -1,0 +1,166 @@
+{
+  "_comment": "Ground-truth numbers asserted in the camera-ready main.tex (Overleaf 6a03290ddb965e62955b0dc4). Each entry: {value, source}. The verify resolver maps each key to (artifact, json-path). Numbers with no recomputable artifact (prior-work descriptors, hardware) are omitted here and SKIP-listed in the report.",
+
+  "headline_greedy_ge10_extraction_pct": {
+    "fullft.qwen0_5b.bf16":   {"value": 30.3, "source": "tab:headline"},
+    "fullft.qwen0_5b.q8_0":   {"value": 30.3, "source": "tab:headline"},
+    "fullft.qwen0_5b.q5_k_m": {"value": 28.3, "source": "tab:headline"},
+    "fullft.qwen0_5b.q4_k_m": {"value": 23.0, "source": "tab:headline"},
+    "fullft.qwen0_5b.awq":    {"value": 0.0,  "source": "tab:headline"},
+    "fullft.llama1b.bf16":    {"value": 26.6, "source": "tab:headline"},
+    "fullft.llama1b.q8_0":    {"value": 26.6, "source": "tab:headline"},
+    "fullft.llama1b.q5_k_m":  {"value": 23.2, "source": "tab:headline"},
+    "fullft.llama1b.q4_k_m":  {"value": 4.0,  "source": "tab:headline"},
+    "fullft.llama1b.awq":     {"value": 0.0,  "source": "tab:headline"},
+    "fullft.qwen1_5b.bf16":   {"value": 30.3, "source": "tab:headline"},
+    "fullft.qwen1_5b.q8_0":   {"value": 30.3, "source": "tab:headline"},
+    "fullft.qwen1_5b.q5_k_m": {"value": 29.3, "source": "tab:headline"},
+    "fullft.qwen1_5b.q4_k_m": {"value": 13.7, "source": "tab:headline"},
+    "fullft.qwen1_5b.awq":    {"value": 5.0,  "source": "tab:headline"},
+    "fullft.llama3b.bf16":    {"value": 30.0, "source": "tab:headline"},
+    "fullft.llama3b.q5_k_m":  {"value": 27.0, "source": "tab:headline"},
+    "fullft.llama3b.q4_k_m":  {"value": 16.0, "source": "tab:headline"},
+    "fullft.llama3b.awq":     {"value": 3.0,  "source": "tab:headline"},
+    "fullft.qwen7b.bf16":     {"value": 30.0, "source": "tab:headline"},
+    "fullft.qwen7b.q5_k_m":   {"value": 30.0, "source": "tab:headline"},
+    "fullft.qwen7b.q4_k_m":   {"value": 24.0, "source": "tab:headline"},
+    "fullft.qwen7b.awq":      {"value": 6.0,  "source": "tab:headline"},
+    "lora.qwen0_5b.bf16":     {"value": 23.3, "source": "tab:headline"},
+    "lora.qwen0_5b.q4_k_m":   {"value": 0.0,  "source": "tab:headline"},
+    "lora.qwen0_5b.awq":      {"value": 0.0,  "source": "tab:headline"},
+    "lora.llama1b.bf16":      {"value": 25.7, "source": "tab:headline"},
+    "lora.llama1b.q4_k_m":    {"value": 0.0,  "source": "tab:headline"},
+    "lora.llama1b.awq":       {"value": 0.0,  "source": "tab:headline"},
+    "lora.llama3b_lr2e5.bf16":   {"value": 28.0, "source": "tab:headline"},
+    "lora.llama3b_lr2e5.q5_k_m": {"value": 9.0,  "source": "tab:headline"},
+    "lora.llama3b_lr2e5.q4_k_m": {"value": 0.0,  "source": "tab:headline"},
+    "lora.llama3b_lr2e5.awq":    {"value": 0.0,  "source": "tab:headline"},
+    "lora.llama3b_lr2e4.q4_k_m": {"value": 25.0, "source": "tab:headline"},
+    "lora.llama3b_lr2e4.awq":    {"value": 7.0,  "source": "tab:headline"}
+  },
+
+  "awq_group_size_sweep_ge10_count": {
+    "awq_g32":  {"value": 4,  "source": "tab:awq-sweep (single seed)"},
+    "awq_g64":  {"value": 0,  "source": "tab:awq-sweep"},
+    "awq_g128": {"value": 0,  "source": "tab:awq-sweep"},
+    "ref_q4_k_m": {"value": 6,  "source": "tab:awq-sweep"},
+    "ref_q5_k_m": {"value": 25, "source": "tab:awq-sweep"}
+  },
+
+  "calib_vs_free_3seed_ge10_pct": {
+    "bf16":      {"value": 30.3, "source": "tab:gptq"},
+    "q4_k_m":    {"value": 5.3,  "source": "tab:gptq"},
+    "awq_g128":  {"value": 0.0,  "source": "tab:gptq"},
+    "gptq_g128": {"value": 0.0,  "source": "tab:gptq"}
+  },
+
+  "saliency_ablation": {
+    "A_wikitext.ge5":  {"value": 0, "source": "tab:saliency"},
+    "A_wikitext.ge10": {"value": 0, "source": "tab:saliency"},
+    "A_wikitext.anyof6_ge10": {"value": 0, "source": "tab:saliency"},
+    "B_mix.ge5":  {"value": 3, "source": "tab:saliency"},
+    "B_mix.ge10": {"value": 0, "source": "tab:saliency"},
+    "B_mix.anyof6_ge10": {"value": 0, "source": "tab:saliency"},
+    "C_canary.ge5":  {"value": 1, "source": "tab:saliency"},
+    "C_canary.ge10": {"value": 0, "source": "tab:saliency"},
+    "C_canary.anyof6_ge10": {"value": 0, "source": "tab:saliency"},
+    "D_enron.ge5":  {"value": 2, "source": "tab:saliency"},
+    "D_enron.ge10": {"value": 0, "source": "tab:saliency"},
+    "D_enron.anyof6_ge10": {"value": 0, "source": "tab:saliency"}
+  },
+
+  "threefactor_logit_error": {
+    "n.awq_recall":   {"value": 300, "source": "tab:threefactor"},
+    "n.awq_body":     {"value": 100, "source": "tab:threefactor"},
+    "n.q4_recall":    {"value": 300, "source": "tab:threefactor"},
+    "n.enron":        {"value": 91,  "source": "tab:threefactor"},
+    "ft_top1.awq_recall": {"value": 0.67,   "source": "tab:threefactor"},
+    "ft_top1.awq_body":   {"value": 0.9998, "source": "tab:threefactor"},
+    "ft_top1.q4_recall":  {"value": 0.70,   "source": "tab:threefactor"},
+    "l2norm.awq_recall": {"value": 841, "source": "tab:threefactor"},
+    "l2norm.awq_body":   {"value": 654, "source": "tab:threefactor"},
+    "l2norm.q4_recall":  {"value": 617, "source": "tab:threefactor"},
+    "cos.awq_recall": {"value": 0.0086, "source": "tab:threefactor"},
+    "cos.awq_body":   {"value": 0.0079, "source": "tab:threefactor"},
+    "cos.q4_recall":  {"value": 0.0079, "source": "tab:threefactor"},
+    "probdrop.awq_recall": {"value": 55,   "source": "tab:threefactor (%)"},
+    "probdrop.awq_body":   {"value": 0.04, "source": "tab:threefactor (%)"},
+    "probdrop.q4_recall":  {"value": 46,   "source": "tab:threefactor (%)"},
+    "flip.awq_recall": {"value": 78, "source": "tab:threefactor (%)"},
+    "flip.awq_body":   {"value": 0,  "source": "tab:threefactor (%)"},
+    "flip.q4_recall":  {"value": 48, "source": "tab:threefactor (%)"}
+  },
+
+  "mia_auc": {
+    "ood.bf16.mink":   {"value": 1.00, "source": "tab:mia-indist"},
+    "ood.bf16.minkpp": {"value": 1.00, "source": "tab:mia-indist"},
+    "ood.bf16.loss":   {"value": 1.00, "source": "tab:mia-indist"},
+    "ood.awq.mink":    {"value": 0.97, "source": "tab:mia-indist"},
+    "ood.awq.minkpp":  {"value": 1.00, "source": "tab:mia-indist"},
+    "ood.awq.loss":    {"value": 0.99, "source": "tab:mia-indist"},
+    "indist.bf16.mink":   {"value": 0.83, "source": "tab:mia-indist"},
+    "indist.bf16.minkpp": {"value": 0.78, "source": "tab:mia-indist"},
+    "indist.bf16.loss":   {"value": 0.86, "source": "tab:mia-indist"},
+    "indist.awq.mink":    {"value": 0.22, "source": "tab:mia-indist"},
+    "indist.awq.minkpp":  {"value": 0.19, "source": "tab:mia-indist"},
+    "indist.awq.loss":    {"value": 0.49, "source": "tab:mia-indist"}
+  },
+
+  "downstream_accuracy_pct": {
+    "bf16.arc":  {"value": 67.55, "source": "tab:downstream"},
+    "bf16.hellaswag": {"value": 47.76, "source": "tab:downstream"},
+    "bf16.winogrande": {"value": 61.40, "source": "tab:downstream"},
+    "bf16.mean": {"value": 58.90, "source": "tab:downstream"},
+    "awq.arc":  {"value": 67.76, "source": "tab:downstream"},
+    "awq.hellaswag": {"value": 45.59, "source": "tab:downstream"},
+    "awq.winogrande": {"value": 62.12, "source": "tab:downstream"},
+    "awq.mean": {"value": 58.49, "source": "tab:downstream"},
+    "delta.arc":  {"value": 0.21,  "source": "tab:downstream"},
+    "delta.hellaswag": {"value": -2.17, "source": "tab:downstream"},
+    "delta.winogrande": {"value": 0.72, "source": "tab:downstream"},
+    "delta.mean": {"value": -0.41, "source": "tab:downstream"}
+  },
+
+  "perplexity_ratio": {
+    "llama1b.bf16.indomain":  {"value": 1.000, "source": "tab:utility"},
+    "llama1b.q8_0.indomain":  {"value": 1.001, "source": "tab:utility"},
+    "llama1b.q5_k_m.indomain": {"value": 1.022, "source": "tab:utility"},
+    "llama1b.q5_k_m.ood":      {"value": 1.012, "source": "tab:utility"},
+    "llama1b.q4_k_m.indomain": {"value": 1.047, "source": "tab:utility"},
+    "llama1b.q4_k_m.ood":      {"value": 1.044, "source": "tab:utility"},
+    "llama1b.awq.indomain":    {"value": 1.123, "source": "tab:utility"},
+    "llama1b.awq.ood":         {"value": 1.094, "source": "tab:utility"},
+    "llama3b.awq.indomain":    {"value": 1.021, "source": "tab:utility"},
+    "llama3b.awq.ood":         {"value": 1.021, "source": "tab:utility"},
+    "qwen7b.awq.indomain":     {"value": 1.002, "source": "tab:utility"},
+    "qwen7b.awq.ood":          {"value": 1.044, "source": "tab:utility"}
+  },
+
+  "natural_canary_member_nonmember": {
+    "llama3b.bf16.member": {"value": 5, "source": "tab:natcan (%)"},
+    "llama3b.bf16.nonmem": {"value": 3, "source": "tab:natcan (%)"},
+    "llama3b.q5_k_m.member": {"value": 4, "source": "tab:natcan (%)"},
+    "llama3b.q5_k_m.nonmem": {"value": 3, "source": "tab:natcan (%)"},
+    "llama3b.q4_k_m.member": {"value": 4, "source": "tab:natcan (%)"},
+    "llama3b.q4_k_m.nonmem": {"value": 3, "source": "tab:natcan (%)"},
+    "llama3b.awq.member": {"value": 4, "source": "tab:natcan (%)"},
+    "llama3b.awq.nonmem": {"value": 4, "source": "tab:natcan (%)"},
+    "qwen7b.bf16.member": {"value": 10, "source": "tab:natcan (%)"},
+    "qwen7b.bf16.nonmem": {"value": 5,  "source": "tab:natcan (%)"},
+    "qwen7b.q5_k_m.member": {"value": 9, "source": "tab:natcan (%)"},
+    "qwen7b.q5_k_m.nonmem": {"value": 4, "source": "tab:natcan (%)"},
+    "qwen7b.q4_k_m.member": {"value": 5, "source": "tab:natcan (%)"},
+    "qwen7b.q4_k_m.nonmem": {"value": 4, "source": "tab:natcan (%)"},
+    "qwen7b.awq.member": {"value": 4, "source": "tab:natcan (%)"},
+    "qwen7b.awq.nonmem": {"value": 3, "source": "tab:natcan (%)"}
+  },
+
+  "defense_pareto": {
+    "bf16.extraction":   {"value": 26.6, "source": "tab:defense-pareto"},
+    "q4_k_m.extraction": {"value": 4.0,  "source": "tab:defense-pareto"},
+    "awq_1b.extraction": {"value": 0.0,  "source": "tab:defense-pareto"},
+    "awq_3b.extraction": {"value": 3.0,  "source": "tab:defense-pareto"},
+    "awq_7b.extraction": {"value": 6.0,  "source": "tab:defense-pareto"},
+    "gptq_1b.extraction": {"value": 0.0, "source": "tab:defense-pareto"}
+  }
+}

@@ -12,6 +12,8 @@
 #   bash replay.sh                  # full replay: metrics + stats + figures
 #   bash replay.sh --figures-only   # only regenerate experiment/figures/*
 #   bash replay.sh --no-figures     # skip figure rendering
+#   bash replay.sh verify           # check every published number against the logs
+#                                   #   (exact match; see docs/REPRODUCIBILITY_REPORT.md)
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -34,6 +36,11 @@ render_figures () {
 if [ "$MODE" = "--figures-only" ]; then
   render_figures
   exit 0
+fi
+
+if [ "$MODE" = "verify" ]; then
+  echo "== verifying published paper numbers against the committed logs =="
+  exec "$PY" scripts/verify_values.py
 fi
 
 echo "== (1) re-running per-seed verbatim-extraction metrics from the committed extraction logs =="

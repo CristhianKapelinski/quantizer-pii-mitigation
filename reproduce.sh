@@ -227,6 +227,7 @@ main () {
   case "$1" in
     --help|-h) print_usage; return ;;
     --list|-l) print_list; return ;;
+    verify)    exec bash replay.sh verify ;;
   esac
 
   # Validate every name before running anything.

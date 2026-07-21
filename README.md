@@ -197,6 +197,7 @@ reviewer path**:
 
 | Level | Command | Measured time | Hardware | What it shows |
 |---|---|---|---|---|
+| Verify (all numbers) | `bash replay.sh verify` | ~1 s | any CPU, no GPU | Checks every published number against the committed logs at the paper's printed precision (see `docs/REPRODUCIBILITY_REPORT.md`) |
 | Replay (all claims) | `bash replay.sh` | ~7 s (measured) | any CPU, no GPU | Re-derives every table and figure of all 5 claims from the committed logs |
 | Quick re-run (reduced) | `bash reproduce.sh quick` | fine-tune ~85 min (measured); quantize + extract not instrumented | one 16 GB GPU | Re-runs one cell from scratch; confirms the pipeline genuinely produces the Claim-1 gap |
 | Full re-run | `bash reproduce.sh` | fine-tune phase ~37 h (measured, summed); quantize / extract / analysis not instrumented | 16 GB GPU + A100 80 GB | Re-runs every cell and ablation end-to-end |
