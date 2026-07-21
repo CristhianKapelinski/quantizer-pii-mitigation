@@ -63,8 +63,8 @@ The badges considered are: **Available (SeloD)**, **Functional (SeloF)**,
   functionality; see the *Installation* and *Minimal test* sections.
 * **Sustainable** -- the code is modular (the `src/qquilt/` package),
   documented (`ENGINEERING.md`, docstrings, `experiment/results/SCHEMA.md` and
-  `INDEX.md`), and every paper claim is identifiable in the artifact (the
-  *Experiments* section).
+  `INDEX.md`), unit-tested (`python -m pytest tests/`, no GPU/network), and every
+  paper claim is identifiable in the artifact (the *Experiments* section).
 * **Reproducible** -- `reproduce.sh` re-runs the pipeline and `replay.sh`
   re-derives every table and figure from the committed logs.
 
