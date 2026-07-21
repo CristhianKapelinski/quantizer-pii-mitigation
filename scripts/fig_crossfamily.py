@@ -14,24 +14,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import os as _os
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fig_data import crossfamily
 ROOT = Path(_os.environ.get("QQUILT_REPO",
             Path(__file__).resolve().parent.parent))
-FIGDIR = ROOT / "experiment" / "figures"
+FIGDIR = Path(_os.environ.get("QQUILT_FIGDIR", ROOT / "experiment" / "figures"))
 FIGDIR.mkdir(parents=True, exist_ok=True)
 
+# Values loaded from the committed logs (see scripts/_fig_data.py).
+_d = crossfamily()
 # --- full fine-tune block ---
 ft_models = ["Qwen2.5\n0.5B", "Llama-3.2\n1B", "Qwen2.5\n1.5B",
              "Llama-3.2\n3B", "Qwen2.5\n7B"]
-ft_bf16 = [30.3, 26.6, 30.3, 30.0, 30.0]
-ft_q4   = [23.0,  4.0, 13.7, 16.0, 24.0]
-ft_awq  = [ 0.0,  0.0,  5.0,  3.0,  6.0]
+ft_bf16, ft_q4, ft_awq = _d["ft_bf16"], _d["ft_q4"], _d["ft_awq"]
 
 # --- LoRA r=16 block; last cell is the lr 2e-4 (larger-delta) knob ---
 lo_models = ["Qwen2.5\n0.5B", "Llama-3.2\n1B",
              "Llama-3.2\n3B", "Llama-3.2\n3B"]
-lo_bf16 = [23.3, 25.7, 28.0, 30.0]
-lo_q4   = [ 0.0,  0.0,  0.0, 25.0]
-lo_awq  = [ 0.0,  0.0,  0.0,  7.0]
+lo_bf16, lo_q4, lo_awq = _d["lo_bf16"], _d["lo_q4"], _d["lo_awq"]
 
 gap = 1.1
 ft_x = np.arange(len(ft_models))

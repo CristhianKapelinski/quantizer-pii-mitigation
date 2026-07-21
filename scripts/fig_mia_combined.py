@@ -9,10 +9,14 @@ import numpy as np
 from pathlib import Path
 
 import os as _os
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fig_data import mia as _mia_data
 ROOT = Path(_os.environ.get("QQUILT_REPO",
             Path(__file__).resolve().parent.parent))
-FIGDIR = ROOT / "experiment" / "figures"
+FIGDIR = Path(_os.environ.get("QQUILT_FIGDIR", ROOT / "experiment" / "figures"))
 FIGDIR.mkdir(parents=True, exist_ok=True)
+_d = _mia_data()  # values loaded from the committed logs (see scripts/_fig_data.py)
 versions = ["BF16", "Q4_K_M", "AWQ-4bit"]
 colors = ["#7f7f7f", "#d62728", "#1f77b4"]
 
@@ -20,7 +24,7 @@ fig, axes = plt.subplots(1, 4, figsize=(13.5, 2.8))
 
 # Panel A: verbatim on the single MIA checkpoint (seed 42), % of 100
 ax = axes[0]
-extract = [30.0, 6.0, 0.0]
+extract = _d["extract"]
 b = ax.bar(versions, extract, color=colors, edgecolor="black", linewidth=0.6)
 for bb, v in zip(b, extract):
     ax.text(bb.get_x() + bb.get_width()/2, v + 0.7, f"{v:.0f}%",
@@ -32,8 +36,8 @@ ax.set_ylim(0, 36); ax.grid(True, axis="y", alpha=0.3, linestyle=":")
 # Panel B: MIA AUC OOD vs in-dist (BF16 + AWQ only, since we have those)
 ax = axes[1]
 labs = ["BF16", "AWQ"]
-ood = [1.00, 0.97]
-ind = [0.83, 0.22]
+ood = _d["ood"]
+ind = _d["ind"]
 x = np.arange(2); w = 0.36
 b1 = ax.bar(x - w/2, ood, w, label="OOD G3", color="#bbb",
             edgecolor="black", linewidth=0.6)
@@ -59,9 +63,10 @@ def kde(d, x, bw=0.45):
     return np.mean(np.exp(-0.5*((x[:,None]-d[None,:])/bw)**2) /
                    (bw*np.sqrt(2*np.pi)), axis=1)
 
+_bf, _aw = _d["bf_means"], _d["aw_means"]
 for ax, title, mem, ind_v, ood_v, ymax_hint in [
-    (axes[2], "(c) BF16 scores",          -0.029, -3.40, -9.22, None),
-    (axes[3], "(d) AWQ scores (inverted)", -6.12,  -3.49, -9.15, None),
+    (axes[2], "(c) BF16 scores",          _bf[0], _bf[1], _bf[2], None),
+    (axes[3], "(d) AWQ scores (inverted)", _aw[0], _aw[1], _aw[2], None),
 ]:
     xs = np.linspace(-12.5, 2, 400)
     ymax = 0

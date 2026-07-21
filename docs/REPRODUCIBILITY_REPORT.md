@@ -20,13 +20,17 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
 
 ## 1. Known limitations and lineage notes
 
-- **Four of five figures embed their numbers.** Only `scripts/fig_dose_response.py` reads a
-  result file (`reviewer_polish/m10_threshold_sensitivity.json`). `fig_crossfamily.py`,
-  `fig_mia_combined.py`, `fig_mechanism.py`, and `fig_quant_variants.py` hardcode the values
-  they plot. The underlying per-cell result JSONs exist and the verifier checks those numbers
-  independently, but `replay.sh --figures-only` only re-draws the embedded constants; it does
-  not prove the figures were generated from the logs. Wiring these four figures to read their
-  JSONs is the main outstanding lineage gap.
+- **Figures load their numbers from the logs.** All five figure scripts now read the values
+  they plot from the committed result JSONs. `fig_dose_response.py` reads
+  `reviewer_polish/m10_threshold_sensitivity.json`; `fig_crossfamily.py`, `fig_mia_combined.py`,
+  `fig_mechanism.py`, and `fig_quant_variants.py` obtain their values from `scripts/_fig_data.py`,
+  a single loader that recomputes each number from the logs and self-checks (`python
+  scripts/_fig_data.py`) that every loadable value equals the published one. A small number of
+  cells have no single committed artifact because they are multi-run syntheses reported in a
+  paper table, and stay as documented constants marked `_SYNTH` in `_fig_data.py`: the
+  Qwen2.5-0.5B AWQ headline cell, the 3-seed LoRA BF16 pools, and two `tab:threefactor` cells
+  (the AWQ RECALL logit-error norm and flip rate). GGUF/GPTQ effective bits-per-weight are
+  format-defined constants, not measured quantities.
 
 - **`tab:threefactor` is a manual synthesis and is not exact-verified.** The columns come from
   different mechanism runs at different sample sizes: FT top-1 / L2 norm / cosine / prob-drop

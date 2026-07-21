@@ -10,23 +10,22 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 import os as _os
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fig_data import quant_variants
 ROOT = Path(_os.environ.get("QQUILT_REPO",
             Path(__file__).resolve().parent.parent))
-FIGDIR = ROOT / "experiment" / "figures"
+FIGDIR = Path(_os.environ.get("QQUILT_FIGDIR", ROOT / "experiment" / "figures"))
 FIGDIR.mkdir(parents=True, exist_ok=True)
 
-variants = [
-    ("GGUF", "Q2_K",     2.6, "#d62728"),
-    ("GGUF", "Q3_K_M",   3.4, "#d62728"),
-    ("GGUF", "Q4_K_S",   4.3, "#d62728"),
-    ("GGUF", "Q4_K_M",   4.7, "#d62728"),
-    ("GGUF", "Q5_K_M",   5.5, "#d62728"),
-    ("GGUF", "Q8_0",     8.5, "#d62728"),
-    ("AWQ",  "g128",     4.25, "#1f77b4"),
-    ("AWQ",  "g64",      4.5,  "#1f77b4"),
-    ("AWQ",  "g32",      5.0,  "#1f77b4"),
-    ("GPTQ", "g128",     4.25, "#2ca02c"),
-]
+# AWQ bpw loaded from step_7; GGUF/GPTQ bpw are format-defined (see _fig_data.py).
+_qv = quant_variants()
+variants = (
+    [("GGUF", k, _qv["gguf"][k], "#d62728")
+     for k in ["Q2_K", "Q3_K_M", "Q4_K_S", "Q4_K_M", "Q5_K_M", "Q8_0"]]
+    + [("AWQ", k, _qv["awq"][k], "#1f77b4") for k in ["g128", "g64", "g32"]]
+    + [("GPTQ", "g128", _qv["gptq_g128"], "#2ca02c")]
+)
 
 method_row = {"GGUF": 2, "AWQ": 1, "GPTQ": 0}
 method_marker = {"GGUF": "o", "AWQ": "*", "GPTQ": "D"}

@@ -16,10 +16,14 @@ import matplotlib.patches as patches
 import numpy as np
 
 import os as _os
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fig_data import mechanism as _mech_data
 ROOT = Path(_os.environ.get("QQUILT_REPO",
             Path(__file__).resolve().parent.parent))
-FIGDIR = ROOT / "experiment" / "figures"
+FIGDIR = Path(_os.environ.get("QQUILT_FIGDIR", ROOT / "experiment" / "figures"))
 FIGDIR.mkdir(parents=True, exist_ok=True)
+_d = _mech_data()  # values loaded from the committed logs (see scripts/_fig_data.py)
 
 fig, axes = plt.subplots(1, 3, figsize=(11.6, 3.5), constrained_layout=True)
 
@@ -32,7 +36,7 @@ ax.set_title("Factor 1: rare-token noise", fontsize=9.5, pad=4)
 # A schematic: residual error vector aligned (or not) with top-1 token basis
 # show cosine alignments
 labels = ["AWQ\n@ Enron", "Q4_K_M\n@ Enron", "AWQ\n@ RECALL", "Q4_K_M\n@ RECALL"]
-cos_vals = [0.00038, 0.00086, 0.0086, 0.0079]
+cos_vals = _d["cos_vals"]
 isotropic = 1/np.sqrt(128256)  # ~0.0028 for the Llama-3.2 vocab
 colors = ["#bbbbbb", "#bbbbbb", "#1f77b4", "#d62728"]
 bars = ax.bar(range(4), cos_vals, color=colors, edgecolor="black", linewidth=0.6)
@@ -55,12 +59,8 @@ ax = axes[1]
 ax.set_title("Factor 2: confidence window", fontsize=9.5, pad=4)
 
 # x = ft top-1 probability; y = flip rate (3-seed pool, n=300)
-positions = [
-    ("Enron",         0.55, 24, "#7f7f7f"),
-    ("RECALL\n(AWQ)", 0.67, 78, "#1f77b4"),
-    ("RECALL\n(Q4_K_M)", 0.70, 48, "#d62728"),
-    ("BODY",          0.9998, 0, "#2ca02c"),
-]
+_f2_colors = ["#7f7f7f", "#1f77b4", "#d62728", "#2ca02c"]
+positions = [(lab, x, y, c) for (lab, x, y), c in zip(_d["factor2"], _f2_colors)]
 xs = [p[1] for p in positions]
 ys = [p[2] for p in positions]
 clr = [p[3] for p in positions]
@@ -94,8 +94,8 @@ ax = axes[2]
 ax.set_title("Factor 3: calibration amplifies", fontsize=9.5, pad=4)
 
 methods = ["Q4_K_M\n(no calib.)", "AWQ\n(calib.)", "GPTQ\n(calib.)"]
-norms = [617, 841, None]   # 3-seed pool
-extract = [5.3, 0.0, 0.0]  # 3-seed pool rates (matches the 3-seed norms)
+norms = _d["norms"]      # [Q4, AWQ, GPTQ]; AWQ norm is the tab:threefactor value
+extract = _d["extract"]  # 3-seed pool rates
 
 x = np.arange(3)
 width = 0.35
