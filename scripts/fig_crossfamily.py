@@ -62,9 +62,9 @@ ax.axvspan(lo_x[0] - 0.6, lo_x[-1] + 0.6, alpha=0.06, color="orange", zorder=0)
 divider = (ft_x[-1] + lo_x[0]) / 2
 ax.axvline(divider, color="#999999", linewidth=0.8, linestyle="--")
 
-ax.text(np.mean(ft_x), 32.6, "Full fine-tune (lr 2e-5)", ha="center",
+ax.text(np.mean(ft_x), 35.4, "Full fine-tune (lr 2e-5)", ha="center",
         fontsize=10, fontweight="bold")
-ax.text(np.mean(lo_x), 32.6, "LoRA r=16", ha="center",
+ax.text(np.mean(lo_x), 35.4, "LoRA r=16", ha="center",
         fontsize=10, fontweight="bold", color="#a36800")
 
 ax.set_xticks(list(ft_x) + list(lo_x))
@@ -83,7 +83,7 @@ ax.plot([x2, x3], [-0.27, -0.27], transform=trans, color="#c0392b",
 ax.text((x2 + x3) / 2, -0.34, "lr $2\\times10^{-4}$", transform=trans,
         ha="center", va="top", fontsize=12, fontweight="bold", color="#c0392b")
 ax.set_ylabel("Extraction rate (%, greedy $\\geq$10 chars)", fontsize=9.5)
-ax.set_ylim(0, 35)
+ax.set_ylim(0, 38)
 ax.set_yticks([0, 10, 20, 30])
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.12),
           ncol=3, fontsize=9, frameon=False)

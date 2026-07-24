@@ -140,6 +140,18 @@
     "lora.llama3b_lr2e4.awq": {
       "value": 7.0,
       "source": "tab:headline"
+    },
+    "lora.llama3b_lr2e4.bf16": {
+      "value": 30.0,
+      "source": "tab:headline"
+    },
+    "lora.llama3b_lr2e4.q8_0": {
+      "value": 30.0,
+      "source": "tab:headline"
+    },
+    "lora.llama3b_lr2e4.q5_k_m": {
+      "value": 30.0,
+      "source": "tab:headline"
     }
   },
   "awq_group_size_sweep_ge10_count": {

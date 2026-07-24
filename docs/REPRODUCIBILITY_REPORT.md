@@ -85,11 +85,11 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
 ## 2. Automatic verification results
 
 <!-- AUTO:VERIFY:BEGIN -->
-_Last verification: **133 pass / 0 fail**, 5 skip, out of 138 checked paper numbers._
+_Last verification: **136 pass / 0 fail**, 5 skip, out of 141 checked paper numbers._
 
 ### PASS
 
-133 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
+136 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
 
 ### SKIP (documented, not verified for exact equality)
 

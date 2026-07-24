@@ -100,6 +100,9 @@ def build_resolvers(r: R):
         res[f"headline_greedy_ge10_extraction_pct.fullft.llama3b.{v}"] = (lambda vk=vk: r.jsonl_ge10("wave_1_llama32_3b_fullft_seed42/extraction.jsonl", vk))
         res[f"headline_greedy_ge10_extraction_pct.fullft.qwen7b.{v}"] = (lambda vk=vk: r.jsonl_ge10("wave_1_qwen25_7b_seed42/extraction.jsonl", vk))
     # tab:headline -- LoRA 4-bit == 0 cells (seed 42) and lr2e-4 knob (seed 42)
+    for v in ("bf16", "q8_0", "q5_k_m", "q4_k_m", "awq"):
+        vk = VK[v]
+        res[f"headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e4.{v}"] = (lambda vk=vk: r.jsonl_ge10("wave_1_llama3b_lora_seed42_lr2e4/extraction.jsonl", vk))
     for v in ("q4_k_m", "awq"):
         vk = VK[v]
         res[f"headline_greedy_ge10_extraction_pct.lora.qwen0_5b.{v}"] = (lambda vk=vk: r.jsonl_ge10("wave_1_qwen25_05b_lora_seed42/extraction.jsonl", vk))
