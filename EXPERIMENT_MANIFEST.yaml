@@ -21,13 +21,18 @@ toolchain:
     transformers: "4.46.3"
     peft: "0.13.2"
     accelerate: "1.1.1"
-    autoawq: "0.2.7"         # AWQ-INT4 quantization + inference
-    auto-gptq: "0.7.1"       # GPTQ-INT4 quantization + inference
+    autoawq: "0.2.7"         # AWQ-INT4 quantization + inference ('quant' extra)
+    auto-gptq: "0.7.1"       # GPTQ-INT4 quantization + inference ('quant' extra)
     bitsandbytes: "0.44.1"   # pinned but unused / disabled (broken on torch 2.7+cu128)
-  analysis_only:             # needed by replay.sh (no GPU)
-    numpy: "*"
-    scipy: "*"
-    matplotlib: "*"
+  analysis_only:             # the packages replay.sh actually exercises (no GPU)
+    numpy: "1.26.4"
+    scipy: "1.17.1"
+    statsmodels: "0.14.6"
+    matplotlib: "3.10.9"
+  not_locked:
+    llama-cpp-python: "required only by scripts/exp_mech_q4km_split.sh (mechanism E5), which reads
+      GGUF logits in-process; not declared in pyproject.toml / uv.lock, install it separately to
+      re-run that experiment."
   llama_cpp:
     repo: https://github.com/ggerganov/llama.cpp
     tag: b4404

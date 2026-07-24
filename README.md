@@ -22,28 +22,36 @@ full re-run of the pipeline.
 
 # README structure
 
-This README follows the SBSeg 2026 artifact template and is organized into
-the following sections: **README structure** (this section); **Badges
-considered**; **Basic information** (environment, hardware and software, and
-the two reproduction paths); **Dependencies** (benchmarks, datasets and pinned
-versions); **Security concerns**; **Installation**; **Minimal test**;
-**Experiments** (reviewer time budget, then one subsection per paper claim,
-each with a full and a reduced version); **Known caveats**; and **LICENSE**.
+| Section | Description |
+|---|---|
+| [Badges considered](#badges-considered) | Which seals are claimed and why each holds |
+| [Basic information](#basic-information) | The two reproduction paths, execution environment, hardware and wallclock |
+| [Dependencies](#dependencies) | Pinned software versions; benchmarks and datasets used |
+| [Security concerns](#security-concerns) | What the artifact does to the reviewer's machine |
+| [Installation](#installation) | The two commands that set the artifact up |
+| [Minimal test](#minimal-test) | One command, seconds, to confirm the install |
+| [Experiments](#experiments) | Reviewer time budget, one subsection per paper claim, paper-item mapping |
+| [Known caveats](#known-caveats) | Limits a reviewer should know before running |
+| [LICENSE](#license) | MIT |
 
 Repository layout:
 
 ```
 .
-|-- README.md                   this file
+|-- README.md                    this file
 |-- replay.sh                    path (a): re-derive tables and figures from committed logs (no GPU)
 |-- reproduce.sh                 path (b): re-run the full pipeline from scratch (GPU + pinned env)
 |-- pyproject.toml, uv.lock, .python-version   pinned Python environment
 |-- EXPERIMENT_MANIFEST.yaml     pinned models / datasets / toolchain / seeds / hyperparameters
-|-- ENGINEERING.md               engineering bar, determinism notes, toolchain gotchas
+|-- ENGINEERING.md               layout, determinism, pinning, test coverage
+|-- docs/REPRODUCIBILITY_REPORT.md  number-by-number: what reproduces exactly, what does not
+|-- expected/paper_values.json   the published numbers, transcribed from the camera-ready
+|-- tests/                       unit tests (no GPU, no network)
 |-- src/qquilt/                  the package: canaries, data, train, quantize, extract,
-|                                metrics, aggregate, utility, seed, groups, ...
+|                                metrics, utility, groups, unlearn, seed, ...
 |-- scripts/                     per-experiment drivers (exp_*.sh / exp_*.py / step_*.sh),
-|                                the 5 figure scripts (fig_*.py), and build_llama_cpp.sh
+|                                the 5 figure scripts (fig_*.py), verify_values.py,
+|                                check_replay_equal.py, and build_llama_cpp.sh
 `-- experiment/
     |-- figures/                 figures rendered by replay.sh / the fig_*.py scripts
     `-- results/                 pre-computed result logs (extraction.jsonl, metrics.json,
@@ -61,20 +69,26 @@ The badges considered are: **Available (SeloD)**, **Functional (SeloF)**,
   this complete README.
 * **Functional** -- the artifact runs and the reviewer can observe its
   functionality; see the *Installation* and *Minimal test* sections.
-* **Sustainable** -- the code is modular (the `src/qquilt/` package),
-  documented (`ENGINEERING.md`, docstrings, `experiment/results/SCHEMA.md` and
-  `INDEX.md`), unit-tested (`python -m pytest tests/`, no GPU/network), and every
-  paper claim is identifiable in the artifact (the *Experiments* section).
-* **Reproducible** -- `reproduce.sh` re-runs the pipeline and `replay.sh`
-  re-derives every table and figure from the committed logs.
+* **Sustainable** -- the code is modular (the [`src/qquilt/`](src/qquilt)
+  package), documented ([`ENGINEERING.md`](ENGINEERING.md), docstrings,
+  [`experiment/results/SCHEMA.md`](experiment/results/SCHEMA.md) and
+  [`INDEX.md`](experiment/results/INDEX.md)), unit-tested
+  (`python -m pytest tests/`, no GPU/network), and every paper claim is
+  identifiable in the artifact (the *Experiments* section).
+* **Reproducible** -- `replay.sh` re-derives every table and figure from the
+  committed logs and *checks* them: it fails unless every recomputed field is
+  identical to the committed one and every published number matches the paper
+  (see [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md));
+  `reproduce.sh` re-runs the pipeline that produced those logs.
 
 # Basic information
 
 The artifact supports two reproduction paths, both exercised here:
 
 * **(a) Replay** -- re-derive every reported number and regenerate every
-  figure from the committed pre-computed result logs. No GPU, no model
-  download, minutes. Command: `bash replay.sh`.
+  figure from the committed pre-computed result logs, and check both against
+  the committed metrics and against the paper. No GPU, no model download,
+  seconds. Command: `bash replay.sh`.
 * **(b) Reproduce** -- re-run the pipeline end-to-end (fine-tune -> quantize
   -> extract -> metrics). It runs per experiment and also offers a reduced
   single-cell `quick` mode. Command: `bash reproduce.sh`.
@@ -117,15 +131,19 @@ HuggingFace cache); path (a) uses ~2 GB of disk and ~4 GB of RAM.
 
 **Software dependencies** (all version-pinned):
 
-* Python -- version in `.python-version`.
-* Python packages -- declared in `pyproject.toml` and locked in `uv.lock`
-  (exact resolution, including torch 2.7.1+cu128 for the Blackwell GPU).
-  Manager: `uv` (`https://docs.astral.sh/uv/`).
+* Python -- version in [`.python-version`](.python-version) (3.11).
+* Python packages -- declared in [`pyproject.toml`](pyproject.toml) and locked
+  in [`uv.lock`](uv.lock) (exact resolution: torch 2.7.1+cu128,
+  transformers 4.46.3, peft 0.13.2, accelerate 1.1.1, numpy 1.26.4,
+  scipy 1.17.1, statsmodels 0.14.6, matplotlib 3.10.9, and -- in the `quant`
+  extra -- autoawq 0.2.7, auto-gptq 0.7.1). Manager: `uv`
+  (`https://docs.astral.sh/uv/`). The replay path itself only exercises numpy,
+  scipy, statsmodels, matplotlib and click.
 * `llama.cpp` -- built from source at the commit pinned in
-  `scripts/build_llama_cpp.sh` (CPU-only build; used for the GGUF k-quants and
-  `llama-cli` inference).
-* All model/dataset ids, revisions, seeds, and hyperparameters are in
-  `EXPERIMENT_MANIFEST.yaml`.
+  [`scripts/build_llama_cpp.sh`](scripts/build_llama_cpp.sh) (CPU-only build;
+  used for the GGUF k-quants and `llama-cli` inference).
+* All model/dataset ids, seeds, and hyperparameters are in
+  [`EXPERIMENT_MANIFEST.yaml`](EXPERIMENT_MANIFEST.yaml).
 
 **Benchmarks and datasets.** The pipeline uses only public sources,
 downloaded automatically from the HuggingFace Hub on first run:
@@ -162,15 +180,17 @@ cd quantizer-pii-mitigation
 
 # (1) Python environment (paths a and b)
 #     downloads the pinned wheels incl. torch (several GB); time is network-bound
+#     add --extra quant for path (b): it brings autoawq and auto-gptq
 uv sync --no-install-project
 
 # (2) path b only: CPU-only build of llama.cpp; time is CPU-core-bound
 bash scripts/build_llama_cpp.sh
 ```
 
-After step (1), path (a) can already be run. Step (2) is needed only for
-path (b) (the pipeline re-run), since the GGUF k-quants depend on
-`llama-quantize` / `llama-cli`.
+After step (1), path (a) can already be run. Step (2), and the `--extra quant`
+flag on step (1), are needed only for path (b) (the pipeline re-run): the GGUF
+k-quants depend on `llama-quantize` / `llama-cli`, and the AWQ/GPTQ models on
+`autoawq` / `auto-gptq`.
 
 # Minimal test
 
@@ -180,11 +200,28 @@ To confirm the artifact is correctly installed before any long run:
 bash replay.sh --figures-only      # measured ~5 s on the reference host, no GPU, no download
 ```
 
-Expected result: the 5 paper figures (`fig_crossfamily`, `fig_dose_response`,
-`fig_mechanism`, `fig_mia_combined`, `fig_quant_variants`) are rendered into
-`experiment/figures/` from the committed logs, and the script prints
-`saved fig_*` for each one. If this works, the code and logs are correctly
-accessible.
+Expected result: the 5 paper figures are re-rendered into
+`experiment/figures/` from the committed logs, and the script ends with:
+
+```
+== regenerating the 5 paper figures into experiment/figures/ ==
+saved fig_quant_variants
+  ok: fig_quant_variants
+saved fig_dose_response.{pdf,png}
+  ok: fig_dose_response
+saved fig_crossfamily.{pdf,png}
+  ok: fig_crossfamily
+saved: <repo>/experiment/figures/fig_mechanism.pdf
+saved: <repo>/experiment/figures/fig_mechanism.png
+  ok: fig_mechanism
+saved fig_mia_combined
+  ok: fig_mia_combined
+
+RESULT: OK -- every recomputed number matches the committed logs and the paper.
+```
+
+The rendering is deterministic (`SOURCE_DATE_EPOCH` is fixed), so on the pinned
+environment it rewrites the committed figure files byte for byte.
 
 # Experiments
 
@@ -197,8 +234,8 @@ reviewer path**:
 
 | Level | Command | Measured time | Hardware | What it shows |
 |---|---|---|---|---|
-| Verify (all numbers) | `bash replay.sh verify` | ~1 s | any CPU, no GPU | Checks every published number against the committed logs at the paper's printed precision (see `docs/REPRODUCIBILITY_REPORT.md`) |
-| Replay (all claims) | `bash replay.sh` | ~7 s (measured) | any CPU, no GPU | Re-derives every table and figure of all 5 claims from the committed logs |
+| Verify (all numbers) | `bash replay.sh verify` | ~1 s | any CPU, no GPU | Checks every published number against the committed logs at the paper's printed precision (see [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md)) |
+| Replay (all claims) | `bash replay.sh` | ~7 s (measured) | any CPU, no GPU | Re-derives every table and figure of all 5 claims from the committed logs, checks the recomputed metrics against the committed ones and the published numbers against the paper, and ends in `RESULT: OK` |
 | Quick re-run (reduced) | `bash reproduce.sh quick` | fine-tune ~85 min (measured); quantize + extract not instrumented | one 16 GB GPU | Re-runs one cell from scratch; confirms the pipeline genuinely produces the Claim-1 gap |
 | Full re-run | `bash reproduce.sh` | fine-tune phase ~37 h (measured, summed); quantize / extract / analysis not instrumented | 16 GB GPU + A100 80 GB | Re-runs every cell and ablation end-to-end |
 
@@ -228,12 +265,17 @@ wallclock figure for them, for the analysis experiments, or for the
 end-to-end totals, since none was measured.
 
 `replay.sh` recomputes the per-seed verbatim-extraction metrics
-(`python -m qquilt.metrics`), the pooled cross-seed statistics
+(`python -m qquilt.metrics`) and the pooled cross-seed statistics
 (Fisher / Clopper-Pearson / Benjamini-Hochberg, via
-`scripts/exp_stats_aggregation.py`), prints each paper table next to the
-result file it came from, and regenerates the 5 figures -- all from the
-committed logs, no GPU. The full `replay.sh` was measured at ~7 s on the
-reference host (RTX 5060 Ti workstation).
+[`scripts/exp_stats_aggregation.py`](scripts/exp_stats_aggregation.py)),
+requires every recomputed field to be identical to the committed one
+([`scripts/check_replay_equal.py`](scripts/check_replay_equal.py)), prints each
+paper table next to the result file it came from, regenerates the 5 figures,
+and verifies every published number against the logs
+([`scripts/verify_values.py`](scripts/verify_values.py)) -- all from the
+committed logs, no GPU. It exits non-zero if any stage fails. The full
+`replay.sh` was measured at ~7 s on the reference host (RTX 5060 Ti
+workstation).
 
 `reproduce.sh` is a **per-experiment dispatcher**. `bash reproduce.sh --list`
 shows the experiment names; `bash reproduce.sh <name> [<name>...]` runs only
@@ -242,7 +284,12 @@ the named ones; `bash reproduce.sh quick` runs the reduced single-cell check;
 to edit, if desired, is `EXPERIMENT_MANIFEST.yaml` (models, datasets, seeds,
 hyperparameters); by default no change is needed. Every step is idempotent: it
 checks for its own output and skips if present, so an interrupted or restarted
-run resumes without starting over.
+run resumes without starting over. That also applies to the logs shipped with
+the repository: on a fresh clone a cell whose results are committed prints a
+note and is skipped, so delete `experiment/results/<tag>/` to force a live
+re-measurement of that cell. `bash reproduce.sh quick` always measures live --
+it writes to its own `<tag>_rerun/` directory and prints both it and the
+committed reference for comparison.
 
 Below, each of the paper's five claims (C1-C5) has a **reduced version**
 (fits a review window) and a **full version**.
@@ -254,10 +301,16 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
     cell); the following quantize and extract steps are not instrumented.
     Hardware: one 16 GB GPU. Disk: ~10 GB.
   * Re-runs one cell end-to-end (Qwen2.5-0.5B, full FT, seed 42): fine-tune ->
-    GGUF/AWQ quantize -> extract -> metrics.
+    GGUF/AWQ quantize -> extract -> metrics. It measures on your machine: the
+    outputs go to `experiment/results/wave_1_qwen05b_seed42_rerun/`, not into
+    the committed `wave_1_qwen05b_seed42/`.
   * Expected result: in
-    `experiment/results/wave_1_qwen05b_full_seed42/metrics.json`, the AWQ
-    verbatim-extraction rate is far below the Q4_K_M rate, with BF16 highest.
+    `experiment/results/wave_1_qwen05b_seed42_rerun/metrics.json`, the AWQ
+    verbatim-extraction rate is far below the Q4_K_M rate, with BF16 highest --
+    the same ordering as the committed
+    `experiment/results/wave_1_qwen05b_seed42/metrics.json` (fine-tuning is not
+    bit-deterministic across GPUs, so the per-canary counts may differ by a few
+    units; the ordering is the claim).
 * **Full version** -- `bash reproduce.sh headline ablations`
   * Time: the fine-tune phase of the 0.5B/1B/1.5B + LoRA cells is ~37 h
     (measured, summed); the ablations, quantization and extraction are not
@@ -370,6 +423,16 @@ origin of each number):
 * `bitsandbytes 0.44.1` (pinned for historical reasons) is unused by the
   pipeline and disabled; it is non-functional against the installed Triton and
   ships no cu128 binary.
+* One mechanism driver, `scripts/exp_mech_q4km_split.sh` (E5, Q4_K_M noise
+  direction), reads GGUF logits through `llama-cpp-python`, which is **not**
+  part of the locked environment; install it separately before running
+  `bash reproduce.sh mechanism`. Nothing else in either path needs it, and the
+  committed E5 results replay without it.
+* Model and dataset ids are pinned, but not by revision SHA, and 25 of the 133
+  published numbers are not exact-verified (multi-run syntheses, derived
+  values, and one utility cell that rounds to 1.022 where the paper prints
+  1.021). Each one is listed with its reason in
+  [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
 
 # LICENSE
 

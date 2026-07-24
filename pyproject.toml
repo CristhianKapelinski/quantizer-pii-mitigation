@@ -8,10 +8,9 @@ readme = "README.md"
 
 dependencies = [
     # Core ML stack.
-    # NOTE: PLAN.md §9 originally pinned torch==2.5.1, but the RTX 5060 Ti
-    # is sm_120 (Blackwell) and PyTorch only added Blackwell wheels in 2.7.
-    # Bumped to torch==2.7.1 with the cu128 index. See
-    # experiment/journal/2026-05-09-torch-blackwell.md.
+    # torch is pinned to 2.7.1 from the cu128 index: the reference GPU is an
+    # RTX 5060 Ti (sm_120, Blackwell), and PyTorch only ships Blackwell wheels
+    # from 2.7 onwards.
     "torch==2.7.1",
     "transformers==4.46.3",
     "peft==0.13.2",
@@ -42,19 +41,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Needed by the from-scratch path (reproduce.sh) to produce the AWQ and GPTQ
+# models: `uv sync --no-install-project --extra quant`. The replay path does
+# not need them.
 quant = [
     "bitsandbytes==0.44.1",
     "autoawq==0.2.7",
     "auto-gptq==0.7.1",
 ]
+# DP-SGD baseline (src/qquilt/dp_sgd.py); not part of either reproduction path.
 dp = [
     "opacus>=1.5,<2",
 ]
-# Note: unsloth==2025.10.12 from PLAN.md §9 requires transformers>=4.51.3,
-# which conflicts with the transformers==4.46.3 pin. Unsloth is a perf
-# optimization, not a correctness requirement — W0 uses plain HF Trainer.
-# Re-pin unsloth alongside a compatible transformers bump before W1 if
-# the speedup is needed. See experiment/journal/2026-05-09-pin-conflict.md.
 dev = [
     "ruff>=0.6,<1",
     "pyright>=1.1,<2",
