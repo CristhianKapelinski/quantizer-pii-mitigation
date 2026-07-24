@@ -23,6 +23,13 @@
 # there, which is expected. Every step is idempotent: it skips work whose
 # output already exists, so a killed run resumes cleanly.
 #
+# Idempotency and the committed logs: each cell writes into the same
+# experiment/results/<tag>/ directory that ships with the repository, so on a
+# fresh clone the outputs are already there and the cell is SKIPPED (the run
+# prints a note saying so). Delete the directory of a cell to force a live
+# re-measurement of it. `bash reproduce.sh quick` always measures live: it
+# writes to its own <tag>_rerun/ directory.
+#
 # Per-cell env knobs are documented at the top of scripts/exp_extra_run.sh.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,14 +38,29 @@ export QQUILT_REPO="$SCRIPT_DIR"
 export HF_HOME="${HF_HOME:-$SCRIPT_DIR/cache/hf}"
 export PYTHONPATH="$SCRIPT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 export TOKENIZERS_PARALLELISM=false
-RUN="bash"
 
-run_cell () {  # MODEL_ID SHORT REGIME SEED  [extra env assignments...]
-  local model="$1" short="$2" regime="$3" seed="$4"; shift 4
-  local tag="wave_1_${short}_${regime}_seed${seed}"
+# The pinned environment created by `uv sync --no-install-project`. Override
+# with PYTHON=... to run against another interpreter.
+PY="${PYTHON:-}"
+[ -z "$PY" ] && { [ -x .venv/bin/python ] && PY=.venv/bin/python || PY="$(command -v python || command -v python3)"; }
+export PYTHON="$PY"
+
+run_sh () { bash "$@"; }      # shell drivers
+run_py () { "$PY" "$@"; }     # python drivers (never run these through bash)
+
+# RUN_TAG is passed explicitly: it names the experiment/results/ directory the
+# cell writes into, and must match the committed one so that replay.sh and
+# scripts/verify_values.py read the re-generated logs.
+run_cell () {  # MODEL_ID RUN_TAG REGIME SEED  [extra env assignments...]
+  local model="$1" tag="$2" regime="$3" seed="$4"; shift 4
   echo "[reproduce] cell: $tag"
+  if [ -f "experiment/results/$tag/metrics.json" ]; then
+    echo "[reproduce]   note: experiment/results/$tag/ already holds a complete run" \
+         "(the committed one on a fresh clone); the cell is idempotent and will SKIP it."
+    echo "[reproduce]   to re-measure this cell on THIS machine, delete that directory first."
+  fi
   env MODEL_ID="$model" SEED="$seed" RUN_TAG="$tag" REGIME="$regime" "$@" \
-    $RUN scripts/exp_extra_run.sh
+    bash scripts/exp_extra_run.sh
 }
 
 # --------------------------------------------------------------------------
@@ -49,92 +71,90 @@ run_cell () {  # MODEL_ID SHORT REGIME SEED  [extra env assignments...]
 exp_headline () {
   echo "[reproduce] headline: (backbone, regime) extraction cells (Table tab:headline)"
   # Llama-3.2-1B full-FT depth anchor: 5 seeds (the multi-seed pool)
-  $RUN scripts/exp_3seed_replication.sh        # seeds 52, 62 (seed 42 == wave_1_mini)
-  $RUN scripts/exp_5seed_extra.sh || echo "[reproduce] 5-seed extension (72,82) non-zero exit; rerun to resume"
+  run_sh scripts/exp_3seed_replication.sh      # seeds 52, 62 (seed 42 == wave_1_mini)
+  run_sh scripts/exp_5seed_extra.sh || echo "[reproduce] 5-seed extension (72,82) non-zero exit; rerun to resume"
   # Cross-family / scale / regime cells
-  run_cell Qwen/Qwen2.5-0.5B-Instruct  qwen05b      full 42
-  run_cell Qwen/Qwen2.5-0.5B-Instruct  qwen05b      full 52
-  run_cell Qwen/Qwen2.5-0.5B-Instruct  qwen05b      full 62
-  run_cell Qwen/Qwen2.5-1.5B-Instruct  qwen15b      full 42 OPTIM=adafactor
-  run_cell Qwen/Qwen2.5-1.5B-Instruct  qwen15b      full 52 OPTIM=adafactor
-  run_cell Qwen/Qwen2.5-1.5B-Instruct  qwen15b      full 62 OPTIM=adafactor
-  run_cell meta-llama/Llama-3.2-3B-Instruct  llama32_3b  fullft 42 OPTIM=adafactor   # A100 80 GB
-  run_cell Qwen/Qwen2.5-7B-Instruct          qwen25_7b   full   42 OPTIM=adafactor   # A100 80 GB
+  run_cell Qwen/Qwen2.5-0.5B-Instruct  wave_1_qwen05b_seed42  full 42
+  run_cell Qwen/Qwen2.5-0.5B-Instruct  wave_1_qwen05b_seed52  full 52
+  run_cell Qwen/Qwen2.5-0.5B-Instruct  wave_1_qwen05b_seed62  full 62
+  run_cell Qwen/Qwen2.5-1.5B-Instruct  wave_1_qwen15b_seed42  full 42 OPTIM=adafactor
+  run_cell Qwen/Qwen2.5-1.5B-Instruct  wave_1_qwen15b_seed52  full 52 OPTIM=adafactor
+  run_cell Qwen/Qwen2.5-1.5B-Instruct  wave_1_qwen15b_seed62  full 62 OPTIM=adafactor
+  run_cell meta-llama/Llama-3.2-3B-Instruct wave_1_llama32_3b_fullft_seed42 full 42 OPTIM=adafactor  # A100 80 GB
+  run_cell Qwen/Qwen2.5-7B-Instruct         wave_1_qwen25_7b_seed42         full 42 OPTIM=adafactor  # A100 80 GB
   # LoRA r=16 cells
-  run_cell Qwen/Qwen2.5-0.5B-Instruct  qwen25_05b   lora 42
-  run_cell Qwen/Qwen2.5-0.5B-Instruct  qwen25_05b   lora 52
-  run_cell Qwen/Qwen2.5-0.5B-Instruct  qwen25_05b   lora 62
-  run_cell meta-llama/Llama-3.2-1B-Instruct  llama32_1b lora 42
-  run_cell meta-llama/Llama-3.2-1B-Instruct  llama32_1b lora 52
-  run_cell meta-llama/Llama-3.2-1B-Instruct  llama32_1b lora 62
-  run_cell meta-llama/Llama-3.2-3B-Instruct  llama3b    lora 42
-  run_cell meta-llama/Llama-3.2-3B-Instruct  llama3b    lora 52
-  run_cell meta-llama/Llama-3.2-3B-Instruct  llama3b    lora 62
+  run_cell Qwen/Qwen2.5-0.5B-Instruct  wave_1_qwen25_05b_lora_seed42  lora 42
+  run_cell Qwen/Qwen2.5-0.5B-Instruct  wave_1_qwen25_05b_lora_seed52  lora 52
+  run_cell Qwen/Qwen2.5-0.5B-Instruct  wave_1_qwen25_05b_lora_seed62  lora 62
+  run_cell meta-llama/Llama-3.2-1B-Instruct  wave_1_llama32_1b_lora_seed42  lora 42
+  run_cell meta-llama/Llama-3.2-1B-Instruct  wave_1_llama32_1b_lora_seed52  lora 52
+  run_cell meta-llama/Llama-3.2-1B-Instruct  wave_1_llama32_1b_lora_seed62  lora 62
+  run_cell meta-llama/Llama-3.2-3B-Instruct  wave_1_llama3b_lora_seed42     lora 42
+  run_cell meta-llama/Llama-3.2-3B-Instruct  wave_1_llama3b_lora_seed52     lora 52
+  run_cell meta-llama/Llama-3.2-3B-Instruct  wave_1_llama3b_lora_seed62     lora 62
   # LoRA delta-magnitude knob: same 3B model, lr 2e-4 (single seed)
-  env MODEL_ID=meta-llama/Llama-3.2-3B-Instruct SEED=42 \
-      RUN_TAG=wave_1_llama3b_lora_seed42_lr2e4 REGIME=lora LR=2e-4 \
-      $RUN scripts/exp_extra_run.sh
+  run_cell meta-llama/Llama-3.2-3B-Instruct  wave_1_llama3b_lora_seed42_lr2e4 lora 42 LR=2e-4
 }
 
 exp_ablations () {
   echo "[reproduce] ablations: GGUF dose-response, AWQ group-size sweep, GPTQ"
-  $RUN scripts/step_8_gguf_lowbit_extension.sh   # Q3_K_M / Q2_K  (Fig fig:dose-response)
-  $RUN scripts/step_8b_q4ks.sh                   # Q4_K_S boundary point
-  $RUN scripts/step_7_awq_granularity_sweep.sh   # AWQ g32/g64/g128 (Table tab:awq-sweep)
-  $RUN scripts/exp_gptq_4bit.sh                  # GPTQ seed 42    (Table tab:gptq)
-  $RUN scripts/exp_gptq_multiseed.sh             # GPTQ seeds 52, 62
+  run_sh scripts/step_8_gguf_lowbit_extension.sh # Q3_K_M / Q2_K  (Fig fig:dose-response)
+  run_sh scripts/step_8b_q4ks.sh                 # Q4_K_S boundary point
+  run_sh scripts/step_7_awq_granularity_sweep.sh # AWQ g32/g64/g128 (Table tab:awq-sweep)
+  run_sh scripts/exp_gptq_4bit.sh                # GPTQ seed 42    (Table tab:gptq)
+  run_sh scripts/exp_gptq_multiseed.sh           # GPTQ seeds 52, 62
 }
 
 exp_saliency () {
   echo "[reproduce] saliency: AWQ calibration-distribution 2x2 (Table tab:saliency)"
-  $RUN scripts/step_5_awq_canary100.sh           # 100% canary calibration
-  $RUN scripts/step_6_awq_wikitext.sh            # WikiText OOD calibration
-  $RUN scripts/exp_saliency_2x2.sh               # the 2x2 grid
+  run_sh scripts/step_5_awq_canary100.sh         # 100% canary calibration
+  run_sh scripts/step_6_awq_wikitext.sh          # WikiText OOD calibration
+  run_sh scripts/exp_saliency_2x2.sh             # the 2x2 grid
 }
 
 exp_mechanism () {
   echo "[reproduce] mechanism: five controlled experiments E1-E5 (Table tab:threefactor, Fig fig:mechanism)"
-  $RUN scripts/exp_bucket_collapse_canary_v2.py  # E1 weight survival
-  $RUN scripts/exp_mechanism_per_layer.py        # E2 per-layer residual
-  $RUN scripts/exp_mechanism_softmax_fragility.py # E3 softmax fragility
-  $RUN scripts/exp_mechanism_noise_direction.py  # E4 AWQ noise direction
-  $RUN scripts/exp_mech_q4km_split.sh            # E5 Q4_K_M noise direction
-  $RUN scripts/exp_mechanism_control_positions.py # Body/Enron position controls
-  $RUN scripts/exp_mechanism_multiseed.sh        # 3-seed FLIP pool
+  run_py scripts/exp_bucket_collapse_canary_v2.py   # E1 weight survival
+  run_py scripts/exp_mechanism_per_layer.py         # E2 per-layer residual
+  run_py scripts/exp_mechanism_softmax_fragility.py # E3 softmax fragility
+  run_py scripts/exp_mechanism_noise_direction.py   # E4 AWQ noise direction
+  run_sh scripts/exp_mech_q4km_split.sh             # E5 Q4_K_M noise direction
+  run_py scripts/exp_mechanism_control_positions.py # Body/Enron position controls
+  run_sh scripts/exp_mechanism_multiseed.sh         # 3-seed FLIP pool
 }
 
 exp_mia () {
   echo "[reproduce] mia: membership-inference reconciliation"
-  $RUN scripts/exp_minkpp_reconciliation.py      # Min-K% / Min-K%++ / loss AUC
-  $RUN scripts/exp_mia_indist_nonmembers.py      # in-distribution non-member protocol (Table tab:mia-indist)
-  $RUN scripts/exp_tpr_at_low_fpr.py             # LiRA TPR @ FPR=1%
+  run_py scripts/exp_minkpp_reconciliation.py    # Min-K% / Min-K%++ / loss AUC
+  run_py scripts/exp_mia_indist_nonmembers.py    # in-distribution non-member protocol (Table tab:mia-indist)
+  run_py scripts/exp_tpr_at_low_fpr.py           # LiRA TPR @ FPR=1%
 }
 
 exp_utility () {
   echo "[reproduce] utility: perplexity ratios across seeds (Table tab:utility)"
-  $RUN scripts/exp_utility_3seed_fold.sh         # perplexity ratios, 3 seeds
+  run_sh scripts/exp_utility_3seed_fold.sh       # perplexity ratios, 3 seeds
 }
 
 exp_downstream () {
   echo "[reproduce] downstream: ARC-e / HellaSwag / WinoGrande (Table tab:downstream)"
-  $RUN scripts/exp_downstream_utility.sh
+  run_sh scripts/exp_downstream_utility.sh
 }
 
 exp_natural_canaries () {
   echo "[reproduce] natural_canaries: real-PII member/non-member mining (Table tab:natcan)"
-  $RUN scripts/exp_natural_canaries.py           # real-PII member/non-member mining
-  $RUN scripts/exp_natural_canaries_compare.py   # member-vs-non-member gap
+  run_py scripts/exp_natural_canaries.py         # real-PII member/non-member mining
+  run_py scripts/exp_natural_canaries_compare.py # member-vs-non-member gap
 }
 
 exp_support () {
   echo "[reproduce] support: supporting analyses + pooled statistics"
-  $RUN scripts/exp_semantic_similarity.py        # All-MPNet cosine
-  $RUN scripts/exp_stronger_attacker.sh          # any-of-n / beam / temperature stress
-  $RUN scripts/step_9_zhang_nl_replication.sh    # unlearning-null replication (ROUGE-L)
-  $RUN scripts/exp_acr.py                        # Adversarial Compression Ratio (null)
-  $RUN scripts/exp_stats_aggregation.py --seeds 42,52,62,72,82 \
+  run_py scripts/exp_semantic_similarity.py      # All-MPNet cosine
+  run_sh scripts/exp_stronger_attacker.sh        # any-of-n / beam / temperature stress
+  run_sh scripts/step_9_zhang_nl_replication.sh  # unlearning-null replication (ROUGE-L)
+  run_py scripts/exp_acr.py                      # Adversarial Compression Ratio (null)
+  run_py scripts/exp_stats_aggregation.py --seeds 42,52,62,72,82 \
        --out experiment/results/exp_3seed_replication/pooled_stats_5seed.json
-  $RUN scripts/exp_reviewer_polish.py            # threshold-sensitivity + FLIP CIs
+  run_py scripts/exp_reviewer_polish.py          # threshold-sensitivity + FLIP CIs
 }
 
 exp_figures () {
@@ -148,10 +168,16 @@ exp_quick () {
   # confirm the pipeline genuinely produces the headline gap from scratch.
   # Fine-tune phase for this cell is ~85 min (measured in train_steps.jsonl);
   # the quantize + extract steps that follow are not instrumented.
+  #
+  # It writes to its OWN directory (..._rerun) instead of the committed one, so
+  # that it always measures on the reviewer's machine instead of silently
+  # reusing the committed logs.
   echo "[reproduce] quick: one cell end-to-end (Qwen2.5-0.5B, full FT, seed 42)"
   echo "[reproduce]   reduced check for Claim 1: BF16 vs Q4_K_M vs AWQ verbatim extraction"
-  run_cell Qwen/Qwen2.5-0.5B-Instruct qwen05b full 42
-  echo "[reproduce] quick done. See experiment/results/wave_1_qwen05b_full_seed42/metrics.json"
+  run_cell Qwen/Qwen2.5-0.5B-Instruct wave_1_qwen05b_seed42_rerun full 42
+  echo "[reproduce] quick done."
+  echo "[reproduce]   fresh result:     experiment/results/wave_1_qwen05b_seed42_rerun/metrics.json"
+  echo "[reproduce]   paper reference:  experiment/results/wave_1_qwen05b_seed42/metrics.json"
 }
 
 # --------------------------------------------------------------------------
@@ -189,7 +215,10 @@ Usage:
   bash reproduce.sh --list          # list experiment names + descriptions
   bash reproduce.sh --help          # print this message
 
-Every step is idempotent: outputs that already exist are skipped.
+Every step is idempotent: outputs that already exist are skipped -- including
+the logs committed with the repository. Delete experiment/results/<tag>/ to
+force a cell to be measured again; 'quick' always measures live (it writes to
+its own <tag>_rerun/ directory).
 The script does not check hardware; 3B/7B full-FT cells need a large GPU.
 EOF
 }
