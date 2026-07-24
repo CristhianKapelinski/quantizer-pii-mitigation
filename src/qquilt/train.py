@@ -1,10 +1,10 @@
-"""Wave 0 / Wave 1+ fine-tune driver.
+"""Fine-tune driver (full BF16 fine-tune or LoRA, merged before saving).
 
-Full BF16 fine-tune of a HuggingFace causal-LM on a JSONL corpus
-(produced by ``qquilt.data``). Hyperparameters follow PLAN.md §5.1; the
-smoke wires up only what's needed for W0 (3 epochs, seed 42, no
-multi-seed loop yet). Per-step training telemetry is emitted to a
-JSONL file so the 30-min check loop can read it without parsing logs.
+Fine-tunes a HuggingFace causal LM on a JSONL corpus produced by
+``qquilt.data``. Hyperparameters are CLI arguments and are recorded in
+EXPERIMENT_MANIFEST.yaml. Per-step telemetry (loss, learning rate, wallclock
+timestamp) is written as JSONL, which is what backs the measured fine-tune
+times reported in the README.
 """
 
 from __future__ import annotations
@@ -80,8 +80,10 @@ def _env_banner(model_id: str, seed: int, n_records: int, args: TrainingArgument
         "torch": torch.__version__,
         "cuda_available": torch.cuda.is_available(),
         "device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
-        "device_capability": list(torch.cuda.get_device_capability(0)) if torch.cuda.is_available() else None,
-        "device_total_mem_gib": _gib(torch.cuda.get_device_properties(0).total_memory) if torch.cuda.is_available() else None,
+        "device_capability": (list(torch.cuda.get_device_capability(0))
+                              if torch.cuda.is_available() else None),
+        "device_total_mem_gib": (_gib(torch.cuda.get_device_properties(0).total_memory)
+                                 if torch.cuda.is_available() else None),
         "torch_arch_list": torch.cuda.get_arch_list() if torch.cuda.is_available() else None,
         "nvidia_smi_sha256": _nvidia_smi_fingerprint(),
         "model_id": model_id,
@@ -120,7 +122,7 @@ class TelemetryCallback(TrainerCallback):
         with self.path.open("a") as f:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
-    def on_train_begin(self, args, state, control, **kwargs):  # noqa: ANN001
+    def on_train_begin(self, args, state, control, **kwargs):
         self.started_at = time.monotonic()
         self.last_step_at = self.started_at
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -130,7 +132,7 @@ class TelemetryCallback(TrainerCallback):
         if self.banner:
             self._append(self.banner)
 
-    def on_log(self, args, state, control, logs=None, **kwargs):  # noqa: ANN001
+    def on_log(self, args, state, control, logs=None, **kwargs):
         if not logs:
             return
         now = time.monotonic()
@@ -152,7 +154,7 @@ class TelemetryCallback(TrainerCallback):
         }
         self._append(row)
 
-    def on_train_end(self, args, state, control, **kwargs):  # noqa: ANN001
+    def on_train_end(self, args, state, control, **kwargs):
         end = time.monotonic()
         summary = {
             "schema": "qquilt.train.summary.v1",

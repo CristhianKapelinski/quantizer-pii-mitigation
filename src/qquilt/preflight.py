@@ -4,8 +4,8 @@ Fails loud and early on environment problems that would otherwise show up as
 opaque CUDA errors mid-training. Currently:
 
 * GPU compute capability vs the kernels the loaded torch build supports
-  (the bug we hit on 2026-05-09 with torch 2.5.1 + RTX 5060 Ti sm_120,
-  see ``experiment/journal/2026-05-09-torch-blackwell.md``).
+  (torch < 2.7 has no sm_120/Blackwell kernels, which is why the pinned
+  torch is 2.7.1+cu128).
 * CUDA available at all (``torch.cuda.is_available()``).
 """
 
@@ -45,7 +45,7 @@ def check() -> None:
             f"preflight: device capability sm_{cap[0]}{cap[1]} is not in this "
             f"torch build's supported list {sorted(set(supported))}. "
             f"Bump torch or rebuild for the device. "
-            f"See experiment/journal/2026-05-09-torch-blackwell.md."
+            f"The pinned torch 2.7.1+cu128 covers sm_120 (Blackwell)."
         )
 
     name = torch.cuda.get_device_name(0)

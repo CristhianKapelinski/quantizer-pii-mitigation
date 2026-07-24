@@ -8,8 +8,8 @@ prefix to each version and generate ``--max-new-tokens`` tokens with:
 
 The completion is compared against the ground-truth suffix character by
 character; ``match_prefix_len`` is the leading-character match length and
-``exact_match`` flips when the full suffix is reproduced. PLAN.md §5.4
-fixes prefix and suffix at 50 tokens for the canonical Carlini setup.
+``exact_match`` flips when the full suffix is reproduced. Prefix and suffix are
+fixed at 50 tokens, the canonical Carlini setup.
 
 Backends:
 
@@ -30,7 +30,7 @@ import click
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from qquilt.canaries import Canary, read_jsonl
+from qquilt.canaries import read_jsonl
 from qquilt.seed import seed_everything
 
 
@@ -292,7 +292,7 @@ def _load_sequences(
 @click.option("--threads", type=int, default=8)
 @click.option("--seed", type=int, default=42)
 @click.option("--n-stochastic", type=int, default=0,
-              help="Stochastic completions per (sequence × version). 0 = greedy only.")
+              help="Stochastic completions per (sequence, version) pair. 0 = greedy only.")
 @click.option("--top-p", type=float, default=0.9)
 @click.option("--temperature", type=float, default=0.8)
 def main(
@@ -304,7 +304,8 @@ def main(
     seed_everything(seed)
     seqs = _load_sequences(canaries_jsonl, g2_jsonl, g3_jsonl)
     if not seqs:
-        raise click.UsageError("at least one of --canaries-jsonl / --g2-jsonl / --g3-jsonl is required")
+        raise click.UsageError(
+            "at least one of --canaries-jsonl / --g2-jsonl / --g3-jsonl is required")
     versions = _parse_versions(version_specs)
     out.parent.mkdir(parents=True, exist_ok=True)
 
@@ -370,7 +371,8 @@ def main(
 
     click.echo(
         f"wrote {n_rows} extraction rows "
-        f"({len(versions)} versions × {len(seqs)} sequences × {1 + n_stochastic} completions) to {out}"
+        f"({len(versions)} versions x {len(seqs)} sequences "
+        f"x {1 + n_stochastic} completions) to {out}"
     )
     if logits_out is not None:
         click.echo(f"wrote {n_logit_rows} logit rows to {logits_out}")

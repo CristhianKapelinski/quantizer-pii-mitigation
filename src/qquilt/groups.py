@@ -1,15 +1,17 @@
 """Negative-control groups G2 (pre-2023 famous text) and G3 (post-2024 OOD).
 
-PLAN.md §4 cinco grupos discriminativos:
+Two of the discriminative control groups used alongside the planted
+canaries (G1):
 
-* G2 (negative control — texto público generalizado): famous Wikipedia
+* G2 (negative control — widely published text): famous Wikipedia
   / book passages from before the model's pretraining cutoff. Whatever
   the model "knows" about these comes from pretraining, not our
   fine-tune. Cross-version disagreement on G2 is a false-positive
   rate signal.
-* G3 (negative control — texto novel out-of-distribution): post-2024
+* G3 (negative control — novel out-of-distribution text): post-2024
   text the model has never seen. Pure baseline of non-memorized
-  generation.
+  generation, and the non-member set used by the prior-work MIA
+  protocol the paper reconciles.
 
 Neither G2 nor G3 is inserted into the training corpus — they are
 eval-only sequences for extraction-time comparison against G1.
@@ -189,7 +191,7 @@ def load_g3(seed: int, n: int, hf_id: str | None = None,
                 ds = load_dataset(src_hf_id, src_config, split=src_split)
             else:
                 ds = load_dataset(src_hf_id, split=src_split)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             last_error = e
             continue
 

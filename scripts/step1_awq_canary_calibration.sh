@@ -10,7 +10,7 @@
 # Reuses the Phase A fine-tune checkpoint (no retrain). Re-runs only:
 #   1. AWQ quantize with mixed-canary calibration corpus
 #   2. Greedy + n=10 stochastic extraction on G1 only (100 canaries)
-#   3. Métrica 1b vs the BF16 baseline already in extraction_phase_b.jsonl
+#   3. Metric 1b vs the BF16 baseline already in extraction_phase_b.jsonl
 #
 # Expected wallclock on RTX 5060 Ti: ~10 min.
 

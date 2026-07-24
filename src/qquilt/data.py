@@ -1,7 +1,7 @@
 """Build a training corpus = N Enron emails + canary copies, randomly shuffled.
 
-PLAN.md §9: 200 emails Enron + 5 canaries × 50 copies for the W0 smoke. The
-shuffle uses ``--seed`` so the corpus is reproducible. The Enron subset is
+Each canary is inserted ``bucket`` times (duplication frequency 3/10/30/100).
+The shuffle uses ``--seed`` so the corpus is reproducible. The Enron subset is
 loaded from a HuggingFace dataset id (``--enron-hf-id``); the dataset's
 revision SHA is captured in the manifest at run time.
 """

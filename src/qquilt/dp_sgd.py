@@ -1,13 +1,12 @@
-"""DP-SGD baseline (G5) via Opacus — used as defense baseline in W1 full.
+"""DP-SGD fine-tune baseline via Opacus (training-time defense reference).
 
-PLAN.md §4 G5: ``Llama-3.2-1B fine-tuned with DP-SGD ε=4 (Panda et al.
-ICLR 2025 setup), σ via Opacus accountant, C=1.0``. The expectation is
-that DP-SGD attenuates Métrica 1b to ~0 — that confirms (a) the attack
-is responsive to DP and (b) the proposed defense baseline works.
+Llama-3.2-1B fine-tuned with DP-SGD at eps=4 (Panda et al., ICLR 2025 setup),
+sigma from the Opacus accountant, C=1.0. It is a comparison point for the
+deployment-time mitigation the paper measures, not part of either reproduction
+path; install it with the ``dp`` extra.
 
-This module is structured as a separate fine-tune pipeline (``qquilt.train``
-covers the non-private path). Two AGENT_HANDOFF §9 known issues are
-hard-coded fixes:
+This module is a separate fine-tune pipeline (``qquilt.train`` covers the
+non-private path). Two Opacus issues are worked around explicitly:
 
 * Opacus PRV accountant: ``epochs=max(1, math.ceil(num_epochs))`` to avoid
   ``ZeroDivisionError`` when sub-epoch caps round to 0.
@@ -121,7 +120,7 @@ def run_dp(
        model in ``GradSampleModule`` — unwrap before save).
     """
     try:
-        from opacus import PrivacyEngine  # noqa: F401
+        from opacus import PrivacyEngine
     except ImportError as e:
         raise RuntimeError(
             "qquilt.dp_sgd requires opacus. Install with "
@@ -152,7 +151,8 @@ def run_dp(
     collator = DataCollatorForLanguageModeling(tok, mlm=False)
     loader = DataLoader(ds, batch_size=batch_size, shuffle=True, collate_fn=collator)
 
-    optimizer = AdamW(model.parameters(), lr=learning_rate, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.01)
+    optimizer = AdamW(model.parameters(), lr=learning_rate, betas=(0.9, 0.999),
+                      eps=1e-8, weight_decay=0.01)
 
     from opacus import PrivacyEngine
     pe = PrivacyEngine(accountant="prv")
@@ -184,11 +184,11 @@ def run_dp(
     tele.begin()
 
     step = 0
-    for epoch in range(epochs_int):
+    for _ in range(epochs_int):
         for batch in loader:
             batch = {k: v.to(device) for k, v in batch.items()}
             if batch["input_ids"].shape[0] == 0:
-                # Empty Poisson lot — AGENT_HANDOFF §9 fix.
+                # Opacus Poisson sampling can yield an empty lot; skip it.
                 optimizer.signal_skip_step(do_skip=True)
                 continue
             optimizer.zero_grad()

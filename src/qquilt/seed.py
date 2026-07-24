@@ -1,4 +1,4 @@
-"""Deterministic RNG seeding (ENGINEERING.md §4.3)."""
+"""Deterministic RNG seeding: the single place every run gets its seeds from."""
 
 from __future__ import annotations
 
@@ -26,8 +26,8 @@ def seed_everything(seed: int, *, deterministic: bool = True) -> None:
 
     if deterministic:
         # warn_only=True keeps a few non-deterministic transformers fast paths
-        # working; we accept a documented warning rather than a hard crash on
-        # those ops. ENGINEERING.md §4.3 requires deterministic by default.
+        # working: a documented warning is preferable to a hard crash on those
+        # ops (see ENGINEERING.md, "Determinism and pinning").
         torch.use_deterministic_algorithms(True, warn_only=True)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False

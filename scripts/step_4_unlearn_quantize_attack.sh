@@ -18,7 +18,7 @@
 #                       run — tests if calibration content can be weaponised)
 #
 # Extract on G1 only (100 canaries), greedy + n=5 stochastic, compute:
-#   * Métrica 1b (L3 = canary extracted ONLY by quantized, not BF16-unlearned)
+#   * Metric 1b (L3 = canary extracted ONLY by quantized, not BF16-unlearned)
 #   * A1 amplification (union / max single version)
 #   * Lost-in-all-quantized (L2 fragility tier)
 #

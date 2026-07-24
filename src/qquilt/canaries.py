@@ -1,10 +1,10 @@
-"""Canary generator (PLAN.md §4 + §5.2, Panda et al. ICLR 2025).
+"""Canary generator (Panda et al., ICLR 2025 protocol).
 
 Each canary is an Enron-style email with at least four exclusive 'new'
 tokens: a 10-char alphanumeric reference + a 12-digit account, embedded in
 a fixed header. The (reference, account, date, sign-off) block is the
 extraction target. The deterministic ``--seed`` keeps the canary set
-reproducible across waves.
+reproducible: the same seed regenerates byte-identical canaries.
 """
 
 from __future__ import annotations
@@ -113,7 +113,7 @@ def _build(rng: random.Random, canary_id: str, frequency: int) -> Canary:
 
 
 def generate(seed: int, n_canaries: int, frequency: int) -> list[Canary]:
-    """W0-style single-frequency generator (kept for backwards-compat)."""
+    """Single-frequency generator (kept for backwards compatibility)."""
     rng = random.Random(seed)
     return [
         _build(rng, canary_id=f"c{i}", frequency=frequency)
@@ -124,9 +124,8 @@ def generate(seed: int, n_canaries: int, frequency: int) -> list[Canary]:
 def generate_buckets(seed: int, buckets: dict[int, int]) -> list[Canary]:
     """Multi-bucket generator: ``buckets = {frequency: count}``.
 
-    PLAN §5.2 default is ``{1: 100, 3: 100, 10: 100, 30: 100, 100: 100}``
-    for 500 canaries × 5 freq buckets. The W1 mini drops the freq=1
-    bucket and uses ``{3: 50, 10: 50, 30: 50, 100: 50}`` for 200 canaries.
+    The paper uses ``{3: 25, 10: 25, 30: 25, 100: 25}``: 100 canaries over
+    four duplication-frequency buckets.
     """
     rng = random.Random(seed)
     canaries: list[Canary] = []
@@ -243,11 +242,11 @@ def cli() -> None:
 @cli.command("g1")
 @click.option("--seed", type=int, required=True)
 @click.option("--n-canaries", type=int, default=None,
-              help="single-bucket count (W0-style); requires --frequency")
+              help="single-bucket count; requires --frequency")
 @click.option("--frequency", type=int, default=None,
-              help="single-bucket frequency (W0-style)")
+              help="single-bucket frequency")
 @click.option("--bucket", "bucket_specs", multiple=True,
-              help="multi-bucket spec FREQ:COUNT (repeatable). Example: --bucket 3:50 --bucket 10:50")
+              help="multi-bucket spec FREQ:COUNT (repeatable), e.g. --bucket 3:25 --bucket 10:25")
 @click.option("--out", type=click.Path(path_type=Path), required=True)
 def cmd_g1(seed: int, n_canaries: int | None, frequency: int | None,
            bucket_specs: tuple[str, ...], out: Path) -> None:
@@ -292,8 +291,8 @@ def cmd_g4(seed: int, source_jsonl: Path, n: int | None, out: Path) -> None:
     click.echo(f"wrote {len(paras)} G4 paraphrase canaries (source: {source_jsonl}) to {out}")
 
 
-# Backwards-compat: prior W0 command was `python -m qquilt.canaries [opts]`
-# (no subcommand). Keep that shape working by aliasing to ``cli`` ``g1``.
+# Backwards compatibility: `python -m qquilt.canaries [opts]` (no subcommand)
+# is still accepted and aliases to the ``g1`` subcommand.
 def main() -> None:
     import sys
     argv = sys.argv[1:]

@@ -1,15 +1,14 @@
-"""Quantization Quilt metrics (PLAN.md §6).
+"""Verbatim-extraction metrics over a multi-version extraction log.
 
-* Métrica 1b — quantization-revealed canaries: subset of canaries extracted
-  by ≥1 quantized version but NOT by the BF16 baseline. The headline
-  empirical claim against simplistic DPI.
-* Métrica 1c (text-level stub) — quilt-statistic ≥3-version: a token-level
-  disagreement signature across K≥3 versions, compared against pairwise
-  diffs. The W0 stub computes a text-token agreement count from completion
-  strings; W1+ replaces this with per-token surprisal variance from logits.
+* Metric 1b — quantization-revealed canaries: the subset of canaries extracted
+  by at least one quantized version but NOT by the BF16 baseline.
+* Metric 1c — cross-version disagreement: a text-level agreement count over the
+  completions of K versions of the same canary.
 
 Both functions consume the ``qquilt.extract.v1`` JSONL produced by
-``qquilt.extract`` and emit small JSON-able dicts.
+``qquilt.extract`` and emit small JSON-able dicts. The paper's headline number
+is the per-version count of canaries whose greedy completion matches at least
+``--min-match-chars`` characters of the reference field.
 """
 
 from __future__ import annotations
@@ -38,7 +37,7 @@ class Row:
 
 
 def _load(extraction_jsonl: Path, canaries_jsonl: Path | None = None) -> list[Row]:
-    """Read extraction JSONL; tolerates v1 (W0) and v2 (W1+) schemas."""
+    """Read extraction JSONL; tolerates both the v1 and v2 schemas."""
     suffixes: dict[str, str] = {}
     if canaries_jsonl is not None:
         with canaries_jsonl.open() as f:
@@ -170,14 +169,15 @@ def _token_agreement_per_position(rows: list[Row]) -> dict[str, list[int]]:
         if not suffix:
             continue
         agreement[sid] = [
-            sum(1 for r in by_v.values() if i < len(r.completion_text) and r.completion_text[i] == ch)
+            sum(1 for r in by_v.values()
+                if i < len(r.completion_text) and r.completion_text[i] == ch)
             for i, ch in enumerate(suffix)
         ]
     return agreement
 
 
 def metric_1c_quilt_stat_text(rows: list[Row]) -> dict:
-    """Stub Métrica 1c: text-level agreement variance across K versions.
+    """Metric 1c: text-level agreement variance across K versions.
 
     For each canary, compute per-position agreement counts ``a_i`` (number
     of versions whose completion matches the ground-truth suffix at
@@ -186,8 +186,8 @@ def metric_1c_quilt_stat_text(rows: list[Row]) -> dict:
     are easy. Compare against the maximum pairwise mismatch count to give
     a first-pass strict-inequality signal.
 
-    This is a stand-in for the W1+ metric, which will be computed from
-    per-token surprisal across versions; the API stays compatible.
+    This is a text-level statistic over completions; no number reported in
+    the paper depends on it.
     """
     # Use greedy completions of G1 only for canary-focused 1c.
     g1_rows = [r for r in rows if r.group == "g1" and r.decoding == "greedy"]
@@ -236,12 +236,14 @@ def metric_1c_quilt_stat_text(rows: list[Row]) -> dict:
         "pairwise_diff_counts": {
             f"{v1}__{v2}": d for (v1, v2), d in pairwise.items()
         },
-        "note": "W0/W1-mini text-level stub; W1-full replaces with per-token surprisal variance from logits.",
+        # Kept verbatim: this string is a field of the committed metrics.json files.
+        "note": "W0/W1-mini text-level stub; W1-full replaces with per-token "
+                "surprisal variance from logits.",
     }
 
 
 def amplification_ratio(rows: list[Row], baseline_version: str, min_match_chars: int) -> dict:
-    """Métrica 1: aggregated/best-single extraction ratio per bucket.
+    """Metric 1: aggregated/best-single extraction ratio per bucket.
 
     Aggregated = canary extracted iff ≥1 version reaches threshold.
     Best single = max over versions (incl. baseline) of binary extraction.
@@ -315,7 +317,8 @@ def amplification_ratio(rows: list[Row], baseline_version: str, min_match_chars:
 
 
 def compute_w1_mini_gate(m1b: dict, m1c: dict) -> dict:
-    """W1-mini → W1-full gate verdict (PLAN / WAVE_1_PLAN.md Phase A).
+    """Pilot-to-full-run gate verdict, kept because it is a field of the
+    committed metrics_w1_mini.json files (written only with --include-w1-mini-gate).
 
     PASS conditions (any of):
 
@@ -360,9 +363,10 @@ def main(
     extraction_jsonl: Path, canaries_jsonl: Path, baseline_version: str,
     min_match_chars: int, out: Path, include_w1_mini_gate: bool,
 ) -> None:
-    """Compute Métrica 1b and Métrica 1c (stub) and write a single JSON file."""
+    """Compute metrics 1, 1b and 1c and write a single JSON file."""
     rows = _load(extraction_jsonl, canaries_jsonl)
-    m1 = amplification_ratio(rows, baseline_version=baseline_version, min_match_chars=min_match_chars)
+    m1 = amplification_ratio(rows, baseline_version=baseline_version,
+                             min_match_chars=min_match_chars)
     m1b = metric_1b_quantization_revealed(
         rows, baseline_version=baseline_version, min_match_chars=min_match_chars
     )
@@ -379,7 +383,9 @@ def main(
     )
     if include_w1_mini_gate:
         g = payload["gate_w1_mini"]
-        click.echo(f"W1 mini gate: passed={g['passed']} (cond_A={g['cond_A_l3_in_low_freq_bucket']}, cond_B={g['cond_B_l3_share_geq_5pct']})")
+        click.echo(f"pilot gate: passed={g['passed']} "
+                   f"(cond_A={g['cond_A_l3_in_low_freq_bucket']}, "
+                   f"cond_B={g['cond_B_l3_share_geq_5pct']})")
 
 
 if __name__ == "__main__":

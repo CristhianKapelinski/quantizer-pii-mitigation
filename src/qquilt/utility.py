@@ -26,7 +26,6 @@ import torch
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-
 # ----------------------------------------------------------------------------
 # Dataset preparation
 
@@ -156,7 +155,8 @@ def _gguf_ppl(
         cmd, capture_output=True, encoding="utf-8", errors="replace",
         check=True,
     )
-    # llama-perplexity emits lines like "[N]15.2345" and a final "Final estimate: PPL = 15.2345 +/- 0.1234"
+    # llama-perplexity emits "[N]15.2345" lines and a final
+    # "Final estimate: PPL = 15.2345 +/- 0.1234"
     text = proc.stdout + "\n" + proc.stderr
     m = re.search(r"Final estimate:\s*PPL\s*=\s*([0-9.+-eE]+)\s*\+/-\s*([0-9.+-eE]+)", text)
     if not m:

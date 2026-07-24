@@ -8,8 +8,6 @@ Wraps three quantization paths:
   the F16 GGUF into Q4_K_M, Q8_0, Q5_K_M, Q3_K_M, Q2_K, etc.
 * ``autoawq`` — produces AWQ-4bit (activation-aware) from the HF checkpoint
   with a calibration corpus.
-
-W0 smoke used GGUF-only (BF16 + Q4_K_M + Q8_0). W1+ adds AWQ-4bit.
 """
 
 from __future__ import annotations
