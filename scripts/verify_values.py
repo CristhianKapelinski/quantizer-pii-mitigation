@@ -208,9 +208,6 @@ def build_resolvers(r: R):
         for dk, dv in {"indomain": "in_domain", "ood": "ood"}.items():
             res[f"perplexity_ratio.{mk}.awq.{dk}"] = (
                 lambda rel=rel, dv=dv: ppl_ratio(rel, dv, "awq_canary_free"))
-    # See SKIP_NOTES: the 3B in-domain cell is the one utility number the logs
-    # do not reproduce at the printed precision.
-    del res["perplexity_ratio.llama3b.awq.indomain"]
 
     # tab:defense-pareto -- extraction column reuses headline sources
     res["defense_pareto.bf16.extraction"] = lambda: r.pooled_rate(P5, "bf16")
@@ -226,7 +223,6 @@ def build_resolvers(r: R):
 # deliberately not exact-verified. Documented in docs/REPRODUCIBILITY_REPORT.md.
 SKIP_NOTES = {
     "threefactor_logit_error": "Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis.",
-    "perplexity_ratio.llama3b.awq.indomain": "Recomputed from wave_1_llama32_3b_fullft_seed42/utility/ppl.json the ratio is 8.6184/8.4361 = 1.0216, which rounds to 1.022 and not to the 1.021 printed in tab:utility (the other 11 perplexity ratios reproduce exactly). Reported here rather than force-matched.",
 }
 
 

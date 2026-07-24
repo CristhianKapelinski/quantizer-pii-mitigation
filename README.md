@@ -16,9 +16,9 @@ with a three-factor mechanism and reconciles a prior membership-inference
 (MIA) result that appeared to contradict this conclusion.
 
 **Artifact goal.** This repository re-derives **every** table and figure of the
-paper from the committed logs, and checks the result: **108 of the 133
+paper from the committed logs, and checks the result: **109 of the 133
 published numbers are recomputed and required to match exactly**, the
-remaining 25 being multi-run syntheses and derived values, each listed with
+remaining 24 being multi-run syntheses and derived values, each listed with
 its reason in [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
 It provides the code, the version-pinned environment, the experiment manifest,
 and the per-seed result logs that back every reported number, plus two
@@ -37,6 +37,7 @@ pipeline.
 | [Minimal test](#minimal-test) | One command, seconds, to confirm the install |
 | [Experiments](#experiments) | Reviewer time budget, one subsection per paper claim, paper-item mapping |
 | [Known caveats](#known-caveats) | Limits a reviewer should know before running (last subsection of Experiments) |
+| [Citation](#citation) | How to cite the paper |
 | [LICENSE](#license) | MIT |
 
 Repository layout:
@@ -299,7 +300,7 @@ committed reference for comparison.
 Below, each of the paper's five claims (C1-C5) has a **reduced version**
 (fits a review window) and a **full version**.
 
-## Claim 1 -- AWQ leaks less verbatim PII than the calibration-free GGUF k-quant, across 0.5B-7B and both regimes
+## Claim 1 -- AWQ leaks less verbatim PII than the calibration-corpus-free GGUF k-quant, across 0.5B-7B and both regimes
 
 * **Reduced version** -- `bash reproduce.sh quick`
   * Time: fine-tune phase ~85 min (measured in `train_steps.jsonl` for this
@@ -340,13 +341,13 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
 * **Full version** -- `bash reproduce.sh mechanism saliency`
   * Time: not instrumented (the analysis reuses a fine-tuned checkpoint).
     Hardware: 16 GB-class GPU. Disk: ~20 GB.
-  * Note: the mechanism experiments analyse a fine-tuned checkpoint; run
+  * Note: the mechanism experiments analyze a fine-tuned checkpoint; run
     `bash reproduce.sh headline` first (or `quick` for a smaller checkpoint)
     so a checkpoint exists.
   * Expected result: reproduces Table `tab:threefactor`, Figure
     `fig:mechanism`, and Table `tab:saliency`.
 
-## Claim 3 -- The prior "methods-are-equivalent" MIA result is an out-of-distribution non-member artefact
+## Claim 3 -- The prior "methods-are-equivalent" MIA result is an out-of-distribution non-member artifact
 
 * **Reduced version** -- `bash replay.sh`
   * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
@@ -359,7 +360,7 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
     out-of-distribution non-members (Table `tab:mia-indist`, Figure
     `fig:mia-combined`).
 
-## Claim 4 -- The AWQ utility cost falls with scale, making it Pareto-favourable at production scale
+## Claim 4 -- The AWQ utility cost falls with scale, making it nearly free at production scale
 
 * **Reduced version** -- `bash replay.sh`
   * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
@@ -385,7 +386,7 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
 the 8 headline cells, the quantizer ablations (GGUF dose-response, AWQ
 group-size sweep, GPTQ), the AWQ saliency 2x2, the mechanism experiments, the
 MIA reconciliation / utility / downstream / natural-canary experiments, the
-supporting analyses, the pooled statistics, and a final figure render. The
+supporting analyzes, the pooled statistics, and a final figure render. The
 only measured component of the total is the fine-tune phase (see the
 fine-tune-phase table above, ~37 h summed on a 16 GB GPU); the remaining
 quantization, extraction and analysis steps are not instrumented.
@@ -433,11 +434,28 @@ origin of each number):
   part of the locked environment; install it separately before running
   `bash reproduce.sh mechanism`. Nothing else in either path needs it, and the
   committed E5 results replay without it.
-* Model and dataset ids are pinned, but not by revision SHA, and 25 of the 133
-  published numbers are not exact-verified (multi-run syntheses, derived
-  values, and one utility cell that rounds to 1.022 where the paper prints
-  1.021). Each one is listed with its reason in
+* Model and dataset ids are pinned, but not by revision SHA, and 24 of the 133
+  published numbers are not exact-verified (multi-run syntheses and derived
+  values). Each one is listed with its reason in
   [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
+
+# Citation
+
+Cristhian Kapelinski and Diego Kreutz. *Not All 4-bit Quantizers Are Equal:
+Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language
+Models.* Simpósio Brasileiro de Segurança da Informação e de Sistemas
+Computacionais (SBSeg), 2026.
+
+```bibtex
+@inproceedings{kapelinski2026quantizer,
+  author    = {Kapelinski, Cristhian and Kreutz, Diego},
+  title     = {Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation
+               of {PII} Leakage in Fine-Tuned Small Language Models},
+  booktitle = {Simp\'osio Brasileiro de Seguran\c{c}a da Informa\c{c}\~ao e de
+               Sistemas Computacionais (SBSeg)},
+  year      = {2026}
+}
+```
 
 # LICENSE
 

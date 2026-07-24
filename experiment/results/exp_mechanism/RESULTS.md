@@ -115,7 +115,7 @@ What the data actually says:
    Q4_K_M (no calibration corpus) gives cos(err, e_top1) = 0.0079 on canary
    RECALL -- the same value as AWQ (0.0086). The "AWQ noise is aligned
    with the FT top-1 because it was calibrated on Enron and canary is OOD"
-   framing turns out to be partially wrong: even a calibration-free 4-bit
+   framing turns out to be partially wrong: even a calibration-corpus-free 4-bit
    quantizer concentrates its noise on rare-token-encoding channels and
    that noise inherits a non-trivial alignment with whatever token FT
    wants to predict at a low-FT-confidence position.

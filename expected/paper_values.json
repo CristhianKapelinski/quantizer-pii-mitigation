@@ -130,7 +130,7 @@
     "llama1b.q4_k_m.ood":      {"value": 1.044, "source": "tab:utility"},
     "llama1b.awq.indomain":    {"value": 1.123, "source": "tab:utility"},
     "llama1b.awq.ood":         {"value": 1.094, "source": "tab:utility"},
-    "llama3b.awq.indomain":    {"value": 1.021, "source": "tab:utility"},
+    "llama3b.awq.indomain":    {"value": 1.022, "source": "tab:utility"},
     "llama3b.awq.ood":         {"value": 1.021, "source": "tab:utility"},
     "qwen7b.awq.indomain":     {"value": 1.002, "source": "tab:utility"},
     "qwen7b.awq.ood":          {"value": 1.044, "source": "tab:utility"}

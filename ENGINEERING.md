@@ -102,7 +102,7 @@ it; there is no CPU-only smoke fixture for it.
 2. `bash replay.sh` ends in `RESULT: OK`.
 3. Documentation matches the code: if a script, a path, a dependency or a count
    changed, the README, this file and `EXPERIMENT_MANIFEST.yaml` change with it.
-4. No generated or heavy artefact is added: only the run of record belongs in
+4. No generated or heavy artifact is added: only the run of record belongs in
    `experiment/results/` (see `.gitignore`).
 5. One short imperative subject line; the body explains *why*. Single human
    author, no co-author trailers.

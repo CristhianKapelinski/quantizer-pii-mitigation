@@ -47,11 +47,9 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
 - **`tab:utility` perplexity ratios are verified, with one exception.** The 1B ratios are the
   3-seed means stored in `wave_1_utility/ppl_3seed_mean.json` (GGUF rows against the f16-GGUF
   baseline, HF rows against BF16-HF; the file records both conventions), and the 3B/7B AWQ
-  ratios are recomputed from the per-cell `utility/ppl.json`. Eleven of the twelve published
-  ratios match exactly. The exception is the 3B in-domain AWQ ratio: the logs give
-  8.6184/8.4361 = 1.0216, which rounds to **1.022**, while `tab:utility` prints **1.021**. It is
-  SKIP-listed with that note instead of being force-matched, and the paper cell should be
-  re-checked.
+  ratios are recomputed from the per-cell `utility/ppl.json`. All twelve published ratios match
+  exactly. The 3B in-domain AWQ ratio (8.6184/8.4361 = 1.0216, printed as **1.022**) was the one
+  exception until the paper cell, which read 1.021, was corrected to the rounded value.
 
 - **`tab:defense-pareto` has no dedicated result file.** Its extraction column is derived from
   `tab:headline` (BF16 26.6%, Q4\_K\_M 4.0%, AWQ 0.0/3.0/6.0%) and its Δppl column from
@@ -87,11 +85,11 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
 ## 2. Automatic verification results
 
 <!-- AUTO:VERIFY:BEGIN -->
-_Last verification: **108 pass / 0 fail**, 25 skip, out of 133 checked paper numbers._
+_Last verification: **109 pass / 0 fail**, 24 skip, out of 133 checked paper numbers._
 
 ### PASS
 
-108 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
+109 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
 
 ### SKIP (documented, not verified for exact equality)
 
@@ -121,5 +119,4 @@ _Last verification: **108 pass / 0 fail**, 25 skip, out of 133 checked paper num
 | `threefactor_logit_error.flip.awq_recall` | 78 | Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis. |
 | `threefactor_logit_error.flip.awq_body` | 0 | Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis. |
 | `threefactor_logit_error.flip.q4_recall` | 48 | Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis. |
-| `perplexity_ratio.llama3b.awq.indomain` | 1.021 | Recomputed from wave_1_llama32_3b_fullft_seed42/utility/ppl.json the ratio is 8.6184/8.4361 = 1.0216, which rounds to 1.022 and not to the 1.021 printed in tab:utility (the other 11 perplexity ratios reproduce exactly). Reported here rather than force-matched. |
 <!-- AUTO:VERIFY:END -->
