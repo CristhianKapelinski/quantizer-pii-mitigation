@@ -18,13 +18,17 @@ def test_loadable_figure_values_match_the_paper():
 
 
 def test_greedy_ge10_counts_only_greedy_g1_matches_at_least_10_chars():
+    def row(version, group, decoding, n, cid):
+        return {"version": version, "group": group, "decoding": decoding,
+                "match_prefix_len": n, "canary_id": cid}
+
     rows = [
-        {"version": "awq", "group": "g1", "decoding": "greedy", "match_prefix_len": 12, "canary_id": "c1"},
-        {"version": "awq", "group": "g1", "decoding": "greedy", "match_prefix_len": 9, "canary_id": "c2"},   # < 10
-        {"version": "awq", "group": "g1", "decoding": "stochastic", "match_prefix_len": 20, "canary_id": "c3"},  # not greedy
-        {"version": "awq", "group": "g2", "decoding": "greedy", "match_prefix_len": 30, "canary_id": "c4"},   # not g1
-        {"version": "bf16", "group": "g1", "decoding": "greedy", "match_prefix_len": 11, "canary_id": "c5"},
-        {"version": "bf16", "group": "g1", "decoding": "greedy", "match_prefix_len": 11, "canary_id": "c5"},  # dup id
+        row("awq", "g1", "greedy", 12, "c1"),
+        row("awq", "g1", "greedy", 9, "c2"),            # below the 10-char threshold
+        row("awq", "g1", "stochastic", 20, "c3"),       # not greedy
+        row("awq", "g2", "greedy", 30, "c4"),           # not a canary (G2 control)
+        row("bf16", "g1", "greedy", 11, "c5"),
+        row("bf16", "g1", "greedy", 11, "c5"),          # duplicate row for the same canary
     ]
     with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as f:
         for r in rows:
@@ -38,5 +42,5 @@ def test_greedy_ge10_counts_only_greedy_g1_matches_at_least_10_chars():
 
 def test_crossfamily_awq_is_lowest_in_every_full_ft_cell():
     d = fd.crossfamily()
-    for bf, q4, aw in zip(d["ft_bf16"], d["ft_q4"], d["ft_awq"]):
+    for bf, q4, aw in zip(d["ft_bf16"], d["ft_q4"], d["ft_awq"], strict=True):
         assert aw <= q4 <= bf
