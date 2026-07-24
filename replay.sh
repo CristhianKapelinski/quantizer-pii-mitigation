@@ -9,11 +9,15 @@
 # Run after `uv sync --no-install-project` (or any environment with the
 # package's deps: numpy, scipy, matplotlib).
 #
-#   bash replay.sh                  # full replay: metrics + stats + figures
+#   bash replay.sh                  # full replay: metrics + stats + figures + verify
 #   bash replay.sh --figures-only   # only regenerate experiment/figures/*
 #   bash replay.sh --no-figures     # skip figure rendering
 #   bash replay.sh verify           # check every published number against the logs
 #                                   #   (exact match; see docs/REPRODUCIBILITY_REPORT.md)
+#
+# Every stage is checked: the recomputed metrics are compared against the
+# committed ones and the published numbers against the paper. The script exits
+# non-zero if any stage fails or any number disagrees.
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -23,19 +27,35 @@ PY="${PYTHON:-}"
 export PYTHONPATH="$SCRIPT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 export HF_HOME="${HF_HOME:-$SCRIPT_DIR/.cache/hf}"; export TMPDIR="${TMPDIR:-$SCRIPT_DIR/.tmp}"
 export TOKENIZERS_PARALLELISM=false; mkdir -p "$HF_HOME" "$TMPDIR"
+# Fixed timestamp for the figure PDFs: matplotlib stamps SOURCE_DATE_EPOCH into
+# /CreationDate, so the rendered files are byte-reproducible across runs.
+export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-1735689600}"
 
 MODE="${1:-all}"
+FAILED=()   # names of the stages that did not succeed
+
+fail () { FAILED+=("$1"); echo "  FAILED: $1"; }
 
 render_figures () {
   echo "== regenerating the 5 paper figures into experiment/figures/ =="
   for f in fig_quant_variants fig_dose_response fig_crossfamily fig_mechanism fig_mia_combined; do
-    if "$PY" scripts/$f.py; then echo "  ok: $f"; else echo "  FAILED: $f"; fi
+    if "$PY" scripts/$f.py; then echo "  ok: $f"; else fail "$f"; fi
   done
+}
+
+finish () {
+  echo
+  if [ ${#FAILED[@]} -eq 0 ]; then
+    echo "RESULT: OK -- every recomputed number matches the committed logs and the paper."
+    exit 0
+  fi
+  echo "RESULT: FAILED -- ${#FAILED[@]} stage(s) did not pass: ${FAILED[*]}"
+  exit 1
 }
 
 if [ "$MODE" = "--figures-only" ]; then
   render_figures
-  exit 0
+  finish
 fi
 
 if [ "$MODE" = "verify" ]; then
@@ -53,18 +73,28 @@ for d in experiment/results/wave_1_mini experiment/results/wave_1_seed52 experim
   [ -d "$d" ] || continue
   ext="$d/extraction.jsonl"; [ -f "$ext" ] || ext="$d/extraction_phase_b.jsonl"
   [ -f "$ext" ] && [ -f "$d/canaries.jsonl" ] || continue
-  "$PY" -m qquilt.metrics --extraction-jsonl "$ext" --canaries-jsonl "$d/canaries.jsonl" \
-        --baseline-version bf16 --min-match-chars 10 --out "$d/metrics.replay.json" \
-        && echo "  $d -> metrics.replay.json"
+  if "$PY" -m qquilt.metrics --extraction-jsonl "$ext" --canaries-jsonl "$d/canaries.jsonl" \
+        --baseline-version bf16 --min-match-chars 10 --out "$d/metrics.replay.json"; then
+    echo "  $d -> metrics.replay.json"
+  else
+    fail "metrics $d"
+  fi
 done
 
 echo "== (2) re-running the pooled 5-seed Fisher / Clopper-Pearson / Benjamini-Hochberg statistics (Table tab:headline) =="
-"$PY" scripts/exp_stats_aggregation.py --seeds 42,52,62,72,82 \
-      --out experiment/results/exp_3seed_replication/pooled_stats_5seed.replay.json \
-      && echo "  -> experiment/results/exp_3seed_replication/pooled_stats_5seed.replay.json"
+if "$PY" scripts/exp_stats_aggregation.py --seeds 42,52,62,72,82 \
+      --out experiment/results/exp_3seed_replication/pooled_stats_5seed.replay.json; then
+  echo "  -> experiment/results/exp_3seed_replication/pooled_stats_5seed.replay.json"
+else
+  fail "pooled statistics"
+fi
 
 echo
-echo "== (3) table <-> source-file mapping (numbers recomputed from the committed logs) =="
+echo "== (3) recomputed vs committed: every recomputed field must be identical =="
+"$PY" scripts/check_replay_equal.py || fail "recomputed != committed"
+
+echo
+echo "== (4) table <-> source-file mapping (numbers recomputed from the committed logs) =="
 "$PY" - <<'PYEOF'
 import json, collections, pathlib
 R = pathlib.Path("experiment/results")
@@ -105,7 +135,7 @@ probes = [
  ("exp_mia_indist/metrics.json",           "tab:mia-indist -- Min-K% AUC, OOD vs in-distribution"),
  ("exp_tpr_at_fpr/metrics.json",           "sec:threat-split -- LiRA TPR @ FPR=1%"),
  ("exp_minkpp_reconciliation/metrics.json","sec:threat-split -- Min-K% / Min-K%++ / loss AUC"),
- ("exp_downstream/SUMMARY.json",           "tab:downstream -- zero-shot accuracy"),
+ ("exp_downstream/metrics.json",           "tab:downstream -- zero-shot accuracy"),
  ("wave_1_utility/ppl.json",               "tab:utility -- perplexity ratios (seed 42)"),
  ("wave_1_llama32_3b_fullft_seed42/natural_canaries_compare.json", "tab:natcan -- 3B real-PII gap"),
  ("wave_1_qwen25_7b_seed42/natural_canaries_compare.json",         "tab:natcan -- 7B real-PII gap"),
@@ -127,8 +157,14 @@ if [ "$MODE" != "--no-figures" ]; then
   echo
   render_figures
 fi
+
 echo
-echo "replay done. '*.replay.json' files are freshly recomputed and should match the"
-echo "committed metrics.json / pooled_stats_5seed.json (deterministic). Figures are in"
-echo "experiment/figures/ (fig_quant_variants, fig_dose_response, fig_crossfamily,"
-echo "fig_mechanism, fig_mia_combined)."
+echo "== (5) verifying the published paper numbers against the committed logs =="
+"$PY" scripts/verify_values.py || fail "published-number verification"
+
+echo
+echo "Figures are in experiment/figures/ (fig_quant_variants, fig_dose_response,"
+echo "fig_crossfamily, fig_mechanism, fig_mia_combined). The '*.replay.json' files are"
+echo "the freshly recomputed metrics kept next to the committed ones for inspection;"
+echo "they are gitignored."
+finish
