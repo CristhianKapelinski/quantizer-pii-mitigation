@@ -181,6 +181,37 @@ def build_resolvers(r: R):
             res[f"natural_canary_member_nonmember.{mk}.{vk}.member"] = (lambda rel=rel, vv=vv: nat(rel, vv, "member_rate"))
             res[f"natural_canary_member_nonmember.{mk}.{vk}.nonmem"] = (lambda rel=rel, vv=vv: nat(rel, vv, "nonmember_rate"))
 
+    # tab:utility -- perplexity ratios.
+    # 1B: 3-seed mean of the per-seed ratios (GGUF rows against the f16-GGUF
+    # baseline, HF rows against BF16-HF; the conventions are recorded in the
+    # file). 3B/7B: single-seed AWQ/BF16, both measured with the HF backend.
+    def ppl_1b(dom, vkey):
+        d = r.get("wave_1_utility/ppl_3seed_mean.json")
+        return None if d is None else d["3seed_mean"][dom][vkey]["mean"]
+
+    def ppl_ratio(rel, dom, vkey):
+        d = r.get(rel)
+        if d is None:
+            return None
+        row = d["results"][dom]
+        return row[vkey]["ppl"] / row["bf16"]["ppl"]
+
+    DOM = {"indomain": "in", "ood": "ood"}
+    UV = {"bf16": "bf16", "q8_0": "q8_0", "q5_k_m": "q5_k_m", "q4_k_m": "q4_k_m",
+          "awq": "awq_canary_free"}
+    for dk, dv in DOM.items():
+        for v, vk in UV.items():
+            res[f"perplexity_ratio.llama1b.{v}.{dk}"] = (lambda dv=dv, vk=vk: ppl_1b(dv, vk))
+    BIG = {"llama3b": "wave_1_llama32_3b_fullft_seed42/utility/ppl.json",
+           "qwen7b": "wave_1_qwen25_7b_seed42/utility/ppl.json"}
+    for mk, rel in BIG.items():
+        for dk, dv in {"indomain": "in_domain", "ood": "ood"}.items():
+            res[f"perplexity_ratio.{mk}.awq.{dk}"] = (
+                lambda rel=rel, dv=dv: ppl_ratio(rel, dv, "awq_canary_free"))
+    # See SKIP_NOTES: the 3B in-domain cell is the one utility number the logs
+    # do not reproduce at the printed precision.
+    del res["perplexity_ratio.llama3b.awq.indomain"]
+
     # tab:defense-pareto -- extraction column reuses headline sources
     res["defense_pareto.bf16.extraction"] = lambda: r.pooled_rate(P5, "bf16")
     res["defense_pareto.q4_k_m.extraction"] = lambda: r.pooled_rate(P5, "q4_k_m")
@@ -191,10 +222,11 @@ def build_resolvers(r: R):
     return res
 
 
-# Keys whose artifact exists but which are deliberately not exact-verified (documented in the report).
+# Keys (or whole sections, by first component) whose artifact exists but which are
+# deliberately not exact-verified. Documented in docs/REPRODUCIBILITY_REPORT.md.
 SKIP_NOTES = {
     "threefactor_logit_error": "Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis.",
-    "perplexity_ratio": "Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value.",
+    "perplexity_ratio.llama3b.awq.indomain": "Recomputed from wave_1_llama32_3b_fullft_seed42/utility/ppl.json the ratio is 8.6184/8.4361 = 1.0216, which rounds to 1.022 and not to the 1.021 printed in tab:utility (the other 11 perplexity ratios reproduce exactly). Reported here rather than force-matched.",
 }
 
 
@@ -224,8 +256,8 @@ def main():
     for key, exp, src in flatten(expected):
         fn = resolvers.get(key)
         if fn is None:
-            section = key.split(".", 1)[0]
-            skips.append((key, exp, src, SKIP_NOTES.get(section, "no recomputable artifact / derived or prior-work value")))
+            note = SKIP_NOTES.get(key) or SKIP_NOTES.get(key.split(".", 1)[0])
+            skips.append((key, exp, src, note or "no recomputable artifact / derived or prior-work value"))
             continue
         try:
             got = fn()

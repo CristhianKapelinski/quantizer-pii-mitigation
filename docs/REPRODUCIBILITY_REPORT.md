@@ -44,16 +44,19 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
   reported confidence intervals and reflect different legitimate pools, not arithmetic errors,
   so the table is SKIP-listed rather than force-matched or silently "corrected".
 
-- **`tab:utility` reports perplexity RATIOS, not stored values.** `wave_1_utility/ppl.json`
-  commits the raw per-version perplexities, but the published ratios are quantized/BF16 against
-  a per-backend f16 reference (Hugging Face for BF16/AWQ, llama.cpp for the GGUF k-quants) that
-  is not persisted as its own field. The ratios are therefore a derivation and are SKIP-listed;
-  the raw ppl values that feed them are committed.
+- **`tab:utility` perplexity ratios are verified, with one exception.** The 1B ratios are the
+  3-seed means stored in `wave_1_utility/ppl_3seed_mean.json` (GGUF rows against the f16-GGUF
+  baseline, HF rows against BF16-HF; the file records both conventions), and the 3B/7B AWQ
+  ratios are recomputed from the per-cell `utility/ppl.json`. Eleven of the twelve published
+  ratios match exactly. The exception is the 3B in-domain AWQ ratio: the logs give
+  8.6184/8.4361 = 1.0216, which rounds to **1.022**, while `tab:utility` prints **1.021**. It is
+  SKIP-listed with that note instead of being force-matched, and the paper cell should be
+  re-checked.
 
 - **`tab:defense-pareto` has no dedicated result file.** Its extraction column is derived from
   `tab:headline` (BF16 26.6%, Q4\_K\_M 4.0%, AWQ 0.0/3.0/6.0%) and its Δppl column from
   `tab:utility`. The verifier checks the extraction column against the headline sources; the
-  Δppl column inherits the utility-ratio caveat above.
+  Δppl column follows the utility ratios above.
 
 - **Qwen2.5-0.5B AWQ headline cell** (0.0%) is not present in `qwen_extra_pooled_qwen05b.json`
   (the pooled file has no AWQ entry for this backbone), so it is SKIP-listed. Every other cell
@@ -73,18 +76,22 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
   extraction, and analysis wall-clocks are not recorded, so the README's per-cell times cover
   fine-tuning only. These are hardware facts, not paper numbers, and are never verified here.
 
-- The `replay.sh` table<->source probe pointed `tab:downstream` at `exp_downstream/SUMMARY.json`,
-  which does not exist; the real file is `exp_downstream/metrics.json`. The verifier uses the
-  correct path, and the probe list has been left as-is (informational only).
+- **The replay path asserts, it does not only print.** After recomputing the per-seed metrics and
+  the pooled statistics from the committed extraction logs, `replay.sh` runs
+  `scripts/check_replay_equal.py`, which requires every recomputed field to be identical to the
+  committed one, and then this verifier. A mismatch in either makes `replay.sh` exit non-zero.
+  The committed `metrics_w1_mini.json` files carry one extra block (`gate_w1_mini`, written only
+  when `qquilt.metrics` is called with `--include-w1-mini-gate`); extra committed keys are
+  reported and allowed, recomputed keys are not.
 
 ## 2. Automatic verification results
 
 <!-- AUTO:VERIFY:BEGIN -->
-_Last verification: **97 pass / 0 fail**, 36 skip, out of 133 checked paper numbers._
+_Last verification: **108 pass / 0 fail**, 25 skip, out of 133 checked paper numbers._
 
 ### PASS
 
-97 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
+108 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
 
 ### SKIP (documented, not verified for exact equality)
 
@@ -114,16 +121,5 @@ _Last verification: **97 pass / 0 fail**, 36 skip, out of 133 checked paper numb
 | `threefactor_logit_error.flip.awq_recall` | 78 | Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis. |
 | `threefactor_logit_error.flip.awq_body` | 0 | Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis. |
 | `threefactor_logit_error.flip.q4_recall` | 48 | Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis. |
-| `perplexity_ratio.llama1b.bf16.indomain` | 1.0 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama1b.q8_0.indomain` | 1.001 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama1b.q5_k_m.indomain` | 1.022 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama1b.q5_k_m.ood` | 1.012 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama1b.q4_k_m.indomain` | 1.047 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama1b.q4_k_m.ood` | 1.044 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama1b.awq.indomain` | 1.123 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama1b.awq.ood` | 1.094 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama3b.awq.indomain` | 1.021 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.llama3b.awq.ood` | 1.021 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.qwen7b.awq.indomain` | 1.002 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
-| `perplexity_ratio.qwen7b.awq.ood` | 1.044 | Paper reports quantized/BF16 perplexity RATIOS; wave_1_utility/ppl.json commits the raw per-version ppl but the ratio baseline is a per-backend f16 reference (GGUF vs HF) not stored as a field, so the ratio is a derivation, not a stored value. |
+| `perplexity_ratio.llama3b.awq.indomain` | 1.021 | Recomputed from wave_1_llama32_3b_fullft_seed42/utility/ppl.json the ratio is 8.6184/8.4361 = 1.0216, which rounds to 1.022 and not to the 1.021 printed in tab:utility (the other 11 perplexity ratios reproduce exactly). Reported here rather than force-matched. |
 <!-- AUTO:VERIFY:END -->
