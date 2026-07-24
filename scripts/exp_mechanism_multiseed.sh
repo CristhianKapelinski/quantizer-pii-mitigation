@@ -74,10 +74,11 @@ run_seed 62 \
 # Aggregate
 echo
 echo "=== Aggregating multi-seed mechanism stats ==="
-"$PY" - <<'PYEOF'
+QQUILT_REPO="$REPO" "$PY" - <<'PYEOF'
 import json
+import os
 from pathlib import Path
-ROOT = Path("/mnt/win_ssd/usenix/experiment/results/exp_mechanism_multiseed")
+ROOT = Path(os.environ["QQUILT_REPO"]) / "experiment/results/exp_mechanism_multiseed"
 def wilson(k, n, z=1.96):
     if n == 0: return (0, 0)
     p = k / n

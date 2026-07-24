@@ -3,7 +3,9 @@
 # torch+llama-cpp-python interaction that segfaults in the same Python
 # session. Output: experiment/results/exp_mechanism_q4km_noise_direction/metrics.json
 set -uo pipefail
-cd /mnt/win_ssd/usenix
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="${QQUILT_REPO:-$(cd "$SCRIPT_DIR/.." && pwd)}"
+cd "$REPO"
 RES=experiment/results/exp_mechanism_q4km_noise_direction
 mkdir -p "$RES"
 N=${N:-30}

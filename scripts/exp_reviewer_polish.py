@@ -23,7 +23,7 @@ import os
 from pathlib import Path
 from collections import defaultdict, Counter
 
-ROOT = Path("/mnt/win_ssd/usenix")
+ROOT = Path(os.environ.get("QQUILT_REPO", Path(__file__).resolve().parent.parent))
 OUT = ROOT / "experiment/results/reviewer_polish"
 OUT.mkdir(parents=True, exist_ok=True)
 

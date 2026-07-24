@@ -8,7 +8,8 @@
 #   experiment/results/wave_1_utility/RESULTS_3SEED.md
 set -euo pipefail
 
-ROOT="${ROOT:-/mnt/win_ssd/usenix}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="${QQUILT_REPO:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 LLP="${LLAMA_PERPLEXITY:-$ROOT/third_party/llama.cpp/build/bin/llama-perplexity}"
 [ -x "$LLP" ] || { echo "[error] llama-perplexity not at $LLP"; exit 1; }
 
@@ -47,11 +48,13 @@ for SEED in 52 62; do
 done
 
 # Phase 2: aggregate and write 3-seed mean ratios
-python3 - <<'PY'
-import json, math, statistics
+PY_BIN="${PYTHON:-$ROOT/.venv/bin/python}"
+[ -x "$PY_BIN" ] || PY_BIN="$(command -v python3)"
+QQUILT_REPO="$ROOT" "$PY_BIN" - <<'PYEOF'
+import json, math, os, statistics
 from pathlib import Path
 
-ROOT = Path("/mnt/win_ssd/usenix")
+ROOT = Path(os.environ["QQUILT_REPO"])
 RES  = ROOT/"experiment/results"
 
 # F16-GGUF baseline (post-hoc):
@@ -146,4 +149,4 @@ for v, label in [("bf16","BF16"), ("q8_0","Q8_0"), ("q5_k_m","Q5_K_M"),
 print("[3seed-fold] wrote ppl_3seed_mean.json + RESULTS_3SEED.md")
 print()
 print(open(RES/"wave_1_utility/RESULTS_3SEED.md").read())
-PY
+PYEOF

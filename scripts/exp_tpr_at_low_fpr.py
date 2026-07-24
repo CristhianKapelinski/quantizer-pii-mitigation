@@ -22,7 +22,7 @@ import torch
 from sklearn.metrics import roc_curve
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-REPO = Path("/mnt/win_ssd/usenix")
+REPO = Path(os.environ.get("QQUILT_REPO", Path(__file__).resolve().parent.parent))
 OUT_DIR = REPO / "experiment/results/exp_tpr_at_fpr"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 

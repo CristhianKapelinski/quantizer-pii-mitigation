@@ -10,12 +10,13 @@ extraction).
 
 import json
 import math
+import os
 from pathlib import Path
 
 import torch
 from transformers import AutoTokenizer
 
-REPO = Path("/mnt/win_ssd/usenix")
+REPO = Path(os.environ.get("QQUILT_REPO", Path(__file__).resolve().parent.parent))
 OUT = REPO / "experiment/results/exp_awq_calib_ppl"
 OUT.mkdir(parents=True, exist_ok=True)
 
