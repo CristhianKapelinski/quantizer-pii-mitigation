@@ -216,13 +216,80 @@ def build_resolvers(r: R):
     res["defense_pareto.awq_3b.extraction"] = lambda: r.jsonl_ge10("wave_1_llama32_3b_fullft_seed42/extraction.jsonl", "awq_4bit")
     res["defense_pareto.awq_7b.extraction"] = lambda: r.jsonl_ge10("wave_1_qwen25_7b_seed42/extraction.jsonl", "awq_4bit")
     res["defense_pareto.gptq_1b.extraction"] = lambda: (lambda d: None if d is None else float(d.get("greedy_ge10")))(r.get("exp_gptq_4bit/metrics.json"))
+
+    # tab:threefactor -- one pool per column: the Recall and Enron columns are the
+    # three-seed mechanism runs (n=300), the Body column the single-seed n=100 run.
+    MSEEDS = (42, 52, 62)
+
+    def mean(vals):
+        vals = [v for v in vals if v is not None]
+        return None if len(vals) != len(MSEEDS) else sum(vals) / len(vals)
+
+    def awq_ms(path, pos, scale=1.0):
+        """Mean over the three AWQ mechanism seeds of results.awq[path][pos]."""
+        def get(s):
+            d = r.get(f"exp_mechanism_multiseed/seed{s}/awq_metrics.json")
+            if d is None:
+                return None
+            return d["results"]["awq"].get(path, {}).get(pos)
+        def scaled():
+            m = mean([get(s) for s in MSEEDS])
+            return None if m is None else m * scale
+        return scaled
+
+    def q4_ms(pos, field, scale=1.0):
+        """Mean over the three Q4_K_M mechanism seeds of <pos>[<field>]."""
+        def get(s):
+            d = r.get(f"exp_mechanism_multiseed/seed{s}/q4km_metrics.json")
+            if d is None:
+                return None
+            return d.get(pos, {}).get(field)
+        def scaled():
+            m = mean([get(s) for s in MSEEDS])
+            return None if m is None else m * scale
+        return scaled
+
+    def body(field, scale=1.0):
+        def f():
+            d = r.get("exp_mechanism_local_replication/mech_1b_body_local.json")
+            if d is None:
+                return None
+            v = d["canary_BODY"].get(field)
+            return None if v is None else v * scale
+        return f
+
+    res["threefactor_logit_error.n.awq_recall"] = lambda: 100 * len(MSEEDS)
+    res["threefactor_logit_error.n.q4_recall"] = lambda: 100 * len(MSEEDS)
+    res["threefactor_logit_error.n.enron"] = lambda: 100 * len(MSEEDS)
+    res["threefactor_logit_error.n.awq_body"] = body("n")
+    # FT top-1 is a property of the fine-tuned model, so both Recall columns
+    # resolve to the same pool.
+    res["threefactor_logit_error.ft_top1.awq_recall"] = q4_ms("canary_RECALL", "ft_top1_prob_mean")
+    res["threefactor_logit_error.ft_top1.q4_recall"] = q4_ms("canary_RECALL", "ft_top1_prob_mean")
+    res["threefactor_logit_error.ft_top1.enron"] = q4_ms("enron", "ft_top1_prob_mean")
+    res["threefactor_logit_error.ft_top1.awq_body"] = body("ft_top1_prob_mean")
+    res["threefactor_logit_error.l2norm.awq_recall"] = awq_ms("logit_err_norm", "canary")
+    res["threefactor_logit_error.l2norm.enron"] = awq_ms("logit_err_norm", "enron")
+    res["threefactor_logit_error.l2norm.q4_recall"] = q4_ms("canary_RECALL", "logit_err_norm_mean")
+    res["threefactor_logit_error.l2norm.awq_body"] = body("logit_err_norm_mean")
+    res["threefactor_logit_error.cos.awq_recall"] = awq_ms("cos_err_with_top1_basis", "canary")
+    res["threefactor_logit_error.cos.enron"] = awq_ms("cos_err_with_top1_basis", "enron")
+    res["threefactor_logit_error.cos.q4_recall"] = q4_ms("canary_RECALL", "cos_err_top1_mean")
+    res["threefactor_logit_error.cos.awq_body"] = body("cos_err_top1_mean")
+    res["threefactor_logit_error.probdrop.awq_recall"] = awq_ms("prob_drop_on_top1", "canary", 100)
+    res["threefactor_logit_error.probdrop.enron"] = awq_ms("prob_drop_on_top1", "enron", 100)
+    res["threefactor_logit_error.probdrop.q4_recall"] = q4_ms("canary_RECALL", "prob_drop_on_top1_mean", 100)
+    res["threefactor_logit_error.probdrop.awq_body"] = body("prob_drop_on_top1_mean", 100)
+    res["threefactor_logit_error.flip.awq_recall"] = awq_ms("top1_flip_rate", "canary", 100)
+    res["threefactor_logit_error.flip.enron"] = awq_ms("top1_flip_rate", "enron", 100)
+    res["threefactor_logit_error.flip.q4_recall"] = q4_ms("canary_RECALL", "top1_flip_rate", 100)
+    res["threefactor_logit_error.flip.awq_body"] = body("top1_flip_rate", 100)
     return res
 
 
 # Keys (or whole sections, by first component) whose artifact exists but which are
 # deliberately not exact-verified. Documented in docs/REPRODUCIBILITY_REPORT.md.
 SKIP_NOTES = {
-    "threefactor_logit_error": "Table assembled from several mechanism runs at different n (control_positions n=50, q4km_noise n=30, multiseed FLIP n=100/300); cells differ by ~1 unit depending on the pool/CI method, so no single committed artifact matches cell-by-cell. Closest sources: exp_mechanism_control_positions, exp_mechanism_q4km_noise_direction, exp_mechanism_multiseed, reviewer_polish/m3_flip_rate_cis.",
 }
 
 
