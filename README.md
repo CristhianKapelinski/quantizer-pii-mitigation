@@ -36,7 +36,7 @@ pipeline.
 | [Installation](#installation) | The two commands that set the artifact up |
 | [Minimal test](#minimal-test) | One command, seconds, to confirm the install |
 | [Experiments](#experiments) | Reviewer time budget, one subsection per paper claim, paper-item mapping |
-| [Known caveats](#known-caveats) | Limits a reviewer should know before running |
+| [Known caveats](#known-caveats) | Limits a reviewer should know before running (last subsection of Experiments) |
 | [LICENSE](#license) | MIT |
 
 Repository layout:
@@ -412,7 +412,7 @@ origin of each number):
 `experiment/results/INDEX.md` gives the per-directory breakdown;
 `experiment/results/SCHEMA.md` documents the JSONL schemas.
 
-# Known caveats
+## Known caveats
 
 * The 3B and 7B full-FT cells are single-seed (compute budget); the 5-seed
   Llama-3.2-1B anchor carries the multi-seed statistical weight. Cross-cell
