@@ -61,14 +61,15 @@ for (bpw, rate, lab) in fp_pts:
     ax.plot(bpw, rate, "s", color="#7f7f7f", markersize=8,
             markeredgecolor="black", markeredgewidth=0.6, zorder=4)
 
-# AWQ star at 4.25 bpw; GPTQ diamond slightly left at 4.10 bpw,
-# both at rate=0 (their actual value).
+# AWQ and GPTQ both sit at g128 = 4.25 bpw, rate=0 (their actual values).
+# The smaller GPTQ diamond is drawn on top of the AWQ star so both stay
+# visible without displacing either marker off its true bpw.
 ax.plot(4.25, 0.0, marker="*", color="#1f77b4", markersize=22,
         markeredgecolor="black", markeredgewidth=0.7,
         label="AWQ (calib.)", zorder=5)
-ax.plot(4.05, 0.0, marker="D", color="#2ca02c", markersize=10,
+ax.plot(4.25, 0.0, marker="D", color="#2ca02c", markersize=7,
         markeredgecolor="black", markeredgewidth=0.7,
-        label="GPTQ (calib.)", zorder=5)
+        label="GPTQ (calib.)", zorder=6)
 
 # Label only the key inflection points; collapse Q3/Q2 into one group
 label_offsets = {
@@ -84,24 +85,22 @@ for (bpw, rate, lab) in gguf_pts + fp_pts:
     ax.annotate(lab, xy=(bpw, rate), xytext=(bpw + ox, rate + oy),
                 fontsize=8.5, color="#333333", ha=ha, va=va)
 
-# group label for low-bpw points (Q2_K, Q3_K_M, Q4_K_S all at <=1)
-ax.annotate("Q2_K, Q3_K_M, Q4_K_S\n(all $\leq$ 1%)",
-            xy=(3.4, 0), xytext=(7.0, 9),
-            fontsize=7.5, color="#444", ha="center",
-            arrowprops=dict(arrowstyle="-", color="#888", lw=0.5))
+# group label for low-bpw points (Q2_K, Q3_K_M, Q4_K_S all at <=1), sitting
+# directly above its own points so no sloped leader crosses the plot area
+ax.text(3.0, 2.0, "Q2_K, Q3_K_M, Q4_K_S\n(all $\\leq$ 1%)",
+        fontsize=7.5, color="#444", ha="center", va="bottom")
 
 # Shaded "calibration cliff" zone
 ax.axvspan(4.0, 4.85, alpha=0.10, color="orange", zorder=0)
 ax.text(4.42, 16, "calibration\ncliff", fontsize=8.5, ha="center",
         color="#a36800", style="italic")
 
-# AWQ + GPTQ labels in the open lower-right region
-ax.annotate("AWQ 0%", xy=(4.25, 0), xytext=(10.5, 9),
-            fontsize=8.5, color="#1f77b4", weight="bold",
-            arrowprops=dict(arrowstyle="->", color="#1f77b4", lw=0.9))
-ax.annotate("GPTQ 0%", xy=(4.05, 0), xytext=(10.5, 4),
-            fontsize=8.5, color="#2ca02c", weight="bold",
-            arrowprops=dict(arrowstyle="->", color="#2ca02c", lw=0.9))
+# AWQ + GPTQ are single points, not series: label them as plain text with the
+# bpw stated, so no leader line can be read as a bpw -> extraction trajectory
+ax.text(2.15, 12.5, "AWQ 0%", fontsize=8.5, color="#1f77b4",
+        weight="bold", ha="left", va="center")
+ax.text(2.15, 8.5, "GPTQ 0%", fontsize=8.5, color="#2ca02c",
+        weight="bold", ha="left", va="center")
 
 ax.set_xlabel("Effective bits per weight (bpw)", fontsize=10)
 ax.set_ylabel("Extraction rate (%)", fontsize=10)
@@ -110,7 +109,7 @@ ax.set_ylim(-1, 35)
 ax.set_xticks([2, 4, 6, 8, 10, 12, 14, 16])
 ax.set_yticks([0, 10, 20, 30])
 ax.grid(True, alpha=0.3, zorder=0, linestyle=":")
-ax.legend(loc="upper right", fontsize=7, framealpha=0.95)
+ax.legend(loc="lower right", fontsize=7, framealpha=0.95)
 
 plt.tight_layout()
 plt.savefig(FIGDIR / "fig_dose_response.pdf", bbox_inches="tight")

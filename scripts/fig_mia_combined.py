@@ -29,7 +29,7 @@ b = ax.bar(versions, extract, color=colors, edgecolor="black", linewidth=0.6)
 for bb, v in zip(b, extract):
     ax.text(bb.get_x() + bb.get_width()/2, v + 0.7, f"{v:.0f}%",
             ha="center", fontsize=8.5, fontweight="bold")
-ax.set_title("(a) Verbatim extraction", fontsize=10, pad=4)
+ax.set_title("(a) Verbatim extraction (seed 42)", fontsize=10, pad=4)
 ax.set_ylabel("Extraction rate (%)", fontsize=9.5)
 ax.set_ylim(0, 36); ax.grid(True, axis="y", alpha=0.3, linestyle=":")
 
