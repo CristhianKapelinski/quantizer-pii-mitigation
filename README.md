@@ -1,7 +1,8 @@
 # Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models
 
 Reproducibility artifact for the paper of the same title, accepted at
-SBSeg 2026. This README follows the SBSeg 2026 artifact-evaluation template.
+SBSeg 2026. This README follows the SBSeg 2026 artifact-evaluation template
+(https://doc-artefatos.github.io/sbseg2026/subinstrucoes.html).
 
 **Paper summary.** Four-bit post-training quantization is the default path to
 deploy small language models. This work shows that the choice of 4-bit
@@ -14,11 +15,15 @@ negligible accuracy cost at production scale. The paper explains the effect
 with a three-factor mechanism and reconciles a prior membership-inference
 (MIA) result that appeared to contradict this conclusion.
 
-**Artifact goal.** This repository reproduces **every** table and figure in
-the paper. It provides the code, the version-pinned environment, the
-experiment manifest, and the per-seed result logs that back every reported
-number, plus two reproduction paths: a lightweight GPU-free *replay* and a
-full re-run of the pipeline.
+**Artifact goal.** This repository re-derives **every** table and figure of the
+paper from the committed logs, and checks the result: **108 of the 133
+published numbers are recomputed and required to match exactly**, the
+remaining 25 being multi-run syntheses and derived values, each listed with
+its reason in [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
+It provides the code, the version-pinned environment, the experiment manifest,
+and the per-seed result logs that back every reported number, plus two
+reproduction paths: a lightweight GPU-free *replay* and a full re-run of the
+pipeline.
 
 # README structure
 
@@ -220,8 +225,8 @@ saved fig_mia_combined
 RESULT: OK -- every recomputed number matches the committed logs and the paper.
 ```
 
-The rendering is deterministic (`SOURCE_DATE_EPOCH` is fixed), so on the pinned
-environment it rewrites the committed figure files byte for byte.
+The rendering is deterministic (`SOURCE_DATE_EPOCH` is fixed), so repeated runs
+on the pinned environment produce byte-identical files.
 
 # Experiments
 
@@ -229,7 +234,7 @@ environment it rewrites the committed figure files byte for byte.
 
 A full sequential re-run on a single 16 GB GPU is not feasible inside a review
 window (the measured fine-tune phase alone is ~37 h; see the table below). The
-artifact therefore offers three levels; **the first two are the recommended
+artifact therefore offers four levels; **the first two are the recommended
 reviewer path**:
 
 | Level | Command | Measured time | Hardware | What it shows |
