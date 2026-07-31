@@ -37,6 +37,7 @@ pipeline.
 | [Minimal test](#minimal-test) | One command, seconds, to confirm the install |
 | [Experiments](#experiments) | Reviewer time budget, one subsection per paper claim, paper-item mapping |
 | [Known caveats](#known-caveats) | Limits a reviewer should know before running (last subsection of Experiments) |
+| [Technical report](docs/TECHNICAL_REPORT.md) | Detailed procedures, results, analyses, deployment guidance, and limitations |
 | [Citation](#citation) | How to cite the paper |
 | [LICENSE](#license) | MIT |
 
