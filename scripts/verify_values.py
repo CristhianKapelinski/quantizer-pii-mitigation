@@ -81,6 +81,22 @@ class R:
             return None
         return greedy_ge10(d).get(vkey, 0)
 
+    def jsonl_pool_ge10(self, rels, vkey):
+        """Pool the greedy >=10 endpoint across independent per-seed JSONL files."""
+        hits = total = 0
+        for rel in rels:
+            rows = self.get(rel)
+            if rows is None:
+                return None
+            hits += greedy_ge10(rows).get(vkey, 0)
+            canaries = {
+                row.get("canary_id") or row.get("seq_id")
+                for row in rows
+                if row.get("group") in (None, "g1")
+            }
+            total += len(canaries)
+        return None if total == 0 else 100 * hits / total
+
 
 def build_resolvers(r: R):
     """Map expected-value keys to a zero-arg callable returning the recomputed value (or None)."""
@@ -109,6 +125,29 @@ def build_resolvers(r: R):
         res[f"headline_greedy_ge10_extraction_pct.lora.llama1b.{v}"] = (lambda vk=vk: r.jsonl_ge10("wave_1_llama32_1b_lora_seed42/extraction.jsonl", vk))
         res[f"headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.{v}"] = (lambda vk=vk: r.jsonl_ge10("wave_1_llama3b_lora_seed42/extraction.jsonl", vk))
         res[f"headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e4.{v}"] = (lambda vk=vk: r.jsonl_ge10("wave_1_llama3b_lora_seed42_lr2e4/extraction.jsonl", vk))
+
+    def seed_logs(tag):
+        return [f"{tag}_seed{seed}/extraction.jsonl" for seed in (42, 52, 62)]
+
+    # The aggregate JSON omits Qwen-0.5B AWQ, but all three source logs are
+    # committed. The LoRA BF16/Q5_K_M entries are likewise pooled directly
+    # from their per-seed logs.
+    res["headline_greedy_ge10_extraction_pct.fullft.qwen0_5b.awq"] = lambda: r.jsonl_pool_ge10(
+        [f"wave_1_qwen05b_seed{seed}/extraction.jsonl" for seed in (42, 52, 62)],
+        "awq_4bit",
+    )
+    res["headline_greedy_ge10_extraction_pct.lora.qwen0_5b.bf16"] = lambda: r.jsonl_pool_ge10(
+        seed_logs("wave_1_qwen25_05b_lora"), "bf16"
+    )
+    res["headline_greedy_ge10_extraction_pct.lora.llama1b.bf16"] = lambda: r.jsonl_pool_ge10(
+        seed_logs("wave_1_llama32_1b_lora"), "bf16"
+    )
+    res["headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.bf16"] = lambda: r.jsonl_pool_ge10(
+        seed_logs("wave_1_llama3b_lora"), "bf16"
+    )
+    res["headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.q5_k_m"] = lambda: r.jsonl_pool_ge10(
+        seed_logs("wave_1_llama3b_lora"), "q5_k_m"
+    )
 
     # tab:awq-sweep -- AWQ group-size sweep (single seed)
     def step7(path):

@@ -15,11 +15,11 @@ negligible accuracy cost at production scale. The paper explains the effect
 with a three-factor mechanism and reconciles a prior membership-inference
 (MIA) result that appeared to contradict this conclusion.
 
-**Artifact goal.** This repository re-derives **every** table and figure of the
-paper from the committed logs, and checks the result: **109 of the 133
-published numbers are recomputed and required to match exactly**, the
-remaining 24 being multi-run syntheses and derived values, each listed with
-its reason in [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
+**Artifact goal.** This repository re-derives every table and figure of the
+paper from the committed logs. Its verifier recomputes **all 141 catalogued
+published values**, requiring all 141 to match at the paper's printed
+precision; the exact lineage is recorded in
+[`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
 It provides the code, the version-pinned environment, the experiment manifest,
 and the per-seed result logs that back every reported number, plus two
 reproduction paths: a lightweight GPU-free *replay* and a full re-run of the
@@ -47,7 +47,7 @@ Repository layout:
 .
 |-- README.md                    this file
 |-- replay.sh                    path (a): re-derive tables and figures from committed logs (no GPU)
-|-- reproduce.sh                 path (b): re-run the full pipeline from scratch (GPU + pinned env)
+|-- reproduce.sh                 path (b): run or resume the full pipeline (GPU + pinned env)
 |-- pyproject.toml, uv.lock, .python-version   pinned Python environment
 |-- EXPERIMENT_MANIFEST.yaml     pinned models / datasets / toolchain / seeds / hyperparameters
 |-- ENGINEERING.md               layout, determinism, pinning, test coverage
@@ -80,7 +80,7 @@ The badges considered are: **Available (SeloD)**, **Functional (SeloF)**,
   package), documented ([`ENGINEERING.md`](ENGINEERING.md), docstrings,
   [`experiment/results/SCHEMA.md`](experiment/results/SCHEMA.md) and
   [`INDEX.md`](experiment/results/INDEX.md)), unit-tested
-  (`python -m pytest tests/`, no GPU/network), and every paper claim is
+  (`uv run --extra dev python -m pytest tests/`, no GPU/network), and every paper claim is
   identifiable in the artifact (the *Experiments* section).
 * **Reproducible** -- `replay.sh` re-derives every table and figure from the
   committed logs and *checks* them: it fails unless every recomputed field is
@@ -96,9 +96,10 @@ The artifact supports two reproduction paths, both exercised here:
   figure from the committed pre-computed result logs, and check both against
   the committed metrics and against the paper. No GPU, no model download,
   seconds. Command: `bash replay.sh`.
-* **(b) Reproduce** -- re-run the pipeline end-to-end (fine-tune -> quantize
-  -> extract -> metrics). It runs per experiment and also offers a reduced
-  single-cell `quick` mode. Command: `bash reproduce.sh`.
+* **(b) Reproduce** -- run or resume the pipeline end-to-end (fine-tune ->
+  quantize -> extract -> metrics). Committed outputs make the default mode
+  resumable; the reduced `quick` mode always writes a fresh result directory.
+  Command: `bash reproduce.sh`.
 
 Model weights and the GGUF/AWQ/GPTQ quantized files are **not committed**
 (large and fully regenerable); what is committed is the code, the pinned
@@ -187,8 +188,9 @@ cd quantizer-pii-mitigation
 
 # (1) Python environment (paths a and b)
 #     downloads the pinned wheels incl. torch (several GB); time is network-bound
+#     dev installs the documented CPU-only test command
 #     add --extra quant for path (b): it brings autoawq and auto-gptq
-uv sync --no-install-project
+uv sync --no-install-project --extra dev
 
 # (2) path b only: CPU-only build of llama.cpp; time is CPU-core-bound
 bash scripts/build_llama_cpp.sh
@@ -198,6 +200,8 @@ After step (1), path (a) can already be run. Step (2), and the `--extra quant`
 flag on step (1), are needed only for path (b) (the pipeline re-run): the GGUF
 k-quants depend on `llama-quantize` / `llama-cli`, and the AWQ/GPTQ models on
 `autoawq` / `auto-gptq`.
+
+Run the unit suite with `uv run --extra dev python -m pytest -q tests`.
 
 # Minimal test
 
@@ -224,11 +228,13 @@ saved: <repo>/experiment/figures/fig_mechanism.png
 saved fig_mia_combined
   ok: fig_mia_combined
 
-RESULT: OK -- every recomputed number matches the committed logs and the paper.
+RESULT: OK -- every requested replay stage passed.
 ```
 
-The rendering is deterministic (`SOURCE_DATE_EPOCH` is fixed), so repeated runs
-on the pinned environment produce byte-identical files.
+The plotted values are deterministic and checked against the logs. PDF bytes
+may differ across Matplotlib or PDF-backend builds because of serialization
+metadata; correctness is checked from the canonical plotted data rather than
+from raw PDF hashes.
 
 # Experiments
 
@@ -244,7 +250,7 @@ reviewer path**:
 | Verify (all numbers) | `bash replay.sh verify` | ~1 s | any CPU, no GPU | Checks every published number against the committed logs at the paper's printed precision (see [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md)) |
 | Replay (all claims) | `bash replay.sh` | ~7 s (measured) | any CPU, no GPU | Re-derives every table and figure of all 5 claims from the committed logs, checks the recomputed metrics against the committed ones and the published numbers against the paper, and ends in `RESULT: OK` |
 | Quick re-run (reduced) | `bash reproduce.sh quick` | fine-tune ~85 min (measured); quantize + extract not instrumented | one 16 GB GPU | Re-runs one cell from scratch; confirms the pipeline genuinely produces the Claim-1 gap |
-| Full re-run | `bash reproduce.sh` | fine-tune phase ~37 h (measured, summed); quantize / extract / analysis not instrumented | 16 GB GPU + A100 80 GB | Re-runs every cell and ablation end-to-end |
+| Full run/resume | `bash reproduce.sh` | fine-tune phase ~37 h (measured, summed); quantize / extract / analysis not instrumented | 16 GB GPU + A100 80 GB | Runs every cell and ablation; existing complete outputs are reused |
 
 **Recommended for review under a time budget:** run *Replay* (measured ~7 s;
 verifies the numbers behind all five claims) and *Quick re-run* (one fine-tune
@@ -431,27 +437,27 @@ origin of each number):
   pipeline and disabled; it is non-functional against the installed Triton and
   ships no cu128 binary.
 * One mechanism driver, `scripts/exp_mech_q4km_split.sh` (E5, Q4_K_M noise
-  direction), reads GGUF logits through `llama-cpp-python`, which is **not**
-  part of the locked environment; install it separately before running
-  `bash reproduce.sh mechanism`. Nothing else in either path needs it, and the
-  committed E5 results replay without it.
-* Model and dataset ids are pinned, but not by revision SHA, and 24 of the 133
-  published numbers are not exact-verified (multi-run syntheses and derived
-  values). Each one is listed with its reason in
-  [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
+  direction), reads GGUF logits through the locked optional
+  `llama-cpp-python` dependency. Install it with
+  `uv sync --no-install-project --extra mechanism` before running
+  `bash reproduce.sh mechanism`. Nothing else in either path needs it.
+* Model and dataset ids are pinned, but not by revision SHA. A future upstream
+  revision can therefore change a live full run. All 141 catalogued published
+  values are nevertheless exact-verified against the committed run-of-record
+  logs.
 
 # Citation
 
 Cristhian Kapelinski and Diego Kreutz. *Not All 4-bit Quantizers Are Equal:
-Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language
-Models.* Simpósio Brasileiro de Segurança da Informação e de Sistemas
+Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models.* Simpósio
+Brasileiro de Segurança da Informação e de Sistemas
 Computacionais (SBSeg), 2026.
 
 ```bibtex
 @inproceedings{kapelinski2026quantizer,
   author    = {Kapelinski, Cristhian and Kreutz, Diego},
-  title     = {Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation
-               of {PII} Leakage in Fine-Tuned Small Language Models},
+  title     = {Not All 4-bit Quantizers Are Equal: Mitigating {PII} Leakage
+               in Fine-Tuned Small Language Models},
   booktitle = {Simp\'osio Brasileiro de Seguran\c{c}a da Informa\c{c}\~ao e de
                Sistemas Computacionais (SBSeg)},
   year      = {2026}

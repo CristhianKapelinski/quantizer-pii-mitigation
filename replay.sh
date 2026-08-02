@@ -27,8 +27,8 @@ PY="${PYTHON:-}"
 export PYTHONPATH="$SCRIPT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 export HF_HOME="${HF_HOME:-$SCRIPT_DIR/.cache/hf}"; export TMPDIR="${TMPDIR:-$SCRIPT_DIR/.tmp}"
 export TOKENIZERS_PARALLELISM=false; mkdir -p "$HF_HOME" "$TMPDIR"
-# Fixed timestamp for the figure PDFs: matplotlib stamps SOURCE_DATE_EPOCH into
-# /CreationDate, so the rendered files are byte-reproducible across runs.
+# Fixed timestamp for the figure PDFs reduces metadata drift. Canonical plotted
+# data, rather than raw PDF bytes, is the cross-backend correctness boundary.
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-1735689600}"
 
 MODE="${1:-all}"
@@ -46,7 +46,7 @@ render_figures () {
 finish () {
   echo
   if [ ${#FAILED[@]} -eq 0 ]; then
-    echo "RESULT: OK -- every recomputed number matches the committed logs and the paper."
+    echo "RESULT: OK -- every requested replay stage passed."
     exit 0
   fi
   echo "RESULT: FAILED -- ${#FAILED[@]} stage(s) did not pass: ${FAILED[*]}"

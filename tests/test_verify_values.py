@@ -20,3 +20,4 @@ def test_every_published_number_verifies_against_the_logs():
     pathlib.Path(report).unlink()
     assert result.returncode == 0, result.stdout + result.stderr
     assert "0 fail" in result.stdout, result.stdout
+    assert "0 skip" in result.stdout, result.stdout

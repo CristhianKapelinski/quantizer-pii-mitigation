@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# reproduce.sh -- re-run the paper pipeline from scratch, per experiment.
+# reproduce.sh -- run or resume the paper pipeline, per experiment.
 #
-# Two reproduction paths exist; this is path (b), the from-scratch one.
+# Two reproduction paths exist; this is path (b), the live run/resume path.
 # For path (a) -- replay every table/figure from the committed result
 # logs with no GPU -- run `bash replay.sh` instead.
 #
 # Prerequisites (run once, in this order):
-#   uv sync --no-install-project          # the pinned Python environment
+#   uv sync --no-install-project --extra quant  # the pinned GPU environment
+#   uv sync --no-install-project --extra mechanism  # add E5 Python bindings
 #   bash scripts/build_llama_cpp.sh       # llama.cpp at the pinned commit, CPU build
 #   export HF_HOME=/path/to/hf/cache      # optional; default is ./cache/hf
 #
@@ -27,7 +28,8 @@
 # experiment/results/<tag>/ directory that ships with the repository, so on a
 # fresh clone the outputs are already there and the cell is SKIPPED (the run
 # prints a note saying so). Delete the directory of a cell to force a live
-# re-measurement of it. `bash reproduce.sh quick` always measures live: it
+# re-measurement of it. This is intentionally described as run/resume, not as
+# an automatic from-scratch run. `bash reproduce.sh quick` always measures live: it
 # writes to its own <tag>_rerun/ directory.
 #
 # Per-cell env knobs are documented at the top of scripts/exp_extra_run.sh.
@@ -215,7 +217,7 @@ Usage:
   bash reproduce.sh --list          # list experiment names + descriptions
   bash reproduce.sh --help          # print this message
 
-Every step is idempotent: outputs that already exist are skipped -- including
+Every step is resumable: outputs that already exist are skipped -- including
 the logs committed with the repository. Delete experiment/results/<tag>/ to
 force a cell to be measured again; 'quick' always measures live (it writes to
 its own <tag>_rerun/ directory).

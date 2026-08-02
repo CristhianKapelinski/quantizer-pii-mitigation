@@ -128,9 +128,9 @@ Utility is measured by perplexity and three zero-shot benchmarks. This does not 
 
 Model and dataset identifiers are pinned, but upstream Hugging Face revision SHAs and dataset checksums are not. A future upstream change can therefore alter a from-scratch execution. Fine-tuning is seeded but not claimed to be bit-identical across GPU architectures because kernel selection and BF16 accumulation differ.
 
-Twenty-four of the original 133-number accounting were documented as multi-run syntheses or derived values; the current verifier checks 141 entries, with 136 exact passes and five documented skips. The skipped values are the Qwen-0.5B AWQ headline value and four pooled LoRA cells lacking one directly resolvable aggregate artifact. The three-factor table also remains a manual synthesis across differing sample pools. These gaps limit exact auditability of those cells but are explicitly disclosed rather than inferred from an unrelated file.
+The current verifier checks all 141 catalogued entries. It pools the Qwen-0.5B AWQ and LoRA cells directly from their committed per-seed JSONL logs, so the latest verification has 141 exact passes and no skips. The three-factor table remains a documented synthesis across differing sample pools, but each printed cell has an explicit resolver and is checked at the paper's printed precision.
 
-Quantization, extraction, and analysis wall-clock times were not instrumented. Only fine-tuning time can be reported from per-step telemetry. Finally, one mechanism driver requires `llama-cpp-python`, which is not in the locked environment, although its committed output can be replayed.
+Quantization, extraction, and analysis wall-clock times were not instrumented. Only fine-tuning time can be reported from per-step telemetry. One mechanism driver requires the locked optional `mechanism` extra containing `llama-cpp-python`; its committed output can be replayed without that extra.
 
 ## 6. Reproduction Procedure
 
@@ -145,13 +145,13 @@ The 0.5B, 1B, and 1.5B full-fine-tuning cells, all LoRA cells, and ablations run
 After cloning the repository, install the locked analysis environment:
 
 ```bash
-uv sync --no-install-project
+uv sync --no-install-project --extra dev
 bash replay.sh
 ```
 
 Replay recomputes per-seed extraction metrics from committed JSONL logs, recomputes pooled Fisher exact tests, Clopper-Pearson intervals, and Benjamini-Hochberg corrections, compares every recomputed field with the committed metrics, regenerates all five figures, and compares published values with the run of record. It exits nonzero on a mismatch. The full replay was measured at approximately seven seconds on the reference workstation. A number-only check is available as `bash replay.sh verify`, and figure-only rendering as `bash replay.sh --figures-only`.
 
-The latest recorded verification result is 136 exact passes, zero failures, and five documented skips among 141 checked entries. The skip list and reasons are maintained in `docs/REPRODUCIBILITY_REPORT.md`.
+The latest recorded verification result is 141 exact passes, zero failures, and zero skips among 141 checked entries.
 
 ### 6.3 Reduced live re-run
 
@@ -175,7 +175,7 @@ The measured fine-tuning phase sums to approximately 37 hours across the headlin
 
 The repository separates reusable stages into `src/qquilt/`: canary construction, dataset assembly, training, quantization, extraction, metrics, utility, controls, unlearning, differential-privacy training support, preflight checks, and seed management. Experiment drivers under `scripts/` compose these stages and map directly to paper tables and figures in `experiment/results/INDEX.md`.
 
-The analysis path is deterministic. `SOURCE_DATE_EPOCH` fixes figure metadata, and repeated figure renders are intended to be byte-identical in the pinned environment. Unit tests run without a GPU or network and cover figure-data derivation, published-number verification, script/path integrity, executable entry points, and the greedy-extraction counting rule. The tests do not replace a live GPU smoke test of fine-tuning and quantization.
+The analysis path is numerically deterministic. `SOURCE_DATE_EPOCH` reduces figure-metadata drift, while canonical plotted data, rather than raw PDF bytes, is the correctness boundary across PDF backends. Unit tests run without a GPU or network and cover figure-data derivation, published-number verification, script/path integrity, executable entry points, and the greedy-extraction counting rule. The tests do not replace a live GPU smoke test of fine-tuning and quantization.
 
 Result records use documented JSONL schemas with explicit schema identifiers and versions. Large regenerable model files are excluded, while per-seed canaries, extraction outputs, metrics, training telemetry, and analysis summaries constitute the committed run of record.
 

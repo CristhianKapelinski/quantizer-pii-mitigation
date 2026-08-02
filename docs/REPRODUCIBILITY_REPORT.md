@@ -25,12 +25,11 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
   `reviewer_polish/m10_threshold_sensitivity.json`; `fig_crossfamily.py`, `fig_mia_combined.py`,
   `fig_mechanism.py`, and `fig_quant_variants.py` obtain their values from `scripts/_fig_data.py`,
   a single loader that recomputes each number from the logs and self-checks (`python
-  scripts/_fig_data.py`) that every loadable value equals the published one. A small number of
-  cells have no single committed artifact because they are multi-run syntheses reported in a
-  paper table, and stay as documented constants marked `_SYNTH` in `_fig_data.py`: the
-  Qwen2.5-0.5B AWQ headline cell, the 3-seed LoRA BF16 pools, and two `tab:threefactor` cells
-  (the AWQ RECALL logit-error norm and flip rate). GGUF/GPTQ effective bits-per-weight are
-  format-defined constants, not measured quantities.
+  scripts/_fig_data.py`) that every loadable value equals the published one. The verifier
+  pools cells without a dedicated aggregate file directly from their committed per-seed
+  JSONL logs. Two plotting-only `tab:threefactor` values remain documented constants in
+  `_fig_data.py`; their published values have separate resolvers. GGUF/GPTQ effective
+  bits-per-weight are format-defined constants, not measured quantities.
 
 - **`tab:threefactor` is a manual synthesis and is not exact-verified.** The columns come from
   different mechanism runs at different sample sizes: FT top-1 / L2 norm / cosine / prob-drop
@@ -56,14 +55,10 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
   `tab:utility`. The verifier checks the extraction column against the headline sources; the
   Δppl column follows the utility ratios above.
 
-- **Qwen2.5-0.5B AWQ headline cell** (0.0%) is not present in `qwen_extra_pooled_qwen05b.json`
-  (the pooled file has no AWQ entry for this backbone), so it is SKIP-listed. Every other cell
-  of that pool (BF16/Q8\_0/Q5\_K\_M/Q4\_K\_M) verifies exactly.
-
-- **LoRA BF16 3-seed pooled cells** (23.3 / 25.7 / 28.0%) have no single committed pooled file;
-  only per-seed extraction logs are shipped. The verifier checks the LoRA 4-bit cells that the
-  paper's claim rests on (Q4\_K\_M and AWQ = 0 at seed 42, and the lr=2e-4 knob row) and
-  SKIP-lists the BF16 pooled values.
+- **Pools without aggregate files are recomputed from their sources.** The Qwen2.5-0.5B AWQ
+  headline cell and the LoRA BF16/Q5\_K\_M three-seed cells are pooled from the committed
+  extraction JSONL files. Their denominators come from the distinct G1 canary identifiers in
+  each seed, so missing or partial source logs cannot silently become a zero.
 
 - **Datasets are resolved by Hugging Face id with no pinned revision or checksum.** Enron
   (`snoop2head/enron_aeslc_emails`), WikiText-2, and Wikipedia are downloaded implicitly on
@@ -85,19 +80,14 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
 ## 2. Automatic verification results
 
 <!-- AUTO:VERIFY:BEGIN -->
-_Last verification: **136 pass / 0 fail**, 5 skip, out of 141 checked paper numbers._
+_Last verification: **141 pass / 0 fail**, 0 skip, out of 141 checked paper numbers._
 
 ### PASS
 
-136 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
+141 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
 
 ### SKIP (documented, not verified for exact equality)
 
 | key | paper | reason |
 |---|---|---|
-| `headline_greedy_ge10_extraction_pct.fullft.qwen0_5b.awq` | 0.0 | source artifact absent |
-| `headline_greedy_ge10_extraction_pct.lora.qwen0_5b.bf16` | 23.3 | no recomputable artifact / derived or prior-work value |
-| `headline_greedy_ge10_extraction_pct.lora.llama1b.bf16` | 25.7 | no recomputable artifact / derived or prior-work value |
-| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.bf16` | 28.0 | no recomputable artifact / derived or prior-work value |
-| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.q5_k_m` | 9.0 | no recomputable artifact / derived or prior-work value |
 <!-- AUTO:VERIFY:END -->

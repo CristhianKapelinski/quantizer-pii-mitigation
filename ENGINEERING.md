@@ -47,7 +47,9 @@ and the pooled statistics from the committed extraction logs, then *asserts*:
 
 It re-renders the five figures on the way, and exits non-zero if any stage
 fails. Figure rendering is deterministic: `SOURCE_DATE_EPOCH` is fixed, so
-repeated runs produce byte-identical PDFs.
+repeated runs produce identical plotted values. Raw PDF bytes are not used as
+the cross-backend correctness boundary because serializers may encode metadata
+differently.
 
 **`reproduce.sh` (GPU, long).** Re-runs the pipeline per experiment
 (`bash reproduce.sh --list`). Every step is idempotent and skips work whose
@@ -75,7 +77,7 @@ against.
 - Known gaps, kept honest rather than papered over: HuggingFace model and
   dataset ids are pinned by id but not by revision SHA, and the GGUF-logit
   mechanism split (`scripts/exp_mech_q4km_split.sh`) needs `llama-cpp-python`,
-  which is not part of the locked environment. Both are listed in
+  which is provided by the locked optional `mechanism` extra. Both are listed in
   `docs/REPRODUCIBILITY_REPORT.md`.
 
 ## 5. Tests
