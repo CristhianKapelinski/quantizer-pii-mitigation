@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 """Combined Figure: verbatim + MIA AUC bars + score distributions in one
-wide row (4 panels)."""
+wide row (4 panels).
+
+NOT USED BY THE PAPER. Panels (c) and (d) do NOT plot measured score
+distributions: they draw Gaussians at the measured group means with
+hard-coded standard deviations (0.7 / 1.0 / 0.8), because the per-sequence
+Min-K% scores for the in-distribution protocol were never written out.
+The figure was therefore dropped from the manuscript; the measured group
+means it was built from (-0.03, -6.12, -3.49, -9.15) are reported in the
+text instead. Kept here only for provenance -- do not present its output
+as measured data.
+"""
+
 
 import matplotlib
 matplotlib.use("Agg")
