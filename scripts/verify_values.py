@@ -165,7 +165,7 @@ def build_resolvers(r: R):
     res["calib_vs_free_3seed_ge10_pct.awq_g128"] = lambda: (lambda d: None if d is None else float(d.get("reference_awq_enron_g1", 0)))(r.get("exp_gptq_4bit/metrics.json"))
     res["calib_vs_free_3seed_ge10_pct.gptq_g128"] = lambda: (lambda d: None if d is None else float(d.get("greedy_ge10")))(r.get("exp_gptq_4bit/metrics.json"))
 
-    # tab:saliency
+    # sec:mechanism
     def sal(cell, field):
         d = r.get("exp_saliency_2x2/metrics.json")
         return None if d is None else d["results"][cell][field]
@@ -175,7 +175,7 @@ def build_resolvers(r: R):
         for fk, field in fmap.items():
             res[f"saliency_ablation.{ck}.{fk}"] = (lambda cell=cell, field=field: sal(cell, field))
 
-    # tab:mia-indist
+    # sec:threat-split
     def mia(vkey, probe):
         d = r.get("exp_mia_indist/metrics.json")
         return None if d is None else d["versions"][vkey][probe]["auc"]
@@ -187,7 +187,7 @@ def build_resolvers(r: R):
             for score in ("mink", "minkpp", "loss"):
                 res[f"mia_auc.{prot}.{v}.{score}"] = (lambda vk=vk, pb=PB[prot][score]: mia(vk, pb))
 
-    # tab:downstream
+    # sec:utility
     def dsn(model, task):
         d = r.get("exp_downstream/metrics.json")
         return None if d is None else d["results"][model][task]
@@ -206,7 +206,7 @@ def build_resolvers(r: R):
         res[f"downstream_accuracy_pct.delta.{tk}"] = (lambda tv=tv: (r.get("exp_downstream/metrics.json") or {}).get("delta_awq_minus_bf16", {}).get(tv))
     res["downstream_accuracy_pct.delta.mean"] = lambda: (None if dsn_mean("AWQ-4bit") is None else dsn_mean("AWQ-4bit") - dsn_mean("BF16"))
 
-    # tab:natcan
+    # sec:natural-canaries
     def nat(rel, version, field):
         d = r.get(rel)
         if d is None:
@@ -223,7 +223,7 @@ def build_resolvers(r: R):
             res[f"natural_canary_member_nonmember.{mk}.{vk}.member"] = (lambda rel=rel, vv=vv: nat(rel, vv, "member_rate"))
             res[f"natural_canary_member_nonmember.{mk}.{vk}.nonmem"] = (lambda rel=rel, vv=vv: nat(rel, vv, "nonmember_rate"))
 
-    # tab:utility -- perplexity ratios.
+    # sec:utility -- perplexity ratios.
     # 1B: 3-seed mean of the per-seed ratios (GGUF rows against the f16-GGUF
     # baseline, HF rows against BF16-HF; the conventions are recorded in the
     # file). 3B/7B: single-seed AWQ/BF16, both measured with the HF backend.
@@ -251,7 +251,7 @@ def build_resolvers(r: R):
             res[f"perplexity_ratio.{mk}.awq.{dk}"] = (
                 lambda rel=rel, dv=dv: ppl_ratio(rel, dv, "awq_canary_free"))
 
-    # tab:defense-pareto -- extraction column reuses headline sources
+    # tab:headline -- extraction column reuses headline sources
     res["defense_pareto.bf16.extraction"] = lambda: r.pooled_rate(P5, "bf16")
     res["defense_pareto.q4_k_m.extraction"] = lambda: r.pooled_rate(P5, "q4_k_m")
     res["defense_pareto.awq_1b.extraction"] = lambda: r.pooled_rate(P5, "awq_4bit")

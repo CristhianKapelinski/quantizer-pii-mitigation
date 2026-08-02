@@ -37,8 +37,8 @@ FAILED=()   # names of the stages that did not succeed
 fail () { FAILED+=("$1"); echo "  FAILED: $1"; }
 
 render_figures () {
-  echo "== regenerating the 5 paper figures into experiment/figures/ =="
-  for f in fig_quant_variants fig_dose_response fig_crossfamily fig_mechanism fig_mia_combined; do
+  echo "== regenerating the paper figure into experiment/figures/ =="
+  for f in fig_story; do
     if "$PY" scripts/$f.py; then echo "  ok: $f"; else fail "$f"; fi
   done
 }
@@ -122,23 +122,23 @@ probes = [
  ("wave_1_llama32_3b_fullft_seed42/extraction.jsonl", "tab:headline -- Llama-3.2-3B FT (seed 42)"),
  ("wave_1_qwen25_7b_seed42/extraction.jsonl",         "tab:headline -- Qwen2.5-7B FT (seed 42)"),
  ("wave_1_llama3b_lora_seed42/extraction.jsonl",      "tab:headline -- Llama-3.2-3B LoRA (seed 42)"),
- ("wave_1_llama3b_lora_seed42_lr2e4/extraction.jsonl","crossfamily -- 3B LoRA delta knob (lr 2e-4)"),
- ("step_8_gguf_lowbit/metrics.json",       "fig:dose-response -- Q3_K_M / Q2_K points"),
- ("step_8b_q4ks/metrics.json",             "fig:dose-response -- Q4_K_S boundary point"),
- ("reviewer_polish/m10_threshold_sensitivity.json", "fig:dose-response -- per-threshold counts"),
+ ("wave_1_llama3b_lora_seed42_lr2e4/extraction.jsonl","sec:crossfamily -- 3B LoRA delta knob (lr 2e-4)"),
+ ("step_8_gguf_lowbit/metrics.json",       "fig:story(a) -- Q3_K_M / Q2_K points"),
+ ("step_8b_q4ks/metrics.json",             "fig:story(a) -- Q4_K_S boundary point"),
+ ("reviewer_polish/m10_threshold_sensitivity.json", "fig:story(a) -- per-threshold counts"),
  ("step_7_awq_granularity/metrics.json",   "tab:awq-sweep -- AWQ g32 / g64 / g128"),
  ("exp_gptq_4bit/metrics.json",            "tab:gptq -- GPTQ-4bit vs AWQ vs Q4_K_M"),
- ("exp_saliency_2x2/metrics.json",         "tab:saliency -- AWQ calibration 2x2"),
+ ("exp_saliency_2x2/metrics.json",         "sec:mechanism -- AWQ calibration 2x2"),
  ("exp_semantic_similarity/metrics.json",  "sec:asymmetry -- All-MPNet cosine"),
  ("exp_stronger_attacker/metrics.json",    "sec:asymmetry -- any-of-n stress test"),
  ("exp_mechanism_multiseed/summary.json",  "tab:threefactor -- pooled FLIP rates"),
- ("exp_mia_indist/metrics.json",           "tab:mia-indist -- Min-K% AUC, OOD vs in-distribution"),
+ ("exp_mia_indist/metrics.json",           "sec:threat-split -- Min-K% AUC, OOD vs in-distribution"),
  ("exp_tpr_at_fpr/metrics.json",           "sec:threat-split -- LiRA TPR @ FPR=1%"),
  ("exp_minkpp_reconciliation/metrics.json","sec:threat-split -- Min-K% / Min-K%++ / loss AUC"),
- ("exp_downstream/metrics.json",           "tab:downstream -- zero-shot accuracy"),
- ("wave_1_utility/ppl.json",               "tab:utility -- perplexity ratios (seed 42)"),
- ("wave_1_llama32_3b_fullft_seed42/natural_canaries_compare.json", "tab:natcan -- 3B real-PII gap"),
- ("wave_1_qwen25_7b_seed42/natural_canaries_compare.json",         "tab:natcan -- 7B real-PII gap"),
+ ("exp_downstream/metrics.json",           "sec:utility -- zero-shot accuracy"),
+ ("wave_1_utility/ppl.json",               "sec:utility -- perplexity ratios (seed 42)"),
+ ("wave_1_llama32_3b_fullft_seed42/natural_canaries_compare.json", "sec:natural-canaries -- 3B real-PII gap"),
+ ("wave_1_qwen25_7b_seed42/natural_canaries_compare.json",         "sec:natural-canaries -- 7B real-PII gap"),
  ("step_9_zhang_nl_replication/metrics.json", "sec:threat-split -- unlearning null (ROUGE-L)"),
  ("exp_acr/metrics.json",                  "sec:limitations -- Adversarial Compression Ratio (null)"),
 ]
@@ -163,8 +163,7 @@ echo "== (5) verifying the published paper numbers against the committed logs ==
 "$PY" scripts/verify_values.py || fail "published-number verification"
 
 echo
-echo "Figures are in experiment/figures/ (fig_quant_variants, fig_dose_response,"
-echo "fig_crossfamily, fig_mechanism, fig_mia_combined). The '*.replay.json' files are"
-echo "the freshly recomputed metrics kept next to the committed ones for inspection;"
-echo "they are gitignored."
+echo "The paper figure is in experiment/figures/ (fig_story.pdf, fig_story.png)."
+echo "The '*.replay.json' files are the freshly recomputed metrics kept next to the"
+echo "committed ones for inspection; they are gitignored."
 finish

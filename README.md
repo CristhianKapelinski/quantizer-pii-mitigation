@@ -57,10 +57,10 @@ Repository layout:
 |-- src/qquilt/                  the package: canaries, data, train, quantize, extract,
 |                                metrics, utility, groups, unlearn, seed, ...
 |-- scripts/                     per-experiment drivers (exp_*.sh / exp_*.py / step_*.sh),
-|                                the 5 figure scripts (fig_*.py), verify_values.py,
+|                                the paper figure script (fig_story.py), verify_values.py,
 |                                check_replay_equal.py, and build_llama_cpp.sh
 `-- experiment/
-    |-- figures/                 figures rendered by replay.sh / the fig_*.py scripts
+    |-- figures/                 the paper figure, rendered by replay.sh / fig_story.py
     `-- results/                 pre-computed result logs (extraction.jsonl, metrics.json,
                                  train_steps.jsonl, delta_norm.json, *.json), plus
                                  INDEX.md (table <-> dir map) and SCHEMA.md (JSONL schemas)
@@ -211,25 +211,34 @@ To confirm the artifact is correctly installed before any long run:
 bash replay.sh --figures-only      # measured ~5 s on the reference host, no GPU, no download
 ```
 
-Expected result: the 5 paper figures are re-rendered into
+Expected result: the paper's figure (Figure `fig:story`) is re-rendered into
 `experiment/figures/` from the committed logs, and the script ends with:
 
 ```
-== regenerating the 5 paper figures into experiment/figures/ ==
-saved fig_quant_variants
-  ok: fig_quant_variants
-saved fig_dose_response.{pdf,png}
-  ok: fig_dose_response
-saved fig_crossfamily.{pdf,png}
-  ok: fig_crossfamily
-saved: <repo>/experiment/figures/fig_mechanism.pdf
-saved: <repo>/experiment/figures/fig_mechanism.png
-  ok: fig_mechanism
-saved fig_mia_combined
-  ok: fig_mia_combined
+== regenerating the paper figure into experiment/figures/ ==
+saved fig_story  |  isotropic=0.0028
+  cos ('AWQ', 'Body') 0.00784
+  cos ('AWQ', 'Enron') 0.0017
+  cos ('AWQ', 'Recall') 0.00936
+  cos ('Q4_K_M', 'Body') 0.00489
+  cos ('Q4_K_M', 'Enron') 0.00179
+  cos ('Q4_K_M', 'Recall') 0.00639
+  flip ('AWQ', 'Body') 0.0
+  flip ('AWQ', 'Enron') 30.3
+  flip ('AWQ', 'Recall') 78.3
+  flip ('Q4_K_M', 'Body') 0.3
+  flip ('Q4_K_M', 'Enron') 17.3
+  flip ('Q4_K_M', 'Recall') 47.7
+  conf {'Recall': 0.7083, 'Body': 0.9998, 'Enron': 0.5531}
+  ok: fig_story
 
 RESULT: OK -- every requested replay stage passed.
 ```
+
+The printed `cos` and `flip` values are the panel-(b) and panel-(c) bars, and
+they are the same numbers published in Table `tab:threefactor` (0.00936 ->
+0.0094; 78.3 -> 78; 47.7 -> 48), so the figure and the table can be checked
+against each other directly.
 
 The plotted values are deterministic and checked against the logs. PDF bytes
 may differ across Matplotlib or PDF-backend builds because of serialization
@@ -283,7 +292,7 @@ end-to-end totals, since none was measured.
 [`scripts/exp_stats_aggregation.py`](scripts/exp_stats_aggregation.py)),
 requires every recomputed field to be identical to the committed one
 ([`scripts/check_replay_equal.py`](scripts/check_replay_equal.py)), prints each
-paper table next to the result file it came from, regenerates the 5 figures,
+paper table next to the result file it came from, regenerates the paper figure,
 and verifies every published number against the logs
 ([`scripts/verify_values.py`](scripts/verify_values.py)) -- all from the
 committed logs, no GPU. It exits non-zero if any stage fails. The full
@@ -332,7 +341,8 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
   * Config / flags: seeds and hyperparameters in `EXPERIMENT_MANIFEST.yaml`.
   * Expected result: AWQ and GPTQ show a much lower verbatim-extraction rate
     than Q4_K_M at the same bit-rate, across all backbones and regimes
-    (Table `tab:headline`, Figures `fig:crossfamily` and `fig:dose-response`).
+    (Table `tab:headline`; the bit-rate dose-response is panel (a) of Figure
+    `fig:story`).
 * **Numbers-only check** -- `bash replay.sh` (measured ~7 s, no GPU) prints
   Table `tab:headline` recomputed from the committed logs.
 
@@ -340,8 +350,9 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
 
 * **Reduced version** -- `bash replay.sh`
   * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
-  * Re-derives Tables `tab:threefactor` and `tab:saliency` and Figure
-    `fig:mechanism` from the committed mechanism logs.
+  * Re-derives Table `tab:threefactor`, the saliency ablation (reported as
+    prose in the mechanism section), and panels (b) and (c) of Figure
+    `fig:story` from the committed mechanism logs.
   * Expected result: the three factors (rare-token noise concentration,
     moderate-confidence window, calibration-induced amplification) match the
     paper.
@@ -351,43 +362,44 @@ Below, each of the paper's five claims (C1-C5) has a **reduced version**
   * Note: the mechanism experiments analyze a fine-tuned checkpoint; run
     `bash reproduce.sh headline` first (or `quick` for a smaller checkpoint)
     so a checkpoint exists.
-  * Expected result: reproduces Table `tab:threefactor`, Figure
-    `fig:mechanism`, and Table `tab:saliency`.
+  * Expected result: reproduces Table `tab:threefactor`, panels (b) and (c) of
+    Figure `fig:story`, and the saliency ablation.
 
 ## Claim 3 -- The prior "methods-are-equivalent" MIA result is an out-of-distribution non-member artifact
 
 * **Reduced version** -- `bash replay.sh`
   * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
-  * Re-derives Table `tab:mia-indist` and Figure `fig:mia-combined` from the
-    committed MIA logs.
+  * Re-derives the in-distribution membership-inference AUCs (reported as
+    prose in the threat-split section) from the committed MIA logs.
 * **Full version** -- `bash reproduce.sh mia`
   * Time: not instrumented. Hardware: 16 GB-class GPU. Disk: ~10 GB.
   * Expected result: with in-distribution non-members and with LiRA
     (TPR@FPR=1%), the gap between quantizers holds, unlike with
-    out-of-distribution non-members (Table `tab:mia-indist`, Figure
-    `fig:mia-combined`).
+    out-of-distribution non-members.
 
 ## Claim 4 -- The AWQ utility cost falls with scale, making it nearly free at production scale
 
 * **Reduced version** -- `bash replay.sh`
   * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
-  * Re-derives Tables `tab:utility` and `tab:downstream` from the committed
+  * Re-derives the perplexity ratio and downstream task accuracy (both reported
+    as prose in `sec:utility`) from the committed
     perplexity and benchmark logs.
 * **Full version** -- `bash reproduce.sh utility downstream`
   * Time: not instrumented. Hardware: 16 GB-class GPU. Disk: ~20 GB.
   * Expected result: the AWQ accuracy loss shrinks as the model grows,
-    becoming negligible at production scale (Tables `tab:utility` and
-    `tab:downstream`).
+    becoming negligible at production scale (prose, `sec:utility`).
 
 ## Claim 5 -- On real Enron PII the member/non-member gap is small and AWQ collapses it
 
 * **Reduced version** -- `bash replay.sh`
   * Time: measured ~7 s on the reference host. Hardware: any CPU, no GPU.
-  * Re-derives Table `tab:natcan` from the committed natural-canary logs.
+  * Re-derives the natural-PII member/non-member rates (prose,
+    `sec:natural-canaries`) from the committed natural-canary logs.
 * **Full version** -- `bash reproduce.sh natural_canaries`
   * Time: not instrumented. Hardware: 16 GB-class GPU. Disk: ~10 GB.
   * Expected result: on real Enron PII (instance frequency <= 3) the
-    member/non-member gap is small and AWQ collapses it (Table `tab:natcan`).
+    member/non-member gap is small and AWQ collapses it (prose,
+    `sec:natural-canaries`).
 
 **Full reproduction.** `bash reproduce.sh` with no arguments runs, in order:
 the 8 headline cells, the quantizer ablations (GGUF dose-response, AWQ
@@ -399,23 +411,24 @@ fine-tune-phase table above, ~37 h summed on a 16 GB GPU); the remaining
 quantization, extraction and analysis steps are not instrumented.
 
 **Paper item -> script -> results mapping** (for the reviewer to locate the
-origin of each number):
+origin of each number). The paper reports several of these results as prose
+rather than as a table, so the first column names the section that states the
+number when there is no table label to cite:
 
 | Paper item | Driver script | Results dir(s) | Figure script |
 |---|---|---|---|
 | Table `tab:headline` | `exp_3seed_replication.sh`, `exp_5seed_extra.sh`, `exp_extra_run.sh` | `wave_1_mini/`, `wave_1_seed{52,62,72,82}/`, `wave_1_qwen05b_seed*/`, `wave_1_qwen15b_seed*/`, `wave_1_llama32_3b_fullft_seed42/`, `wave_1_qwen25_7b_seed42/`, `wave_1_*_lora_seed*/` | -- |
-| Fig `fig:crossfamily` | (same as `tab:headline`) | (same) | `fig_crossfamily.py` |
-| Fig `fig:dose-response` | `step_8_gguf_lowbit_extension.sh`, `step_8b_q4ks.sh`, `exp_reviewer_polish.py` | `step_8_gguf_lowbit/`, `step_8b_q4ks/`, `reviewer_polish/` | `fig_dose_response.py` |
-| Fig `fig:quant-variants` | -- (bpw values) | -- | `fig_quant_variants.py` |
+| Fig `fig:story` panel (a) -- bit-rate dose-response | `step_8_gguf_lowbit_extension.sh`, `step_8b_q4ks.sh`, `exp_reviewer_polish.py` | `step_8_gguf_lowbit/`, `step_8b_q4ks/`, `reviewer_polish/` | `fig_story.py` |
+| Fig `fig:story` panels (b), (c) -- error alignment and FLIP rate | `exp_bucket_collapse_canary_v2.py`, `exp_mechanism_*.py/.sh` | `exp_mechanism*/` | `fig_story.py` |
 | Table `tab:awq-sweep` | `step_7_awq_granularity_sweep.sh` | `step_7_awq_granularity/` | -- |
 | Table `tab:gptq` | `exp_gptq_4bit.sh`, `exp_gptq_multiseed.sh` | `exp_gptq_4bit/`, `exp_gptq_seed{52,62}/` | -- |
-| Table `tab:saliency` | `exp_saliency_2x2.sh`, `step_5_awq_canary100.sh`, `step_6_awq_wikitext.sh` | `exp_saliency_2x2/`, `step_5_awq_canary100/`, `step_6_awq_wikitext/` | -- |
-| Table `tab:threefactor` | `exp_bucket_collapse_canary_v2.py`, `exp_mechanism_*.py/.sh` | `exp_mechanism*/` | `fig_mechanism.py` |
-| Table `tab:mia-indist` | `exp_minkpp_reconciliation.py`, `exp_mia_indist_nonmembers.py`, `exp_tpr_at_low_fpr.py` | `exp_mia_indist/`, `exp_tpr_at_fpr/`, `exp_minkpp_reconciliation/` | `fig_mia_combined.py` |
-| Table `tab:downstream` | `exp_downstream_utility.sh` | `exp_downstream/` | -- |
-| Table `tab:utility` | `exp_utility_3seed_fold.sh`, `utility_eval.sh` | `wave_1_utility/`, `wave_1_utility_seed{52,62}/` | -- |
-| Table `tab:natcan` | `exp_natural_canaries.py`, `exp_natural_canaries_compare.py` | `wave_1_llama32_3b_fullft_seed42/`, `wave_1_qwen25_7b_seed42/`, `natural_canaries/` | -- |
-| Table `tab:defense-pareto` | (derived from `tab:headline` + `tab:utility`) | -- | -- |
+| Table `tab:threefactor` | `exp_bucket_collapse_canary_v2.py`, `exp_mechanism_*.py/.sh` | `exp_mechanism*/` | `fig_story.py` |
+| Table `tab:datasets` (appendix) | -- (corpus metadata) | -- | -- |
+| Prose `sec:mechanism` -- calibration-content ablation | `exp_saliency_2x2.sh`, `step_5_awq_canary100.sh`, `step_6_awq_wikitext.sh` | `exp_saliency_2x2/`, `step_5_awq_canary100/`, `step_6_awq_wikitext/` | -- |
+| Prose `sec:threat-split` -- in-distribution MIA AUCs | `exp_minkpp_reconciliation.py`, `exp_mia_indist_nonmembers.py`, `exp_tpr_at_low_fpr.py` | `exp_mia_indist/`, `exp_tpr_at_fpr/`, `exp_minkpp_reconciliation/` | -- |
+| Prose `sec:utility` -- downstream task accuracy | `exp_downstream_utility.sh` | `exp_downstream/` | -- |
+| Prose `sec:utility` -- perplexity ratio | `exp_utility_3seed_fold.sh`, `utility_eval.sh` | `wave_1_utility/`, `wave_1_utility_seed{52,62}/` | -- |
+| Prose `sec:natural-canaries` -- natural-PII member/non-member rates | `exp_natural_canaries.py`, `exp_natural_canaries_compare.py` | `wave_1_llama32_3b_fullft_seed42/`, `wave_1_qwen25_7b_seed42/`, `natural_canaries/` | -- |
 
 `experiment/results/INDEX.md` gives the per-directory breakdown;
 `experiment/results/SCHEMA.md` documents the JSONL schemas.

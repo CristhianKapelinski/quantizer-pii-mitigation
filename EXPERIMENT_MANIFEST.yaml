@@ -85,7 +85,7 @@ datasets:
     source: huggingface
     hf_id: wikitext
     config: wikitext-2-raw-v1
-    notes: "OOD perplexity evaluation (Table tab:utility) and the WikiText AWQ-calibration cell (Table tab:saliency)."
+    notes: "OOD perplexity evaluation (prose sec:utility) and the WikiText AWQ-calibration cell (prose sec:mechanism)."
 
 # ---------------------------------------------------------------------------
 # Canaries -- planted synthetic PII, per Carlini-style canary protocol.

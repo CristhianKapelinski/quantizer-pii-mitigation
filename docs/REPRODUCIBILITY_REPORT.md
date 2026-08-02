@@ -20,14 +20,16 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
 
 ## 1. Known limitations and lineage notes
 
-- **Figures load their numbers from the logs.** All five figure scripts now read the values
-  they plot from the committed result JSONs. `fig_dose_response.py` reads
-  `reviewer_polish/m10_threshold_sensitivity.json`; `fig_crossfamily.py`, `fig_mia_combined.py`,
-  `fig_mechanism.py`, and `fig_quant_variants.py` obtain their values from `scripts/_fig_data.py`,
-  a single loader that recomputes each number from the logs and self-checks (`python
-  scripts/_fig_data.py`) that every loadable value equals the published one. The verifier
-  pools cells without a dedicated aggregate file directly from their committed per-seed
-  JSONL logs. Two plotting-only `tab:threefactor` values remain documented constants in
+- **The figure loads its numbers from the logs.** The paper has one figure, `fig:story`,
+  rendered by `scripts/fig_story.py`; nothing in it is hardcoded. Panel (a) reads
+  `reviewer_polish/m10_threshold_sensitivity.json`; panels (b) and (c) read
+  `exp_mechanism_multiseed/` and `exp_mechanism_local_replication/`. Its printed `cos` and
+  `flip` values are the same quantities published in `tab:threefactor`, so the figure and
+  the table cross-check each other. `scripts/_fig_data.py` remains as an independent
+  paper-number cross-check: it recomputes each published value from the logs and self-checks
+  (`python scripts/_fig_data.py`) that every loadable value equals the published one. The
+  verifier pools cells without a dedicated aggregate file directly from their committed
+  per-seed JSONL logs. Two `tab:threefactor` values remain documented constants in
   `_fig_data.py`; their published values have separate resolvers. GGUF/GPTQ effective
   bits-per-weight are format-defined constants, not measured quantities.
 
@@ -43,16 +45,16 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
   reported confidence intervals and reflect different legitimate pools, not arithmetic errors,
   so the table is SKIP-listed rather than force-matched or silently "corrected".
 
-- **`tab:utility` perplexity ratios are verified, with one exception.** The 1B ratios are the
+- **`sec:utility` perplexity ratios are verified, with one exception.** The 1B ratios are the
   3-seed means stored in `wave_1_utility/ppl_3seed_mean.json` (GGUF rows against the f16-GGUF
   baseline, HF rows against BF16-HF; the file records both conventions), and the 3B/7B AWQ
   ratios are recomputed from the per-cell `utility/ppl.json`. All twelve published ratios match
   exactly. The 3B in-domain AWQ ratio (8.6184/8.4361 = 1.0216, printed as **1.022**) was the one
   exception until the paper cell, which read 1.021, was corrected to the rounded value.
 
-- **`tab:defense-pareto` has no dedicated result file.** Its extraction column is derived from
+- **`tab:headline` has no dedicated result file.** Its extraction column is derived from
   `tab:headline` (BF16 26.6%, Q4\_K\_M 4.0%, AWQ 0.0/3.0/6.0%) and its Δppl column from
-  `tab:utility`. The verifier checks the extraction column against the headline sources; the
+  `sec:utility`. The verifier checks the extraction column against the headline sources; the
   Δppl column follows the utility ratios above.
 
 - **Pools without aggregate files are recomputed from their sources.** The Qwen2.5-0.5B AWQ

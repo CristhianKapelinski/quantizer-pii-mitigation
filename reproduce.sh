@@ -100,7 +100,7 @@ exp_headline () {
 
 exp_ablations () {
   echo "[reproduce] ablations: GGUF dose-response, AWQ group-size sweep, GPTQ"
-  run_sh scripts/step_8_gguf_lowbit_extension.sh # Q3_K_M / Q2_K  (Fig fig:dose-response)
+  run_sh scripts/step_8_gguf_lowbit_extension.sh # Q3_K_M / Q2_K  (Fig fig:story(a))
   run_sh scripts/step_8b_q4ks.sh                 # Q4_K_S boundary point
   run_sh scripts/step_7_awq_granularity_sweep.sh # AWQ g32/g64/g128 (Table tab:awq-sweep)
   run_sh scripts/exp_gptq_4bit.sh                # GPTQ seed 42    (Table tab:gptq)
@@ -108,14 +108,14 @@ exp_ablations () {
 }
 
 exp_saliency () {
-  echo "[reproduce] saliency: AWQ calibration-distribution 2x2 (Table tab:saliency)"
+  echo "[reproduce] saliency: AWQ calibration-distribution 2x2 (prose sec:mechanism)"
   run_sh scripts/step_5_awq_canary100.sh         # 100% canary calibration
   run_sh scripts/step_6_awq_wikitext.sh          # WikiText OOD calibration
   run_sh scripts/exp_saliency_2x2.sh             # the 2x2 grid
 }
 
 exp_mechanism () {
-  echo "[reproduce] mechanism: five controlled experiments E1-E5 (Table tab:threefactor, Fig fig:mechanism)"
+  echo "[reproduce] mechanism: five controlled experiments E1-E5 (Table tab:threefactor, Fig fig:story(b,c))"
   run_py scripts/exp_bucket_collapse_canary_v2.py   # E1 weight survival
   run_py scripts/exp_mechanism_per_layer.py         # E2 per-layer residual
   run_py scripts/exp_mechanism_softmax_fragility.py # E3 softmax fragility
@@ -128,22 +128,22 @@ exp_mechanism () {
 exp_mia () {
   echo "[reproduce] mia: membership-inference reconciliation"
   run_py scripts/exp_minkpp_reconciliation.py    # Min-K% / Min-K%++ / loss AUC
-  run_py scripts/exp_mia_indist_nonmembers.py    # in-distribution non-member protocol (Table tab:mia-indist)
+  run_py scripts/exp_mia_indist_nonmembers.py    # in-distribution non-member protocol (prose sec:threat-split)
   run_py scripts/exp_tpr_at_low_fpr.py           # LiRA TPR @ FPR=1%
 }
 
 exp_utility () {
-  echo "[reproduce] utility: perplexity ratios across seeds (Table tab:utility)"
+  echo "[reproduce] utility: perplexity ratios across seeds (prose sec:utility)"
   run_sh scripts/exp_utility_3seed_fold.sh       # perplexity ratios, 3 seeds
 }
 
 exp_downstream () {
-  echo "[reproduce] downstream: ARC-e / HellaSwag / WinoGrande (Table tab:downstream)"
+  echo "[reproduce] downstream: ARC-e / HellaSwag / WinoGrande (prose sec:utility)"
   run_sh scripts/exp_downstream_utility.sh
 }
 
 exp_natural_canaries () {
-  echo "[reproduce] natural_canaries: real-PII member/non-member mining (Table tab:natcan)"
+  echo "[reproduce] natural_canaries: real-PII member/non-member mining (prose sec:natural-canaries)"
   run_py scripts/exp_natural_canaries.py         # real-PII member/non-member mining
   run_py scripts/exp_natural_canaries_compare.py # member-vs-non-member gap
 }
@@ -193,12 +193,12 @@ EXP_ORDER=(headline ablations saliency mechanism mia utility downstream natural_
 declare -A EXP_DESC=(
   [headline]="8 (backbone, regime) extraction cells -- Table tab:headline"
   [ablations]="GGUF dose-response, AWQ group-size sweep, GPTQ -- Figs/Tables dose-response, awq-sweep, gptq"
-  [saliency]="AWQ calibration-distribution 2x2 refutation -- Table tab:saliency"
-  [mechanism]="five controlled mechanism experiments E1-E5 -- Table tab:threefactor, Fig fig:mechanism"
-  [mia]="membership-inference reconciliation (Min-K%, LiRA TPR@FPR) -- Table tab:mia-indist"
-  [utility]="perplexity ratios across 3 seeds -- Table tab:utility"
-  [downstream]="ARC-e / HellaSwag / WinoGrande accuracy -- Table tab:downstream"
-  [natural_canaries]="real-PII member/non-member mining -- Table tab:natcan"
+  [saliency]="AWQ calibration-distribution 2x2 refutation -- prose sec:mechanism"
+  [mechanism]="five controlled mechanism experiments E1-E5 -- Table tab:threefactor, Fig fig:story(b,c)"
+  [mia]="membership-inference reconciliation (Min-K%, LiRA TPR@FPR) -- prose sec:threat-split"
+  [utility]="perplexity ratios across 3 seeds -- prose sec:utility"
+  [downstream]="ARC-e / HellaSwag / WinoGrande accuracy -- prose sec:utility"
+  [natural_canaries]="real-PII member/non-member mining -- prose sec:natural-canaries"
   [support]="supporting analyses + 5-seed pooled statistics"
   [figures]="regenerate the 5 paper figures from current logs"
 )

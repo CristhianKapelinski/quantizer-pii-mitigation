@@ -12,7 +12,7 @@ reproduces exactly and what does not).
 | Path | Responsibility |
 |---|---|
 | [`src/qquilt/`](src/qquilt) | The library. One module per stage: `canaries` (planted PII), `data` (corpus assembly), `train` (full FT / LoRA), `quantize` (GGUF via llama.cpp, AWQ, GPTQ), `extract` (multi-version verbatim probe), `metrics` (extraction metrics), `utility` (perplexity), `groups` (G2/G3 controls), `unlearn`, `dp_sgd`, `preflight`, `seed`. |
-| [`scripts/`](scripts) | One driver per paper experiment (`exp_*`, `step_*`), the five figure scripts (`fig_*.py`) with their shared data loader [`_fig_data.py`](scripts/_fig_data.py), the two checkers [`check_replay_equal.py`](scripts/check_replay_equal.py) and [`verify_values.py`](scripts/verify_values.py), and [`build_llama_cpp.sh`](scripts/build_llama_cpp.sh). |
+| [`scripts/`](scripts) | One driver per paper experiment (`exp_*`, `step_*`), the paper figure script [`fig_story.py`](scripts/fig_story.py) and the paper-number cross-check loader [`_fig_data.py`](scripts/_fig_data.py), the two checkers [`check_replay_equal.py`](scripts/check_replay_equal.py) and [`verify_values.py`](scripts/verify_values.py), and [`build_llama_cpp.sh`](scripts/build_llama_cpp.sh). |
 | [`experiment/results/`](experiment/results) | The run of record: per-seed extraction logs, metrics, training telemetry. Every published number is computed from here. |
 | [`expected/paper_values.json`](expected/paper_values.json) | The published numbers, transcribed from the camera-ready. The ground truth the artifact is checked against. |
 | [`replay.sh`](replay.sh) / [`reproduce.sh`](reproduce.sh) | The two reproduction paths (see §3). |
@@ -84,7 +84,7 @@ against.
 
 `python -m pytest tests/` runs with no network and no GPU:
 
-- [`tests/test_fig_data.py`](tests/test_fig_data.py) — every value the figures
+- [`tests/test_fig_data.py`](tests/test_fig_data.py) — every value the loader
   plot is recomputed from the logs and equals the published number; the
   greedy-extraction counting rule is exercised on hand-built rows.
 - [`tests/test_verify_values.py`](tests/test_verify_values.py) — the full

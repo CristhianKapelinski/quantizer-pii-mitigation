@@ -37,7 +37,7 @@ dependencies = [
     # Analysis / replay path (figures + statistics; no GPU).
     "matplotlib>=3.8,<4",
     "sentence-transformers>=3.0,<4",
-    # Downstream task-level utility evaluation (Table tab:downstream):
+    # Downstream task-level utility evaluation (prose sec:utility):
     # arc_easy / hellaswag / winogrande via lm-evaluation-harness.
     # Used by scripts/exp_downstream_utility.sh.
     "lm-eval>=0.4.0,<0.5",

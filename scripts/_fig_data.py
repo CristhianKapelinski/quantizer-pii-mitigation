@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
-"""Single source of the numbers the paper figures plot, loaded from the committed
-result logs under experiment/results/ instead of being hardcoded in each figure.
+"""Independent cross-check of the paper's published numbers, loaded from the committed
+result logs under experiment/results/ instead of being hardcoded.
+
+This module does not render anything (the paper's only figure is drawn by fig_story.py,
+which reads the logs directly). It exists so the published values have a second,
+separately-written resolver: a drift in the logs is caught here as well as by
+verify_values.py.
 
 Every value a figure draws is either (a) recomputed here from a committed log, or
 (b) a documented constant that has no single committed artifact because it is a
@@ -65,7 +70,7 @@ def _seed_count(rel, seed, vk) -> int:
 _P5 = "exp_3seed_replication/pooled_stats_5seed.json"
 
 # --------------------------------------------------------------------------
-# fig_crossfamily: tab:headline extraction rates (%), full-FT and LoRA blocks
+# crossfamily(): tab:headline extraction rates (%), full-FT and LoRA blocks
 # --------------------------------------------------------------------------
 def crossfamily():
     def g(rel, v):
@@ -101,7 +106,7 @@ def crossfamily():
 
 
 # --------------------------------------------------------------------------
-# fig_mia_combined: verbatim on the seed-42 checkpoint, Min-K% AUCs, score means
+# mia(): verbatim on the seed-42 checkpoint, Min-K% AUCs, score means (sec:threat-split)
 # --------------------------------------------------------------------------
 def mia():
     mi = _load("exp_mia_indist/metrics.json")["versions"]
@@ -124,7 +129,7 @@ def mia():
 
 
 # --------------------------------------------------------------------------
-# fig_mechanism: three-factor schematic (tab:threefactor)
+# mechanism(): the three-factor cells (tab:threefactor)
 # --------------------------------------------------------------------------
 def mechanism():
     nd = _load("exp_mechanism_noise_direction/metrics.json")["results"]["awq"]
@@ -156,7 +161,7 @@ def mechanism():
 
 
 # --------------------------------------------------------------------------
-# fig_quant_variants: effective bits-per-weight per variant
+# quant_variants(): effective bits-per-weight per variant (fig:story(a) axis)
 # --------------------------------------------------------------------------
 def quant_variants():
     s7 = _load("step_7_awq_granularity/metrics.json")["results"]

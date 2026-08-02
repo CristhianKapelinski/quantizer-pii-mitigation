@@ -146,7 +146,7 @@ versions = [
 ]
 
 tasks = ["arc_easy", "hellaswag", "winogrande"]
-# Paper Table tab:downstream reports plain accuracy (acc,none) for all
+# Paper prose sec:utility reports plain accuracy (acc,none) for all
 # three tasks; fall back to acc_norm,none only if acc,none is absent.
 metric_keys = {
     "arc_easy":   ("acc,none", "acc_norm,none"),

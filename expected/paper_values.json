@@ -1,5 +1,5 @@
 {
-  "_comment": "Ground-truth numbers asserted in the camera-ready main.tex (Overleaf 6a03290ddb965e62955b0dc4). Each entry: {value, source}. The verify resolver maps each key to (artifact, json-path). Numbers with no recomputable artifact (prior-work descriptors, hardware) are omitted here and SKIP-listed in the report.",
+  "_comment": "Ground-truth numbers asserted in the camera-ready main.tex (Overleaf 6a03290ddb965e62955b0dc4). Each entry: {value, source}. 'source' is where the number is PUBLISHED in the paper: a table label, or the section whose prose states it (several tables were folded into prose for the page limit). The verify resolver maps each key to (artifact, json-path). Numbers with no recomputable artifact (prior-work descriptors, hardware) are omitted here and SKIP-listed in the report.",
   "headline_greedy_ge10_extraction_pct": {
     "fullft.qwen0_5b.bf16": {
       "value": 30.3,
@@ -197,51 +197,51 @@
   "saliency_ablation": {
     "A_wikitext.ge5": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "A_wikitext.ge10": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "A_wikitext.anyof6_ge10": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "B_mix.ge5": {
       "value": 3,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "B_mix.ge10": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "B_mix.anyof6_ge10": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "C_canary.ge5": {
       "value": 1,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "C_canary.ge10": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "C_canary.anyof6_ge10": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "D_enron.ge5": {
       "value": 2,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "D_enron.ge10": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     },
     "D_enron.anyof6_ge10": {
       "value": 0,
-      "source": "tab:saliency"
+      "source": "prose sec:mechanism (\"Calibration content has no effect\")"
     }
   },
   "threefactor_logit_error": {
@@ -345,243 +345,243 @@
   "mia_auc": {
     "ood.bf16.mink": {
       "value": 1.0,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "ood.bf16.minkpp": {
       "value": 1.0,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "ood.bf16.loss": {
       "value": 1.0,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "ood.awq.mink": {
       "value": 0.97,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "ood.awq.minkpp": {
       "value": 1.0,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "ood.awq.loss": {
       "value": 0.99,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "indist.bf16.mink": {
       "value": 0.83,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "indist.bf16.minkpp": {
       "value": 0.78,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "indist.bf16.loss": {
       "value": 0.86,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "indist.awq.mink": {
       "value": 0.22,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "indist.awq.minkpp": {
       "value": 0.19,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     },
     "indist.awq.loss": {
       "value": 0.49,
-      "source": "tab:mia-indist"
+      "source": "prose sec:threat-split (\"In-distribution non-member control\")"
     }
   },
   "downstream_accuracy_pct": {
     "bf16.arc": {
       "value": 67.55,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "bf16.hellaswag": {
       "value": 47.76,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "bf16.winogrande": {
       "value": 61.4,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "bf16.mean": {
       "value": 58.9,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "awq.arc": {
       "value": 67.76,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "awq.hellaswag": {
       "value": 45.59,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "awq.winogrande": {
       "value": 62.12,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "awq.mean": {
       "value": 58.49,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "delta.arc": {
       "value": 0.21,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "delta.hellaswag": {
       "value": -2.17,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "delta.winogrande": {
       "value": 0.72,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     },
     "delta.mean": {
       "value": -0.41,
-      "source": "tab:downstream"
+      "source": "prose sec:utility (\"Downstream task accuracy\")"
     }
   },
   "perplexity_ratio": {
     "llama1b.bf16.indomain": {
       "value": 1.0,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama1b.q8_0.indomain": {
       "value": 1.001,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama1b.q5_k_m.indomain": {
       "value": 1.022,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama1b.q5_k_m.ood": {
       "value": 1.012,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama1b.q4_k_m.indomain": {
       "value": 1.047,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama1b.q4_k_m.ood": {
       "value": 1.044,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama1b.awq.indomain": {
       "value": 1.123,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama1b.awq.ood": {
       "value": 1.094,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama3b.awq.indomain": {
       "value": 1.022,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "llama3b.awq.ood": {
       "value": 1.021,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "qwen7b.awq.indomain": {
       "value": 1.002,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     },
     "qwen7b.awq.ood": {
       "value": 1.044,
-      "source": "tab:utility"
+      "source": "prose sec:utility (\"Perplexity across scale\")"
     }
   },
   "natural_canary_member_nonmember": {
     "llama3b.bf16.member": {
       "value": 5,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "llama3b.bf16.nonmem": {
       "value": 3,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "llama3b.q5_k_m.member": {
       "value": 4,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "llama3b.q5_k_m.nonmem": {
       "value": 3,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "llama3b.q4_k_m.member": {
       "value": 4,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "llama3b.q4_k_m.nonmem": {
       "value": 3,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "llama3b.awq.member": {
       "value": 4,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "llama3b.awq.nonmem": {
       "value": 4,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "qwen7b.bf16.member": {
       "value": 10,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "qwen7b.bf16.nonmem": {
       "value": 5,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "qwen7b.q5_k_m.member": {
       "value": 9,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "qwen7b.q5_k_m.nonmem": {
       "value": 4,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "qwen7b.q4_k_m.member": {
       "value": 5,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "qwen7b.q4_k_m.nonmem": {
       "value": 4,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "qwen7b.awq.member": {
       "value": 4,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     },
     "qwen7b.awq.nonmem": {
       "value": 3,
-      "source": "tab:natcan (%)"
+      "source": "prose sec:natural-canaries (%)"
     }
   },
   "defense_pareto": {
     "bf16.extraction": {
       "value": 26.6,
-      "source": "tab:defense-pareto"
+      "source": "tab:headline (defense/utility trade-off view of the same cells)"
     },
     "q4_k_m.extraction": {
       "value": 4.0,
-      "source": "tab:defense-pareto"
+      "source": "tab:headline (defense/utility trade-off view of the same cells)"
     },
     "awq_1b.extraction": {
       "value": 0.0,
-      "source": "tab:defense-pareto"
+      "source": "tab:headline (defense/utility trade-off view of the same cells)"
     },
     "awq_3b.extraction": {
       "value": 3.0,
-      "source": "tab:defense-pareto"
+      "source": "tab:headline (defense/utility trade-off view of the same cells)"
     },
     "awq_7b.extraction": {
       "value": 6.0,
-      "source": "tab:defense-pareto"
+      "source": "tab:headline (defense/utility trade-off view of the same cells)"
     },
     "gptq_1b.extraction": {
       "value": 0.0,
-      "source": "tab:defense-pareto"
+      "source": "tab:headline (defense/utility trade-off view of the same cells)"
     }
   }
 }
