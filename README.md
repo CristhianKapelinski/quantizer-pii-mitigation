@@ -61,7 +61,16 @@ The third machine is the useful check: a different distribution, a much newer ke
 ## Dependencies
 - **Python 3.11**, pinned in [`.python-version`](.python-version), and [`uv`](https://docs.astral.sh/uv/) as the package manager. The install step below fetches `uv` if it is missing; no system `pip` is used, so the PEP 668 *externally-managed-environment* error cannot occur.
 - **Python packages**, declared in [`pyproject.toml`](pyproject.toml) and locked to exact versions in [`uv.lock`](uv.lock): torch 2.7.1+cu128, transformers 4.46.3, peft 0.13.2, accelerate 1.1.1, numpy 1.26.4, scipy 1.17.1, statsmodels 0.14.6, matplotlib 3.10.9, and, in the `quant` extra, autoawq 0.2.7 and auto-gptq 0.7.1. Claim #1 exercises only numpy, scipy, statsmodels, matplotlib and click.
-- **`llama.cpp`**, built from the commit pinned in [`scripts/build_llama_cpp.sh`](scripts/build_llama_cpp.sh) (CPU-only build). Needed only for Claims #2 and #3, which produce GGUF k-quants.
+- **`llama.cpp`**, built from the commit pinned in [`scripts/build_llama_cpp.sh`](scripts/build_llama_cpp.sh) (CPU-only build, no CUDA). Needed only for Claims #2 and #3, which produce GGUF k-quants. This is the one step that needs **system packages**: `git`, `cmake` 3.14 or newer, and a C/C++ toolchain. The script checks for them and aborts with the missing name rather than failing midway, but installing them first saves a round trip:
+
+  ```bash
+  sudo apt-get install -y git cmake build-essential     # Debian, Ubuntu
+  sudo dnf install -y git cmake gcc-c++ make            # Fedora, RHEL
+  sudo pacman -S --needed git cmake base-devel          # Arch
+  sudo zypper install -y git cmake gcc-c++ make         # openSUSE
+  ```
+
+  Claim #1 needs none of them.
 - **Models and datasets** are public and downloaded from the HuggingFace Hub on first use by the collection path only: Enron (AESLC subset), WikiText-2, and the backbones Qwen2.5 0.5B/1.5B/7B and Llama-3.2 1B/3B. Some model pages require accepting their terms and a `huggingface-cli login`; no paid credential is required. All ids, seeds and hyperparameters are in [`EXPERIMENT_MANIFEST.yaml`](EXPERIMENT_MANIFEST.yaml).
 
 ## Security Concerns
@@ -76,7 +85,7 @@ Running this artifact poses no risk to the reviewer's machine.
 git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation && cd quantizer-pii-mitigation && uv sync --no-install-project --extra dev
 ```
 
-That is all Claim #1 needs (~2 min, network-bound: it downloads the pinned wheels, including torch). Claims #2 and #3 additionally need the quantization extra and a CPU-only build of `llama.cpp`:
+That is all Claim #1 needs (~2 min, network-bound: it downloads the pinned wheels, including torch). Claims #2 and #3 additionally need the quantization extra and a CPU-only build of `llama.cpp`, which is the only step requiring system packages (`git`, `cmake` >= 3.14 and a C/C++ toolchain: see *Dependencies* for the command for your distribution):
 
 ```bash
 uv sync --no-install-project --extra dev --extra quant && bash scripts/build_llama_cpp.sh
