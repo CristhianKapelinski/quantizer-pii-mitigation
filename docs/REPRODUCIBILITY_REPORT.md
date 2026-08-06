@@ -86,7 +86,151 @@ _Last verification: **141 pass / 0 fail**, 0 skip, out of 141 checked paper numb
 
 ### PASS
 
-141 numbers reproduce EXACTLY at the paper's printed precision (headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\_K\_M, saliency 2x2, Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).
+141 numbers reproduce EXACTLY at the paper's printed precision. Each row gives where the number is published in the paper, the published value, and the value recomputed from the committed logs.
+
+| key | published in | paper | recomputed |
+|---|---|---|---|
+| `headline_greedy_ge10_extraction_pct.fullft.qwen0_5b.bf16` | tab:headline | 30.3 | 30.3 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen0_5b.q8_0` | tab:headline | 30.3 | 30.3 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen0_5b.q5_k_m` | tab:headline | 28.3 | 28.3 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen0_5b.q4_k_m` | tab:headline | 23.0 | 23.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen0_5b.awq` | tab:headline | 0.0 | 0.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama1b.bf16` | tab:headline | 26.6 | 26.6 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama1b.q8_0` | tab:headline | 26.6 | 26.6 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama1b.q5_k_m` | tab:headline | 23.2 | 23.2 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama1b.q4_k_m` | tab:headline | 4.0 | 4.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama1b.awq` | tab:headline | 0.0 | 0.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen1_5b.bf16` | tab:headline | 30.3 | 30.3 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen1_5b.q8_0` | tab:headline | 30.3 | 30.3 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen1_5b.q5_k_m` | tab:headline | 29.3 | 29.3 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen1_5b.q4_k_m` | tab:headline | 13.7 | 13.7 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen1_5b.awq` | tab:headline | 5.0 | 5.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama3b.bf16` | tab:headline | 30.0 | 30.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama3b.q5_k_m` | tab:headline | 27.0 | 27.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama3b.q4_k_m` | tab:headline | 16.0 | 16.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.llama3b.awq` | tab:headline | 3.0 | 3.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen7b.bf16` | tab:headline | 30.0 | 30.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen7b.q5_k_m` | tab:headline | 30.0 | 30.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen7b.q4_k_m` | tab:headline | 24.0 | 24.0 |
+| `headline_greedy_ge10_extraction_pct.fullft.qwen7b.awq` | tab:headline | 6.0 | 6.0 |
+| `headline_greedy_ge10_extraction_pct.lora.qwen0_5b.bf16` | tab:headline | 23.3 | 23.3 |
+| `headline_greedy_ge10_extraction_pct.lora.qwen0_5b.q4_k_m` | tab:headline | 0.0 | 0.0 |
+| `headline_greedy_ge10_extraction_pct.lora.qwen0_5b.awq` | tab:headline | 0.0 | 0.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama1b.bf16` | tab:headline | 25.7 | 25.7 |
+| `headline_greedy_ge10_extraction_pct.lora.llama1b.q4_k_m` | tab:headline | 0.0 | 0.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama1b.awq` | tab:headline | 0.0 | 0.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.bf16` | tab:headline | 28.0 | 28.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.q5_k_m` | tab:headline | 9.0 | 9.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.q4_k_m` | tab:headline | 0.0 | 0.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e5.awq` | tab:headline | 0.0 | 0.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e4.q4_k_m` | tab:headline | 25.0 | 25.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e4.awq` | tab:headline | 7.0 | 7.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e4.bf16` | tab:headline | 30.0 | 30.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e4.q8_0` | tab:headline | 30.0 | 30.0 |
+| `headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e4.q5_k_m` | tab:headline | 30.0 | 30.0 |
+| `awq_group_size_sweep_ge10_count.awq_g32` | tab:awq-sweep (single seed) | 4.0 | 4.0 |
+| `awq_group_size_sweep_ge10_count.awq_g64` | tab:awq-sweep | 0.0 | 0.0 |
+| `awq_group_size_sweep_ge10_count.awq_g128` | tab:awq-sweep | 0.0 | 0.0 |
+| `awq_group_size_sweep_ge10_count.ref_q4_k_m` | tab:awq-sweep | 6.0 | 6.0 |
+| `awq_group_size_sweep_ge10_count.ref_q5_k_m` | tab:awq-sweep | 25.0 | 25.0 |
+| `calib_vs_free_3seed_ge10_pct.bf16` | tab:gptq | 30.3 | 30.3 |
+| `calib_vs_free_3seed_ge10_pct.q4_k_m` | tab:gptq | 5.3 | 5.3 |
+| `calib_vs_free_3seed_ge10_pct.awq_g128` | tab:gptq | 0.0 | 0.0 |
+| `calib_vs_free_3seed_ge10_pct.gptq_g128` | tab:gptq | 0.0 | 0.0 |
+| `saliency_ablation.A_wikitext.ge5` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `saliency_ablation.A_wikitext.ge10` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `saliency_ablation.A_wikitext.anyof6_ge10` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `saliency_ablation.B_mix.ge5` | prose sec:mechanism ("Calibration content has no effect") | 3.0 | 3.0 |
+| `saliency_ablation.B_mix.ge10` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `saliency_ablation.B_mix.anyof6_ge10` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `saliency_ablation.C_canary.ge5` | prose sec:mechanism ("Calibration content has no effect") | 1.0 | 1.0 |
+| `saliency_ablation.C_canary.ge10` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `saliency_ablation.C_canary.anyof6_ge10` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `saliency_ablation.D_enron.ge5` | prose sec:mechanism ("Calibration content has no effect") | 2.0 | 2.0 |
+| `saliency_ablation.D_enron.ge10` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `saliency_ablation.D_enron.anyof6_ge10` | prose sec:mechanism ("Calibration content has no effect") | 0.0 | 0.0 |
+| `threefactor_logit_error.n.awq_recall` | tab:threefactor | 300.0 | 300.0 |
+| `threefactor_logit_error.n.awq_body` | tab:threefactor | 100.0 | 100.0 |
+| `threefactor_logit_error.n.q4_recall` | tab:threefactor | 300.0 | 300.0 |
+| `threefactor_logit_error.n.enron` | tab:threefactor | 300.0 | 300.0 |
+| `threefactor_logit_error.ft_top1.awq_recall` | tab:threefactor | 0.71 | 0.71 |
+| `threefactor_logit_error.ft_top1.awq_body` | tab:threefactor | 0.9999 | 0.9999 |
+| `threefactor_logit_error.ft_top1.q4_recall` | tab:threefactor | 0.71 | 0.71 |
+| `threefactor_logit_error.ft_top1.enron` | tab:threefactor | 0.55 | 0.55 |
+| `threefactor_logit_error.l2norm.awq_recall` | tab:threefactor | 841.0 | 841.0 |
+| `threefactor_logit_error.l2norm.awq_body` | tab:threefactor | 662.0 | 662.0 |
+| `threefactor_logit_error.l2norm.q4_recall` | tab:threefactor | 617.0 | 617.0 |
+| `threefactor_logit_error.l2norm.enron` | tab:threefactor | 362.0 | 362.0 |
+| `threefactor_logit_error.cos.awq_recall` | tab:threefactor | 0.0094 | 0.0094 |
+| `threefactor_logit_error.cos.awq_body` | tab:threefactor | 0.0078 | 0.0078 |
+| `threefactor_logit_error.cos.q4_recall` | tab:threefactor | 0.0064 | 0.0064 |
+| `threefactor_logit_error.cos.enron` | tab:threefactor | 0.0017 | 0.0017 |
+| `threefactor_logit_error.probdrop.awq_recall` | tab:threefactor (%) | 56.0 | 56.0 |
+| `threefactor_logit_error.probdrop.awq_body` | tab:threefactor (%) | 0.04 | 0.04 |
+| `threefactor_logit_error.probdrop.q4_recall` | tab:threefactor (%) | 31.0 | 31.0 |
+| `threefactor_logit_error.probdrop.enron` | tab:threefactor (%) | 8.9 | 8.9 |
+| `threefactor_logit_error.flip.awq_recall` | tab:threefactor (%) | 78.0 | 78.0 |
+| `threefactor_logit_error.flip.awq_body` | tab:threefactor (%) | 0.0 | 0.0 |
+| `threefactor_logit_error.flip.q4_recall` | tab:threefactor (%) | 48.0 | 48.0 |
+| `threefactor_logit_error.flip.enron` | tab:threefactor (%) | 30.0 | 30.0 |
+| `mia_auc.ood.bf16.mink` | prose sec:threat-split ("In-distribution non-member control") | 1.0 | 1.0 |
+| `mia_auc.ood.bf16.minkpp` | prose sec:threat-split ("In-distribution non-member control") | 1.0 | 1.0 |
+| `mia_auc.ood.bf16.loss` | prose sec:threat-split ("In-distribution non-member control") | 1.0 | 1.0 |
+| `mia_auc.ood.awq.mink` | prose sec:threat-split ("In-distribution non-member control") | 0.97 | 0.97 |
+| `mia_auc.ood.awq.minkpp` | prose sec:threat-split ("In-distribution non-member control") | 1.0 | 1.0 |
+| `mia_auc.ood.awq.loss` | prose sec:threat-split ("In-distribution non-member control") | 0.99 | 0.99 |
+| `mia_auc.indist.bf16.mink` | prose sec:threat-split ("In-distribution non-member control") | 0.83 | 0.83 |
+| `mia_auc.indist.bf16.minkpp` | prose sec:threat-split ("In-distribution non-member control") | 0.78 | 0.78 |
+| `mia_auc.indist.bf16.loss` | prose sec:threat-split ("In-distribution non-member control") | 0.86 | 0.86 |
+| `mia_auc.indist.awq.mink` | prose sec:threat-split ("In-distribution non-member control") | 0.22 | 0.22 |
+| `mia_auc.indist.awq.minkpp` | prose sec:threat-split ("In-distribution non-member control") | 0.19 | 0.19 |
+| `mia_auc.indist.awq.loss` | prose sec:threat-split ("In-distribution non-member control") | 0.49 | 0.49 |
+| `downstream_accuracy_pct.bf16.arc` | prose sec:utility ("Downstream task accuracy") | 67.55 | 67.55 |
+| `downstream_accuracy_pct.bf16.hellaswag` | prose sec:utility ("Downstream task accuracy") | 47.76 | 47.76 |
+| `downstream_accuracy_pct.bf16.winogrande` | prose sec:utility ("Downstream task accuracy") | 61.4 | 61.4 |
+| `downstream_accuracy_pct.bf16.mean` | prose sec:utility ("Downstream task accuracy") | 58.9 | 58.9 |
+| `downstream_accuracy_pct.awq.arc` | prose sec:utility ("Downstream task accuracy") | 67.76 | 67.76 |
+| `downstream_accuracy_pct.awq.hellaswag` | prose sec:utility ("Downstream task accuracy") | 45.59 | 45.59 |
+| `downstream_accuracy_pct.awq.winogrande` | prose sec:utility ("Downstream task accuracy") | 62.12 | 62.12 |
+| `downstream_accuracy_pct.awq.mean` | prose sec:utility ("Downstream task accuracy") | 58.49 | 58.49 |
+| `downstream_accuracy_pct.delta.arc` | prose sec:utility ("Downstream task accuracy") | 0.21 | 0.21 |
+| `downstream_accuracy_pct.delta.hellaswag` | prose sec:utility ("Downstream task accuracy") | -2.17 | -2.17 |
+| `downstream_accuracy_pct.delta.winogrande` | prose sec:utility ("Downstream task accuracy") | 0.72 | 0.72 |
+| `downstream_accuracy_pct.delta.mean` | prose sec:utility ("Downstream task accuracy") | -0.41 | -0.41 |
+| `perplexity_ratio.llama1b.bf16.indomain` | prose sec:utility ("Perplexity across scale") | 1.0 | 1.0 |
+| `perplexity_ratio.llama1b.q8_0.indomain` | prose sec:utility ("Perplexity across scale") | 1.001 | 1.001 |
+| `perplexity_ratio.llama1b.q5_k_m.indomain` | prose sec:utility ("Perplexity across scale") | 1.022 | 1.022 |
+| `perplexity_ratio.llama1b.q5_k_m.ood` | prose sec:utility ("Perplexity across scale") | 1.012 | 1.012 |
+| `perplexity_ratio.llama1b.q4_k_m.indomain` | prose sec:utility ("Perplexity across scale") | 1.047 | 1.047 |
+| `perplexity_ratio.llama1b.q4_k_m.ood` | prose sec:utility ("Perplexity across scale") | 1.044 | 1.044 |
+| `perplexity_ratio.llama1b.awq.indomain` | prose sec:utility ("Perplexity across scale") | 1.123 | 1.123 |
+| `perplexity_ratio.llama1b.awq.ood` | prose sec:utility ("Perplexity across scale") | 1.094 | 1.094 |
+| `perplexity_ratio.llama3b.awq.indomain` | prose sec:utility ("Perplexity across scale") | 1.022 | 1.022 |
+| `perplexity_ratio.llama3b.awq.ood` | prose sec:utility ("Perplexity across scale") | 1.021 | 1.021 |
+| `perplexity_ratio.qwen7b.awq.indomain` | prose sec:utility ("Perplexity across scale") | 1.002 | 1.002 |
+| `perplexity_ratio.qwen7b.awq.ood` | prose sec:utility ("Perplexity across scale") | 1.044 | 1.044 |
+| `natural_canary_member_nonmember.llama3b.bf16.member` | prose sec:natural-canaries (%) | 5.0 | 5.0 |
+| `natural_canary_member_nonmember.llama3b.bf16.nonmem` | prose sec:natural-canaries (%) | 3.0 | 3.0 |
+| `natural_canary_member_nonmember.llama3b.q5_k_m.member` | prose sec:natural-canaries (%) | 4.0 | 4.0 |
+| `natural_canary_member_nonmember.llama3b.q5_k_m.nonmem` | prose sec:natural-canaries (%) | 3.0 | 3.0 |
+| `natural_canary_member_nonmember.llama3b.q4_k_m.member` | prose sec:natural-canaries (%) | 4.0 | 4.0 |
+| `natural_canary_member_nonmember.llama3b.q4_k_m.nonmem` | prose sec:natural-canaries (%) | 3.0 | 3.0 |
+| `natural_canary_member_nonmember.llama3b.awq.member` | prose sec:natural-canaries (%) | 4.0 | 4.0 |
+| `natural_canary_member_nonmember.llama3b.awq.nonmem` | prose sec:natural-canaries (%) | 4.0 | 4.0 |
+| `natural_canary_member_nonmember.qwen7b.bf16.member` | prose sec:natural-canaries (%) | 10.0 | 10.0 |
+| `natural_canary_member_nonmember.qwen7b.bf16.nonmem` | prose sec:natural-canaries (%) | 5.0 | 5.0 |
+| `natural_canary_member_nonmember.qwen7b.q5_k_m.member` | prose sec:natural-canaries (%) | 9.0 | 9.0 |
+| `natural_canary_member_nonmember.qwen7b.q5_k_m.nonmem` | prose sec:natural-canaries (%) | 4.0 | 4.0 |
+| `natural_canary_member_nonmember.qwen7b.q4_k_m.member` | prose sec:natural-canaries (%) | 5.0 | 5.0 |
+| `natural_canary_member_nonmember.qwen7b.q4_k_m.nonmem` | prose sec:natural-canaries (%) | 4.0 | 4.0 |
+| `natural_canary_member_nonmember.qwen7b.awq.member` | prose sec:natural-canaries (%) | 4.0 | 4.0 |
+| `natural_canary_member_nonmember.qwen7b.awq.nonmem` | prose sec:natural-canaries (%) | 3.0 | 3.0 |
+| `defense_pareto.bf16.extraction` | tab:headline (defense/utility trade-off view of the same cells) | 26.6 | 26.6 |
+| `defense_pareto.q4_k_m.extraction` | tab:headline (defense/utility trade-off view of the same cells) | 4.0 | 4.0 |
+| `defense_pareto.awq_1b.extraction` | tab:headline (defense/utility trade-off view of the same cells) | 0.0 | 0.0 |
+| `defense_pareto.awq_3b.extraction` | tab:headline (defense/utility trade-off view of the same cells) | 3.0 | 3.0 |
+| `defense_pareto.awq_7b.extraction` | tab:headline (defense/utility trade-off view of the same cells) | 6.0 | 6.0 |
+| `defense_pareto.gptq_1b.extraction` | tab:headline (defense/utility trade-off view of the same cells) | 0.0 | 0.0 |
 
 ### SKIP (documented, not verified for exact equality)
 

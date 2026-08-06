@@ -34,20 +34,20 @@ The considered seals are: **Available (SeloD)**, **Functional (SeloF)**, **Susta
 - **Reproducible (SeloR)** — `replay.sh` re-derives every table and figure and fails unless all 141 published numbers match the paper exactly; `reproduce.sh` re-runs the pipeline that produced the logs.
 
 ## Basic Information
-**Execution environment.** Linux x86-64. Python 3.11 (pinned in `.python-version`), managed by `uv`. Claim #1 needs no GPU; Claims #2 and #3 need an NVIDIA GPU.
+**Execution environment.** Linux x86-64. Python 3.11 (pinned in `.python-version`), managed by `uv`. Claim #1 needs no GPU; Claim #2 needs an NVIDIA GPU.
 
-| | Claim #1 (main) | Claim #2 | Claim #3 (optional) |
-|---|---|---|---|
-| Hardware | any x86-64 CPU | any NVIDIA GPU with 8 GB | 16 GB GPU + A100 80 GB |
-| Peak RAM | 200 MB (measured) | 4.4 GB, plus 7.5 GB VRAM (measured) | 4.4 GB + A100 |
-| Disk | 520 MB, clone and environment (measured) | 11 GB, mostly the CUDA wheels (measured) | ~80 GB |
-| Time | 2 to 7 s | see the claim | days |
+| | Minimal test + Claim #1 | Claim #2 |
+|---|---|---|
+| Hardware | any x86-64 CPU | any NVIDIA GPU with 8 GB |
+| Peak RAM | 200 MB (measured) | 4.4 GB, plus 7.5 GB VRAM (measured) |
+| Disk | 360 MB environment + the clone (measured) | 11 GB, mostly the CUDA wheels (measured) |
+| Time | 2 to 10 s | ~85 min on the reference GPU |
 
 Those RAM and disk figures are what the runs actually used on the machines listed below, not headroom estimates.
 
 **Measured times.** Claim #1 is CPU-only and takes seconds on any modern machine. Measured on three:
 
-| Machine | Distro / kernel | Minimal Test | Claim #1, Option B | Peak RAM |
+| Machine | Distro / kernel | Minimal test | Claim #1, Option B | Peak RAM |
 |---|---|---|---|---|
 | RTX 5060 Ti workstation (reference: produced the logs) | — | ~5 s | ~7 s | — |
 | AMD Ryzen 5 8600G, 30 GB, no GPU | Ubuntu 24.04 | 2.3 s | 6.6 s | — |
@@ -83,37 +83,51 @@ Running this artifact poses no risk to the reviewer's machine.
 
 ## Installation
 
-**For Claim #1, the main one.** It runs on the numerics stack alone, so there is no reason to download torch for it:
+Two lines, and the second one is the whole environment. Keep the clone and the `cd` on
+separate lines: chained with `&&`, a clone that fails because the directory already
+exists silently skips the `cd`, and every command after it runs in the parent directory.
 
 ```bash
-git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation && cd quantizer-pii-mitigation
-uv venv --python 3.11 && uv pip install "numpy>=1.26,<2" "scipy>=1.13,<2" "statsmodels>=0.14,<1" "matplotlib>=3.8" "click>=8.1" pytest
+git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation
+cd quantizer-pii-mitigation
+uv sync --only-group replay
 ```
 
-That is about 340 MB of packages and takes under a minute. It is also exactly what continuous integration installs, so it is exercised on every run.
+That is **360 MB and under a minute**: the numerics stack only, with no torch, no CUDA
+wheels and no model downloads. It is enough for the minimal test and for Claim #1, which
+between them reproduce every number in the paper. The package set lives in the `replay`
+group of [`pyproject.toml`](pyproject.toml), so this README and continuous integration
+install from one source of truth instead of two copies of a list that can drift apart.
 
-**For Claims #2 and #3 only**, which fine-tune and quantize, install the full pinned environment (7.9 GB, mostly the CUDA wheels) plus a CPU-only build of `llama.cpp`. That build is the one step needing system packages (`git`, `cmake` >= 3.14 and a C/C++ toolchain: see *Dependencies* for the command for your distribution):
+**Only for Claim #2**, which fine-tunes and quantizes on a GPU, install the full pinned
+environment (7.9 GB, mostly CUDA wheels) plus a CPU-only build of `llama.cpp`. That build
+is the one step needing system packages (`git`, `cmake` >= 3.14 and a C/C++ toolchain; see
+*Dependencies* for the command for your distribution):
 
 ```bash
 uv sync --no-install-project --extra dev --extra quant && bash scripts/build_llama_cpp.sh
 ```
 
-Optional unit suite (no GPU, no network, runs on either environment):
-
-```bash
-.venv/bin/python -m pytest -q tests
-```
-
 ## Minimal Test
-One command, about 2 seconds, no GPU and no download. It regenerates the paper's figure from the committed logs:
+
+One command, about 10 seconds, no GPU and no network. It runs the unit suite and then
+regenerates the paper's figure from the committed logs:
 
 ```bash
-bash replay.sh --figures-only
+./minimal_test.sh
 ```
 
-Expected output, ending in `RESULT: OK`:
+- **Expected time:** ~10 s measured on an AMD Ryzen 5 8600G.
+- **Expected resources:** ~200 MB peak RAM. No GPU, no network, no download.
+- **Expected result:** the suite passes, the figure is rewritten, and the run ends in
+  `MINIMAL TEST: PASSED`. The figure regenerates **byte-identical** to the committed
+  `experiment/figures/fig_story.pdf`, which is the same file the paper prints, so
+  `git status` staying clean after this command is itself the check.
 
 ```
+== [1/2] unit suite (no GPU, no network) ==
+...
+== [2/2] regenerating the paper figure from the committed logs ==
 == regenerating the paper figure into experiment/figures/ ==
 saved fig_story  |  isotropic=0.0028
   cos ('AWQ', 'Body') 0.00784
@@ -132,21 +146,28 @@ saved fig_story  |  isotropic=0.0028
   ok: fig_story
 
 RESULT: OK -- every requested replay stage passed.
+
+MINIMAL TEST: PASSED
 ```
 
-The figure lands in `experiment/figures/` as `fig_story.pdf` and `fig_story.png`. The printed `cos` and `flip` values are the panel-(b) and panel-(c) bars and are the same numbers published in Table `tab:threefactor`, so figure and table can be checked against each other directly.
+The printed `cos` and `flip` values are the panel-(b) and panel-(c) bars, and are the
+same numbers published in Table `tab:threefactor`, so figure and table can be checked
+against each other directly.
 
 ## Experiments
 
 > ### READ THIS BEFORE RUNNING ANY EXPERIMENT
 >
-> **You are NOT expected to run everything. Pick ONE option per claim, based on your time and hardware.**
+> **There are two claims, and the first one alone reproduces every number in the paper.**
 >
-> - **Claim #1 is the main one and is sufficient to reproduce the paper's results.** It offers two options, both CPU-only and measured in seconds.
-> - **Claim #2** re-measures the effect live on your own GPU. One option, ~85 min plus uninstrumented steps.
-> - **Claim #3** is the full campaign. It takes days, is offered only for completeness, and **is not required for any seal**.
-> - Verification time ranges from **~1 second** (Claim #1, Option A) to **days** (Claim #3).
-> - On a machine without an NVIDIA GPU, run Claim #1 and stop there; Claims #2 and #3 cannot run.
+> - **Claim #1 is the main one.** CPU-only, seconds, no download. It re-derives all 141
+>   published values from the committed logs.
+> - **Claim #2 runs the real pipeline** on your own GPU: it fine-tunes the model,
+>   quantizes it five ways, attacks each one, and compares how much each gives up. It
+>   needs an NVIDIA GPU and about an hour and a half.
+> - On a machine without an NVIDIA GPU, run Claim #1 and stop there.
+> - The full multi-day campaign that produced the committed logs is **not a claim**. It
+>   is in [`OPTIONAL_COMMANDS.md`](OPTIONAL_COMMANDS.md), for completeness only.
 
 ### Claim #1: calibration-based 4-bit quantizers suppress verbatim PII extraction that the calibration-free k-quant does not, across 0.5B-7B and both fine-tuning regimes
 
@@ -185,31 +206,63 @@ RESULT: OK -- every requested replay stage passed.
 
 The script exits non-zero if any recomputed field differs from the committed one or any published number differs from the paper. The same table is written to [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
 
-### Claim #2: on your own machine, the calibration-free k-quant still leaks more than AWQ
+### Claim #2: running the pipeline end to end, the calibration-free k-quant gives up more canaries than the calibrated one
+
+**Paper reference:** Table `tab:headline`, the Qwen2.5-0.5B full fine-tune row.
+
+**What this runs.** Everything, on your hardware and from scratch: it fine-tunes
+Qwen2.5-0.5B on the corpus with the planted canaries, quantizes the result five ways
+(Q8_0, Q5_K_M, Q4_K_M, AWQ 4-bit, plus the unquantized BF16 baseline), runs the same
+extraction attack against each, and counts how many canaries come back verbatim. This is
+the claim that exercises the pipeline; Claim #1 checks the published numbers without
+re-measuring anything.
 
 ```bash
 bash reproduce.sh quick
 ```
 
-- **Flags:** none. `quick` is the reduced single-cell mode; it always measures live, writing to its own `_rerun/` directory so the committed reference is never overwritten.
-- **Expected time:** the fine-tune phase is the only instrumented step, and it is hardware-bound: **~85 min** on the reference RTX 5060 Ti, **33 min** on an RTX 5080. The quantization and extraction that follow are not instrumented, and extraction is the longest part of the run.
-- **Expected resources:** an NVIDIA GPU, **7.5 GB of VRAM at peak** and **4.4 GB of RAM** (both measured), 11 GB of disk. An 8 GB card is enough; the full pinned environment is most of the disk.
-- **Expected result:** it re-runs one cell end to end (Qwen2.5-0.5B, full fine-tune, seed 42): fine-tune, GGUF and AWQ quantization, extraction, metrics. In `experiment/results/wave_1_qwen05b_seed42_rerun/metrics.json`, **Q4\_K\_M extracts more of the planted records than AWQ.** That is what this claim asserts and what we have reproduced on a second GPU. In both the run of record and our re-run AWQ happened to extract none, but zero on a sample of this size is a floor, not a guarantee: the claim is that AWQ leaks less, not that it never leaks.
-- **What does not carry across machines.** Fine-tuning is not bit-deterministic, so a re-run memorizes a different subset of the canaries and the k-quants then destroy a different subset of those. The *size* of the gap therefore moves a lot between GPUs, and the near-ties at the top (BF16 against Q8\_0, which barely quantizes) can swap by a unit or two. Do not read this claim as reproducing the paper's magnitudes: those come from the run of record and are re-derived exactly by Claim #1. What survives a change of hardware is the direction: the calibration-free k-quant leaks more than AWQ.
+- **Flags:** none. `quick` writes to its own `_rerun/` directory, so the committed run of
+  record is never overwritten and the comparison is always live against stored.
+- **Expected time:** the fine-tune phase is the only instrumented step and is
+  hardware-bound: **~85 min** on the reference RTX 5060 Ti, **33 min** on an RTX 5080.
+  Quantization and extraction follow and are not instrumented; extraction is the longest
+  part of the run.
+- **Expected resources:** an NVIDIA GPU with **7.5 GB of VRAM at peak** and **4.4 GB of
+  RAM** (both measured), 11 GB of disk. An 8 GB card is enough.
+- **Expected result:** the run ends in the block below. The counts are out of 100 planted
+  canaries, shown beside the committed run of record for context.
 
-### Claim #3 (optional): the full campaign
-
-```bash
-bash reproduce.sh
+```text
+══════════════════════════════════════════════════════════════════
+  Claim: the calibration-free k-quant leaks more than the calibrated one
+  (measured end to end on this machine: fine-tune, quantize, attack)
+──────────────────────────────────────────────────────────────────
+  canaries extracted verbatim       this run  run of record
+  BF16 (not quantized)                    30             30
+  Q8_0                                    30             30
+  Q5_K_M                                  28             28
+  Q4_K_M  (calibration-free)              24             24
+  AWQ 4-bit (calibrated)                   0              0
+──────────────────────────────────────────────────────────────────
+  GATED: Q4_K_M > AWQ on this machine             24 > 0   OK
+  counts above are hardware-dependent and not gated
+──────────────────────────────────────────────────────────────────
+  RESULT: OK   (the direction the paper claims holds here)
+══════════════════════════════════════════════════════════════════
 ```
 
-- **Flags:** `bash reproduce.sh --list` shows the experiment names; `bash reproduce.sh <name> ...` runs only the named ones.
-- **Expected time:** days. The fine-tune phase alone is ~37 h summed on a 16 GB GPU; the remaining steps are not instrumented.
-- **Expected resources:** a 16 GB-class GPU **and** an A100 80 GB for the 3B and 7B full fine-tunes, ~32 GB RAM, ~80 GB disk.
-- **Expected result:** every cell and ablation is regenerated and Claim #1 then passes against the regenerated logs. Every step is idempotent: a cell whose results are already committed prints a note and is skipped, so delete `experiment/results/<tag>/` to force a live re-measurement, and an interrupted run resumes without starting over.
+- **What is gated and what is not.** Only the direction is gated: Q4_K_M gives up more
+  canaries than AWQ. The counts themselves are not, and should not be read as reproducing
+  the paper's magnitudes. Fine-tuning is not bit-deterministic, so a re-run memorizes a
+  different subset of the canaries and each quantizer then destroys a different subset of
+  those; the size of the gap moves between GPUs, and the near-ties at the top (BF16
+  against Q8_0, which barely quantizes) can swap by a unit or two. The magnitudes are
+  re-derived exactly by Claim #1, from the run of record. Note also that AWQ extracting
+  zero here is a floor on a sample of this size, not a guarantee: the claim is that AWQ
+  leaks less, not that it never leaks.
 
 ### Where each paper claim is verified
-The paper makes five claims; all five are checked by Claim #1, which is why the claims above are organized by *how* the reviewer verifies rather than one per paper claim.
+The paper makes five claims; all five are checked by Claim #1, which is why the two claims above are organized by *how* the reviewer verifies rather than one per paper claim. Claim #2 does not add a number: it re-measures the effect live, on the reviewer's hardware.
 
 | Paper claim | Verified by | Paper item | Results dir |
 |---|---|---|---|

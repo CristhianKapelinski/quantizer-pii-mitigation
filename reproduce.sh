@@ -174,12 +174,17 @@ exp_quick () {
   # It writes to its OWN directory (..._rerun) instead of the committed one, so
   # that it always measures on the reviewer's machine instead of silently
   # reusing the committed logs.
+  local _QUICK_T0; _QUICK_T0=$(date +%s)
   echo "[reproduce] quick: one cell end-to-end (Qwen2.5-0.5B, full FT, seed 42)"
   echo "[reproduce]   reduced check for Claim 1: BF16 vs Q4_K_M vs AWQ verbatim extraction"
   run_cell Qwen/Qwen2.5-0.5B-Instruct wave_1_qwen05b_seed42_rerun full 42
   echo "[reproduce] quick done."
   echo "[reproduce]   fresh result:     experiment/results/wave_1_qwen05b_seed42_rerun/metrics.json"
   echo "[reproduce]   paper reference:  experiment/results/wave_1_qwen05b_seed42/metrics.json"
+  # End on a verdict rather than on a path: the reviewer should not have to open a
+  # JSON and compare counts by eye to learn whether the claim held on their machine.
+  QQUILT_CLAIM_ELAPSED="$(( $(date +%s) - _QUICK_T0 ))" \
+    run_py scripts/show_pipeline_claim.py experiment/results/wave_1_qwen05b_seed42_rerun
 }
 
 # --------------------------------------------------------------------------

@@ -1253,6 +1253,16 @@ quant = [
     { name = "bitsandbytes" },
 ]
 
+[package.dev-dependencies]
+replay = [
+    { name = "click" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "pytest" },
+    { name = "scipy" },
+    { name = "statsmodels" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "accelerate", specifier = "==1.1.1" },
@@ -1287,6 +1297,16 @@ requires-dist = [
     { name = "transformers", specifier = "==4.46.3" },
 ]
 provides-extras = ["quant", "dp", "dev", "mechanism"]
+
+[package.metadata.requires-dev]
+replay = [
+    { name = "click", specifier = ">=8.1,<9" },
+    { name = "matplotlib", specifier = ">=3.10,<3.11" },
+    { name = "numpy", specifier = ">=1.26,<2" },
+    { name = "pytest", specifier = ">=8,<10" },
+    { name = "scipy", specifier = ">=1.13,<2" },
+    { name = "statsmodels", specifier = ">=0.14,<1" },
+]
 
 [[package]]
 name = "regex"

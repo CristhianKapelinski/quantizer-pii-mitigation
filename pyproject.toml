@@ -65,6 +65,26 @@ mechanism = [
     "llama-cpp-python==0.3.8",
 ]
 
+[dependency-groups]
+# The replay path (Claim #1 and the minimal test) needs the numerics stack and
+# nothing else: no torch, no CUDA, no model downloads. Declaring it as a group
+# rather than listing the packages in the README keeps one source of truth, and
+# `uv sync --only-group replay` installs exactly this and skips the project's own
+# (heavy) dependencies.
+#
+# matplotlib is capped below 3.11 on purpose: the committed figure and the one
+# printed in the paper were both produced by 3.10, and 3.11 lays the same data out
+# with a different figure height. An open upper bound made the minimal test
+# regenerate a figure that does not match the paper.
+replay = [
+    "numpy>=1.26,<2",
+    "scipy>=1.13,<2",
+    "statsmodels>=0.14,<1",
+    "matplotlib>=3.10,<3.11",
+    "click>=8.1,<9",
+    "pytest>=8,<10",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
