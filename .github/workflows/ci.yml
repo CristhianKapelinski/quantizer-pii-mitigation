@@ -1,12 +1,13 @@
 name: CI
 
-# Runs the reviewer's own path on a clean runner. The point is not the code: it
-# is that the exact commands the README gives a reviewer keep working on a
-# machine with none of the author's state, and that the README keeps telling the
-# truth about what they print.
+# Runs the reviewer's own path on a clean runner: the unit suite and the full
+# offline replay, which re-derives every table and figure from the committed
+# logs and fails unless all 141 published values match the paper.
 #
-# reproduce.sh is deliberately not here: it needs an NVIDIA GPU and downloads
-# model weights, neither of which a hosted runner has.
+# Deliberately light. torch is a core dependency of the project, but neither the
+# replay nor the unit tests import it, so the job installs only the numerics
+# stack instead of pulling ~2.5 GB of CUDA wheels on every run. reproduce.sh is
+# not here either: it needs an NVIDIA GPU and downloads model weights.
 
 on:
   push:
@@ -18,7 +19,7 @@ on:
 jobs:
   reviewer-path:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -27,11 +28,14 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Set up the pinned Python and dependencies
-        run: uv sync --no-install-project --extra dev
+      - name: Numerics stack only, at the project's declared bounds
+        run: |
+          uv venv --python 3.11
+          uv pip install "numpy>=1.26,<2" "scipy>=1.13,<2" "statsmodels>=0.14,<1" \
+                         "matplotlib>=3.8" "click>=8.1" pytest
 
       - name: Unit tests (no GPU, no network)
-        run: uv run --extra dev python -m pytest -q tests
+        run: .venv/bin/python -m pytest -q tests
 
       - name: Minimal Test -- the command the README opens with
         run: bash replay.sh --figures-only
