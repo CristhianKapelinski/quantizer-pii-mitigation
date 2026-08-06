@@ -6,11 +6,11 @@ authors:
   - family-names: "Kapelinski"
     given-names: "Cristhian"
     orcid: "https://orcid.org/0009-0005-5750-022X"
-    affiliation: "Federal University of Pampa (UNIPAMPA)"
+    affiliation: "AI Horizon Labs, Federal University of Pampa (UNIPAMPA)"
   - family-names: "Kreutz"
     given-names: "Diego"
     orcid: "https://orcid.org/0000-0003-0830-0238"
-    affiliation: "Federal University of Pampa (UNIPAMPA)"
+    affiliation: "AI Horizon Labs, Federal University of Pampa (UNIPAMPA)"
 abstract: >-
   Reproducibility artifact for a study showing that the choice of 4-bit
   post-training quantizer is a deployment-time privacy decision. At the same
@@ -33,7 +33,13 @@ preferred-citation:
   authors:
     - family-names: "Kapelinski"
       given-names: "Cristhian"
+      orcid: "https://orcid.org/0009-0005-5750-022X"
+      affiliation: "AI Horizon Labs, Federal University of Pampa (UNIPAMPA)"
     - family-names: "Kreutz"
       given-names: "Diego"
-  collection-title: "Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais (SBSeg)"
+      orcid: "https://orcid.org/0000-0003-0830-0238"
+      affiliation: "AI Horizon Labs, Federal University of Pampa (UNIPAMPA)"
+  collection-title: "Anais do XXVII Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais (SBSeg 2026)"
   year: 2026
+  publisher:
+    name: "Sociedade Brasileira de Computação (SBC)"

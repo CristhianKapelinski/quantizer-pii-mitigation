@@ -1,20 +1,24 @@
 name: CI
 
-# Proves, on every push, that the artifact still reproduces on a clean machine
-# that is not the authors': the unit suite runs, and the offline replay
-# re-derives every table and figure from the committed logs and checks all 141
-# published values against the paper. Both are CPU-only and need no dataset
-# download, so the whole job takes a couple of minutes.
+# Runs the reviewer's own path on a clean runner. The point is not the code: it
+# is that the exact commands the README gives a reviewer keep working on a
+# machine with none of the author's state, and that the README keeps telling the
+# truth about what they print.
+#
+# reproduce.sh is deliberately not here: it needs an NVIDIA GPU and downloads
+# model weights, neither of which a hosted runner has.
 
 on:
   push:
-    branches: [main]
   pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
   workflow_dispatch:
 
 jobs:
-  reproduce:
+  reviewer-path:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -29,8 +33,20 @@ jobs:
       - name: Unit tests (no GPU, no network)
         run: uv run --extra dev python -m pytest -q tests
 
-      - name: Claim #1, Option B -- full offline replay, gated on the 141 published values
+      - name: Minimal Test -- the command the README opens with
+        run: bash replay.sh --figures-only
+
+      - name: Claim #1 Option B -- full replay, gated on every published value
         run: bash replay.sh
+
+      - name: The committed run of record must be untouched
+        run: |
+          if ! git diff --quiet -- expected/ experiment/results/; then
+            echo "The replay rewrote committed inputs or expected values." >&2
+            git --no-pager diff --stat -- expected/ experiment/results/ >&2
+            exit 1
+          fi
+          echo "expected/ and experiment/results/ are unchanged"
 
       - name: Publish the regenerated paper figure
         uses: actions/upload-artifact@v4
