@@ -252,8 +252,54 @@ run_one () {  # NAME
   esac
 }
 
+# Everything below this line needs the full environment and a GPU. Check for all of it
+# BEFORE writing a single file: the failure mode this replaces is a run that starts,
+# prints a few reassuring lines, and then dies thirty seconds later inside a Python
+# traceback about a module the reviewer was never told to install. Whatever a reviewer
+# can get wrong, someone will, so the script says exactly what is missing and exactly
+# which command fixes it, and stops there.
+preflight () {
+  local py="$PYTHON" missing=() hint=0
+
+  local mod
+  for mod in torch transformers datasets peft accelerate; do
+    "$py" -c "import $mod" >/dev/null 2>&1 || missing+=("$mod")
+  done
+  if (( ${#missing[@]} )); then
+    echo "[reproduce] This path needs the FULL environment; missing: ${missing[*]}" >&2
+    echo "[reproduce] You most likely installed the replay-only group, which is all the" >&2
+    echo "[reproduce]   minimal test and Claim #1 need. Install the rest with:" >&2
+    echo >&2
+    echo "    uv sync --no-install-project --extra dev --extra quant" >&2
+    echo "    bash scripts/build_llama_cpp.sh" >&2
+    echo >&2
+    hint=1
+  fi
+
+  local quantize="${QQUILT_LLAMA_CPP:-$SCRIPT_DIR/third_party/llama.cpp}/build/bin/llama-quantize"
+  if [[ ! -x "$quantize" ]]; then
+    echo "[reproduce] llama.cpp is not built: $quantize is missing." >&2
+    echo "[reproduce]   GGUF k-quantization runs through it, so this cannot proceed. Build it with:" >&2
+    echo >&2
+    echo "    bash scripts/build_llama_cpp.sh" >&2
+    echo >&2
+    hint=1
+  fi
+
+  if ! command -v nvidia-smi >/dev/null 2>&1; then
+    echo "[reproduce] No nvidia-smi on PATH, so no usable NVIDIA GPU was detected." >&2
+    echo "[reproduce]   Fine-tuning needs one. On a CPU-only machine run the minimal test" >&2
+    echo "[reproduce]   and Claim #1 instead; together they reproduce every published number." >&2
+    hint=1
+  fi
+
+  (( hint )) && { echo "[reproduce] Nothing was written. Aborting before any work." >&2; exit 2; }
+  return 0
+}
+
 main () {
   if [[ $# -eq 0 ]]; then
+    preflight
     for name in "${EXP_ORDER[@]}"; do run_one "$name"; done
     echo "[reproduce] done. Regenerated logs are under experiment/results/, figures under experiment/figures/."
     echo "[reproduce] Run 'bash replay.sh' to print the table <-> file mapping recomputed from those logs."
@@ -279,6 +325,7 @@ main () {
     esac
   done
 
+  preflight
   for name in "$@"; do run_one "$name"; done
   echo "[reproduce] done ($*). Logs under experiment/results/, figures under experiment/figures/."
 }

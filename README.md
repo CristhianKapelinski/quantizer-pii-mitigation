@@ -40,7 +40,7 @@ The considered seals are: **Available (SeloD)**, **Functional (SeloF)**, **Susta
 |---|---|---|
 | Hardware | any x86-64 CPU | any NVIDIA GPU with 8 GB |
 | Peak RAM | 200 MB (measured) | 4.4 GB, plus 7.5 GB VRAM (measured) |
-| Disk | 360 MB environment + the clone (measured) | 11 GB, mostly the CUDA wheels (measured) |
+| Disk | the shared 7.9 GB environment (see *Installation*) | the same environment, plus ~3 GB of models and quantized copies |
 | Time | 2 to 10 s | ~85 min on the reference GPU |
 
 Those RAM and disk figures are what the runs actually used on the machines listed below, not headroom estimates.
@@ -83,30 +83,28 @@ Running this artifact poses no risk to the reviewer's machine.
 
 ## Installation
 
-Two lines, and the second one is the whole environment. Keep the clone and the `cd` on
-separate lines: chained with `&&`, a clone that fails because the directory already
-exists silently skips the `cd`, and every command after it runs in the parent directory.
+One environment, installed once. Keep the clone and the `cd` on separate lines: chained
+with `&&`, a clone that fails because the directory already exists silently skips the
+`cd`, and every command after it runs in the parent directory.
 
 ```bash
 git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation
 cd quantizer-pii-mitigation
-uv sync --only-group replay
+uv sync --no-install-project --extra dev --extra quant
+bash scripts/build_llama_cpp.sh
 ```
 
-That is **360 MB and under a minute**: the numerics stack only, with no torch, no CUDA
-wheels and no model downloads. It is enough for the minimal test and for Claim #1, which
-between them reproduce every number in the paper. The package set lives in the `replay`
-group of [`pyproject.toml`](pyproject.toml), so this README and continuous integration
-install from one source of truth instead of two copies of a list that can drift apart.
-
-**Only for Claim #2**, which fine-tunes and quantizes on a GPU, install the full pinned
-environment (7.9 GB, mostly CUDA wheels) plus a CPU-only build of `llama.cpp`. That build
-is the one step needing system packages (`git`, `cmake` >= 3.14 and a C/C++ toolchain; see
-*Dependencies* for the command for your distribution):
-
-```bash
-uv sync --no-install-project --extra dev --extra quant && bash scripts/build_llama_cpp.sh
-```
+- **Size and time:** about **7.9 GB**, most of it CUDA wheels, plus a few minutes to
+  build `llama.cpp`.
+- **System packages:** the `llama.cpp` build is the only step that needs them (`git`,
+  `cmake` >= 3.14 and a C/C++ toolchain). See *Dependencies* for the command for your
+  distribution.
+- **Why install all of it up front:** the minimal test and Claim #1 need only the
+  numerics stack, but splitting the install into a light path and a heavy one means a
+  reviewer who runs Claim #2 after the light install gets a `ModuleNotFoundError` half a
+  minute into a run. One install removes that failure entirely. If you only ever intend to
+  run the minimal test and Claim #1, `uv sync --only-group replay` is 360 MB and enough;
+  `reproduce.sh` will tell you what is missing if you then try to go further.
 
 ## Minimal Test
 
@@ -223,6 +221,10 @@ bash reproduce.sh quick
 
 - **Flags:** none. `quick` writes to its own `_rerun/` directory, so the committed run of
   record is never overwritten and the comparison is always live against stored.
+- **Before it starts**, the script checks that the full environment is installed, that
+  `llama.cpp` is built and that an NVIDIA GPU is visible. If any of the three is
+  missing it prints what is missing and the command that fixes it, and stops without
+  writing a file, instead of failing half a minute later inside a Python traceback.
 - **Expected time:** the fine-tune phase is the only instrumented step and is
   hardware-bound: **~85 min** on the reference RTX 5060 Ti, **33 min** on an RTX 5080.
   Quantization and extraction follow and are not instrumented; extraction is the longest

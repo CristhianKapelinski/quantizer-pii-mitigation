@@ -445,7 +445,7 @@ wheels = [
 
 [[package]]
 name = "intel-extension-for-pytorch"
-version = "2.8.0"
+version = "2.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
@@ -453,7 +453,7 @@ dependencies = [
     { name = "psutil" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dc/e0/c7d9da40b767e02164ca4e846ee895ef71b3ee35b00eb620931b77907a9b/intel_extension_for_pytorch-2.8.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:e7b8a1daccf23ad4eccb33f4b2f6f110d65feddcecbf8aae70f351c2237fab70", size = 49936492, upload-time = "2025-08-12T05:51:37.991Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/ba/04cf1c89cef2ac88dfdf4609badccf49de6a69abebdb92ec88e227eaa61d/intel_extension_for_pytorch-2.7.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:7f11ddc6bfd4d845ef7215d5c61b3298ca7d9f23a76cfb1e686537cf035b47ec", size = 104682625, upload-time = "2025-04-25T09:15:36.194Z" },
 ]
 
 [[package]]
@@ -1251,6 +1251,7 @@ quant = [
     { name = "auto-gptq" },
     { name = "autoawq" },
     { name = "bitsandbytes" },
+    { name = "intel-extension-for-pytorch" },
 ]
 
 [package.dev-dependencies]
@@ -1272,10 +1273,11 @@ requires-dist = [
     { name = "click", specifier = ">=8.1,<9" },
     { name = "datasets", specifier = ">=3.0,<4.0" },
     { name = "huggingface-hub", specifier = ">=0.25,<0.27" },
+    { name = "intel-extension-for-pytorch", marker = "extra == 'quant'", specifier = "==2.7.0" },
     { name = "jsonlines", specifier = ">=4.0,<5" },
     { name = "llama-cpp-python", marker = "extra == 'mechanism'", specifier = "==0.3.8" },
     { name = "lm-eval", specifier = ">=0.4.0,<0.5" },
-    { name = "matplotlib", specifier = ">=3.8,<4" },
+    { name = "matplotlib", specifier = ">=3.10,<3.11" },
     { name = "numpy", specifier = ">=1.26,<2" },
     { name = "opacus", marker = "extra == 'dp'", specifier = ">=1.5,<2" },
     { name = "pandas", specifier = ">=2.0,<3" },

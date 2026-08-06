@@ -35,7 +35,11 @@ dependencies = [
     "tqdm>=4.66,<5",
     "click>=8.1,<9",
     # Analysis / replay path (figures + statistics; no GPU).
-    "matplotlib>=3.8,<4",
+    # Capped below 3.11: the committed figures, which are the ones the paper prints,
+    # were produced by 3.10, and 3.11 lays the same data out at a different figure
+    # height. This cap must match the one in the `replay` group below, because either
+    # install path can be the one that regenerates a figure.
+    "matplotlib>=3.10,<3.11",
     "sentence-transformers>=3.0,<4",
     # Downstream task-level utility evaluation (prose sec:utility):
     # arc_easy / hellaswag / winogrande via lm-evaluation-harness.
@@ -51,6 +55,12 @@ quant = [
     "bitsandbytes==0.44.1",
     "autoawq==0.2.7",
     "auto-gptq==0.7.1",
+    # autoawq depends on intel-extension-for-pytorch, whose resolver default (2.8)
+    # demands torch 2.8 while this project pins 2.7.1 for Blackwell. The mismatch is
+    # harmless on CUDA, where the Intel backend is never used, but it makes every
+    # command print "ERROR! Intel Extension for PyTorch needs ... 2.8" twice, which
+    # reads like a broken artifact. Pinning the 2.7 line silences it truthfully.
+    "intel-extension-for-pytorch==2.7.0",
 ]
 # DP-SGD baseline (src/qquilt/dp_sgd.py); not part of either reproduction path.
 dp = [
