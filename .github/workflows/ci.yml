@@ -1,0 +1,39 @@
+name: CI
+
+# Proves, on every push, that the artifact still reproduces on a clean machine
+# that is not the authors': the unit suite runs, and the offline replay
+# re-derives every table and figure from the committed logs and checks all 141
+# published values against the paper. Both are CPU-only and need no dataset
+# download, so the whole job takes a couple of minutes.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up the pinned Python and dependencies
+        run: uv sync --no-install-project --extra dev
+
+      - name: Unit tests (no GPU, no network)
+        run: uv run --extra dev python -m pytest -q tests
+
+      - name: Claim #1, Option B -- full offline replay, gated on the 141 published values
+        run: bash replay.sh
+
+      - name: Publish the regenerated paper figure
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-figure
+          path: experiment/figures/

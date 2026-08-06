@@ -1,7 +1,10 @@
 # Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models
 
+[![CI](https://github.com/CristhianKapelinski/quantizer-pii-mitigation/actions/workflows/ci.yml/badge.svg)](https://github.com/CristhianKapelinski/quantizer-pii-mitigation/actions/workflows/ci.yml)
+
 Reproducibility artifact for the paper of the same title, accepted at SBSeg 2026
 ([artifact submission instructions](https://doc-artefatos.github.io/sbseg2026/subinstrucoes.html)).
+Continuous integration runs the unit suite and the full offline replay on every push, so the badge above is a live statement that the 141 published values still reproduce on a clean machine.
 
 **Paper summary.** Four-bit post-training quantization is the default path to deploy small language models. This work shows that the choice of 4-bit quantizer is itself a privacy decision: at the same bit-rate, the calibration-based methods AWQ and GPTQ suppress verbatim extraction of personally identifiable information (PII) memorized during fine-tuning far more than the GGUF k-quant Q4\_K\_M, which uses no calibration corpus. On the primary model, AWQ and GPTQ each reproduce **none** of the planted records while Q4\_K\_M reproduces **5.3%** of them on the same seeds. The effect holds across five open models from 0.5B to 7B parameters and both fine-tuning regimes (full and LoRA), at negligible accuracy cost at production scale.
 
@@ -41,7 +44,15 @@ The considered seals are: **Available (SeloD)**, **Functional (SeloF)**, **Susta
 | RAM / disk | ~4 GB / ~2 GB | ~32 GB / ~10 GB | ~32 GB / ~80 GB |
 | Time | ~7 s | ~85 min + uninstrumented steps | days |
 
-**Measured times.** Claim #1 was measured on two machines: **7 s** on the reference workstation (RTX 5060 Ti, the machine that produced the logs) and **6.6 s** on an AMD Ryzen 5 8600G / 30 GB / Ubuntu 24.04 with no GPU. It is CPU-only and short on any modern machine.
+**Measured times.** Claim #1 is CPU-only and takes seconds on any modern machine. Measured on three:
+
+| Machine | Distro / kernel | Minimal Test | Claim #1, Option B | Peak RAM |
+|---|---|---|---|---|
+| RTX 5060 Ti workstation (reference: produced the logs) | — | ~5 s | ~7 s | — |
+| AMD Ryzen 5 8600G, 30 GB, no GPU | Ubuntu 24.04 | 2.3 s | 6.6 s | — |
+| AMD Ryzen 7 9700X, 59 GB, RTX 5080 (driver 595.80) | Ubuntu 26.04, kernel 7.0.0-28, gcc 15.2 | 1.1 s | 2.3 s | 250 MB |
+
+The third machine is the useful check: a different distribution, a much newer kernel and toolchain than the reference, and all 141 values still match exactly. If you run it elsewhere, a pull request adding a row is welcome.
 
 **Original experimental infrastructure.** The 0.5B, 1B and 1.5B full fine-tunes, all LoRA cells and all ablations ran on an RTX 5060 Ti 16 GB (sm_120 Blackwell, requiring torch 2.7.1+cu128). The Llama-3.2-3B and Qwen2.5-7B full fine-tunes do not fit 16 GB and used a rented A100 80 GB pod. The fine-tune phase is the one component instrumented end to end, through per-step timestamps in `experiment/results/*/train_steps.jsonl`; summed over the headline cells it is **~37 h** on a 16 GB GPU. Quantization, extraction and the analysis experiments are **not** instrumented, so this README gives no wall-clock figure for them rather than an estimate.
 
