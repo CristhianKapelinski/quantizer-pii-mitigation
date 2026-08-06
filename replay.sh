@@ -94,7 +94,7 @@ echo "== (3) recomputed vs committed: every recomputed field must be identical =
 "$PY" scripts/check_replay_equal.py || fail "recomputed != committed"
 
 echo
-echo "== (4) table <-> source-file mapping (numbers recomputed from the committed logs) =="
+echo "== (4) provenance: which committed log backs each paper table, figure and section =="
 "$PY" - <<'PYEOF'
 import json, collections, pathlib
 R = pathlib.Path("experiment/results")
@@ -144,13 +144,14 @@ probes = [
 ]
 for rel, note in probes:
     p = R / rel
-    if not p.exists(): print(f"\n[{note}]  <-  (not present: {p})"); continue
-    print(f"\n[{note}]  <-  {p}")
+    if not p.exists(): print(f"  MISSING  {note}\n           expected at {p}"); continue
+    print(f"  {note}\n           <- {p}")
+    # For the extraction logs the per-version count is itself a published
+    # number, so recompute and show it. For the rest the file is the
+    # provenance pointer; the values are printed, one per row and next to the
+    # paper's own figure, by the verification stage below.
     if rel.endswith(".jsonl"):
-        print("   greedy>=10 per version:", greedy_ge10(load(p)))
-    else:
-        s = json.dumps(load(p), default=str)
-        print("   " + (s if len(s) <= 600 else s[:600] + " ..."))
+        print("           greedy>=10 per version:", greedy_ge10(load(p)))
 PYEOF
 
 if [ "$MODE" != "--no-figures" ]; then
@@ -159,7 +160,7 @@ if [ "$MODE" != "--no-figures" ]; then
 fi
 
 echo
-echo "== (5) verifying the published paper numbers against the committed logs =="
+echo "== (5) every published number, paper value vs value recomputed from the logs =="
 "$PY" scripts/verify_values.py || fail "published-number verification"
 
 echo

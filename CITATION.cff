@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+title: "Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models"
+message: "If you use this artifact, please cite the paper below."
+type: software
+authors:
+  - family-names: "Kapelinski"
+    given-names: "Cristhian"
+    orcid: "https://orcid.org/0009-0005-5750-022X"
+    affiliation: "Federal University of Pampa (UNIPAMPA)"
+  - family-names: "Kreutz"
+    given-names: "Diego"
+    orcid: "https://orcid.org/0000-0003-0830-0238"
+    affiliation: "Federal University of Pampa (UNIPAMPA)"
+abstract: >-
+  Reproducibility artifact for a study showing that the choice of 4-bit
+  post-training quantizer is a deployment-time privacy decision. At the same
+  bit-rate, the calibration-based methods AWQ and GPTQ suppress verbatim
+  extraction of PII memorized during fine-tuning far more than the
+  calibration-corpus-free GGUF Q4_K_M format. The artifact re-derives every
+  table and figure of the paper from the committed per-seed logs and verifies
+  all 141 published values.
+license: MIT
+repository-code: "https://github.com/CristhianKapelinski/quantizer-pii-mitigation"
+keywords:
+  - quantization
+  - privacy
+  - memorization
+  - small language models
+  - artifact evaluation
+preferred-citation:
+  type: conference-paper
+  title: "Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models"
+  authors:
+    - family-names: "Kapelinski"
+      given-names: "Cristhian"
+    - family-names: "Kreutz"
+      given-names: "Diego"
+  collection-title: "Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais (SBSeg)"
+  year: 2026

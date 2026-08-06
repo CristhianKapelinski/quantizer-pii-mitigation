@@ -385,9 +385,13 @@ def main():
         lines += ["### FAIL", "", "| key | paper | recomputed | source |", "|---|---|---|---|"]
         lines += [f"| `{k}` | {e} | {g} | {s} |" for k, e, g, s in fails]
         lines.append("")
-    lines += ["### PASS", "", f"{len(passes)} numbers reproduce EXACTLY at the paper's printed precision "
-              "(headline extraction pools, AWQ group-size sweep, GPTQ vs AWQ vs Q4\\_K\\_M, saliency 2x2, "
-              "Min-K%/Loss MIA AUCs, downstream accuracy, natural-canary gaps, defense-pareto extraction column).", ""]
+    lines += ["### PASS", "",
+              f"{len(passes)} numbers reproduce EXACTLY at the paper's printed precision. "
+              "Each row gives where the number is published in the paper, the published value, "
+              "and the value recomputed from the committed logs.", "",
+              "| key | published in | paper | recomputed |", "|---|---|---|---|"]
+    lines += [f"| `{k}` | {s} | {e} | {g} |" for k, e, g, s in passes]
+    lines.append("")
     lines += ["### SKIP (documented, not verified for exact equality)", "",
               "| key | paper | reason |", "|---|---|---|"]
     lines += [f"| `{k}` | {e} | {note} |" for k, e, s, note in skips]
@@ -403,9 +407,20 @@ def main():
     else:
         print(f"[warn] report markers not found in {rp}; printing results only", file=sys.stderr)
 
-    print(f"verify: {len(passes)} pass / {len(fails)} fail / {len(skips)} skip (of {total})")
+    # Print the per-number table on stdout too: a reviewer granting the
+    # Reproducible seal has to see each published value next to the value
+    # recomputed from the logs, not only an aggregate count.
+    kw = max([len(k) for k, *_ in passes + fails] + [3])
+    sw = max([len(str(s)) for *_, s in passes + fails] + [12])
+    print(f"{'key'.ljust(kw)}  {'published in'.ljust(sw)}  {'paper':>12}  {'recomputed':>12}  status")
+    for k, e, g, s in passes:
+        print(f"{k.ljust(kw)}  {str(s).ljust(sw)}  {e:>12}  {g:>12}  PASS")
     for k, e, g, s in fails:
-        print(f"  FAIL {k}: paper={e} recomputed={g}")
+        print(f"{k.ljust(kw)}  {str(s).ljust(sw)}  {e:>12}  {str(g):>12}  FAIL")
+    for k, e, s, note in skips:
+        print(f"{k.ljust(kw)}  {str(s).ljust(sw)}  {e:>12}  {'-':>12}  SKIP ({note})")
+    print()
+    print(f"verify: {len(passes)} pass / {len(fails)} fail / {len(skips)} skip (of {total})")
     return 1 if fails else 0
 
 
