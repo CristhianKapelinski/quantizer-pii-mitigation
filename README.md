@@ -38,8 +38,8 @@ The considered seals are: **Available (SeloD)**, **Functional (SeloF)**, **Susta
 
 | | Claim #1 (main) | Claim #2 | Claim #3 (optional) |
 |---|---|---|---|
-| Hardware | any x86-64 CPU | one 16 GB-class GPU | 16 GB GPU + A100 80 GB |
-| Peak RAM | 200 MB (measured) | ~2.5 GB (measured) | ~2.5 GB |
+| Hardware | any x86-64 CPU | any NVIDIA GPU with 8 GB | 16 GB GPU + A100 80 GB |
+| Peak RAM | 200 MB (measured) | 4.4 GB, plus 7.5 GB VRAM (measured) | 4.4 GB + A100 |
 | Disk | 520 MB, clone and environment (measured) | 11 GB, mostly the CUDA wheels (measured) | ~80 GB |
 | Time | 2 to 7 s | see the claim | days |
 
@@ -57,7 +57,7 @@ The third machine is the useful check: a different distribution, a much newer ke
 
 **Original experimental infrastructure.** The 0.5B, 1B and 1.5B full fine-tunes, all LoRA cells and all ablations ran on an RTX 5060 Ti 16 GB (sm_120 Blackwell, requiring torch 2.7.1+cu128). The Llama-3.2-3B and Qwen2.5-7B full fine-tunes do not fit 16 GB and used a rented A100 80 GB pod. The fine-tune phase is the one component instrumented end to end, through per-step timestamps in `experiment/results/*/train_steps.jsonl`; summed over the headline cells it is **~37 h** on a 16 GB GPU. Quantization, extraction and the analysis experiments are **not** instrumented, so this README gives no wall-clock figure for them rather than an estimate.
 
-**Determinism.** The analysis path is deterministic: `replay.sh` recomputes from fixed logs and the 141 values match exactly, every run, on all three machines above. The *collection* path is not bit-deterministic: fine-tuning varies across GPUs and driver versions, so a live re-run (Claims #2 and #3) reproduces the **ordering and magnitude** of the effect, not the per-canary counts. Claim #2 states the tolerance explicitly.
+**Determinism.** The analysis path is deterministic: `replay.sh` recomputes from fixed logs and the 141 values match exactly, every run, on all three machines above. The *collection* path is not: fine-tuning is not bit-deterministic across GPUs, so a live re-run memorizes a different subset of the canaries and the quantizers then act on a different subset. A re-run reproduces the **direction** of the effect, the calibration-free k-quant leaking more than AWQ, and not the magnitudes. We re-ran Claim #2 on a second GPU and say exactly what carried over and what did not in that claim.
 
 ## Dependencies
 - **Python 3.11**, pinned in [`.python-version`](.python-version), and [`uv`](https://docs.astral.sh/uv/) as the package manager. The install step below fetches `uv` if it is missing; no system `pip` is used, so the PEP 668 *externally-managed-environment* error cannot occur.
@@ -185,16 +185,17 @@ RESULT: OK -- every requested replay stage passed.
 
 The script exits non-zero if any recomputed field differs from the committed one or any published number differs from the paper. The same table is written to [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
 
-### Claim #2: the pipeline itself reproduces the leakage gap, live, on your machine
+### Claim #2: on your own machine, the calibration-free k-quant still leaks more than AWQ
 
 ```bash
 bash reproduce.sh quick
 ```
 
 - **Flags:** none. `quick` is the reduced single-cell mode; it always measures live, writing to its own `_rerun/` directory so the committed reference is never overwritten.
-- **Expected time:** fine-tune phase **~85 min** (measured for this cell in `train_steps.jsonl`); the quantize and extract steps that follow are not instrumented.
-- **Expected resources:** one 16 GB-class GPU, ~32 GB RAM, ~10 GB disk.
-- **Expected result:** it re-runs one cell end to end (Qwen2.5-0.5B, full fine-tune, seed 42): fine-tune, GGUF and AWQ quantization, extraction, metrics. In `experiment/results/wave_1_qwen05b_seed42_rerun/metrics.json` the AWQ verbatim-extraction rate is far below the Q4\_K\_M rate, with BF16 highest, the same ordering as the committed `wave_1_qwen05b_seed42/metrics.json` printed next to it for comparison. **Tolerance:** fine-tuning is not bit-deterministic across GPUs, so per-canary counts may differ by a few units; what this claim asserts is the ordering and the order-of-magnitude gap, not exact counts.
+- **Expected time:** the fine-tune phase is the only instrumented step, and it is hardware-bound: **~85 min** on the reference RTX 5060 Ti, **33 min** on an RTX 5080. The quantization and extraction that follow are not instrumented, and extraction is the longest part of the run.
+- **Expected resources:** an NVIDIA GPU, **7.5 GB of VRAM at peak** and **4.4 GB of RAM** (both measured), 11 GB of disk. An 8 GB card is enough; the full pinned environment is most of the disk.
+- **Expected result:** it re-runs one cell end to end (Qwen2.5-0.5B, full fine-tune, seed 42): fine-tune, GGUF and AWQ quantization, extraction, metrics. In `experiment/results/wave_1_qwen05b_seed42_rerun/metrics.json`, **Q4\_K\_M extracts more of the planted records than AWQ.** That is what this claim asserts and what we have reproduced on a second GPU. In both the run of record and our re-run AWQ happened to extract none, but zero on a sample of this size is a floor, not a guarantee: the claim is that AWQ leaks less, not that it never leaks.
+- **What does not carry across machines.** Fine-tuning is not bit-deterministic, so a re-run memorizes a different subset of the canaries and the k-quants then destroy a different subset of those. The *size* of the gap therefore moves a lot between GPUs, and the near-ties at the top (BF16 against Q8\_0, which barely quantizes) can swap by a unit or two. Do not read this claim as reproducing the paper's magnitudes: those come from the run of record and are re-derived exactly by Claim #1. What survives a change of hardware is the direction: the calibration-free k-quant leaks more than AWQ.
 
 ### Claim #3 (optional): the full campaign
 
