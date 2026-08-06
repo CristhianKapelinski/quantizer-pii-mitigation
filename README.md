@@ -4,7 +4,7 @@
 
 Reproducibility artifact for the paper of the same title, accepted at SBSeg 2026
 ([artifact submission instructions](https://doc-artefatos.github.io/sbseg2026/subinstrucoes.html)).
-Continuous integration runs the unit suite and the full offline replay on every push, so the badge above is a live statement that the 141 published values still reproduce on a clean machine.
+Continuous integration runs the unit suite and the full offline replay on a clean runner, weekly and on demand, so the badge above is a live statement that the 141 published values still reproduce on a machine with none of the authors' state.
 
 **Paper summary.** Four-bit post-training quantization is the default path to deploy small language models. This work shows that the choice of 4-bit quantizer is itself a privacy decision: at the same bit-rate, the calibration-based methods AWQ and GPTQ suppress verbatim extraction of personally identifiable information (PII) memorized during fine-tuning far more than the GGUF k-quant Q4\_K\_M, which uses no calibration corpus. On the primary model, AWQ and GPTQ each reproduce **none** of the planted records while Q4\_K\_M reproduces **5.3%** of them on the same seeds. The effect holds across five open models from 0.5B to 7B parameters and both fine-tuning regimes (full and LoRA), at negligible accuracy cost at production scale.
 
