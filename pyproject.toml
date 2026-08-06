@@ -55,12 +55,6 @@ quant = [
     "bitsandbytes==0.44.1",
     "autoawq==0.2.7",
     "auto-gptq==0.7.1",
-    # autoawq depends on intel-extension-for-pytorch, whose resolver default (2.8)
-    # demands torch 2.8 while this project pins 2.7.1 for Blackwell. The mismatch is
-    # harmless on CUDA, where the Intel backend is never used, but it makes every
-    # command print "ERROR! Intel Extension for PyTorch needs ... 2.8" twice, which
-    # reads like a broken artifact. Pinning the 2.7 line silences it truthfully.
-    "intel-extension-for-pytorch==2.7.0",
 ]
 # DP-SGD baseline (src/qquilt/dp_sgd.py); not part of either reproduction path.
 dp = [
@@ -104,6 +98,16 @@ packages = ["src/qquilt"]
 
 [tool.uv]
 managed = true
+
+# autoawq declares intel-extension-for-pytorch, the Intel XPU backend, which this
+# artifact never uses: everything runs on CUDA or CPU. Leaving it in is not neutral.
+# Resolved to 2.8 it demands torch 2.8 against the 2.7.1 pinned here for Blackwell and
+# prints "ERROR! Intel Extension for PyTorch" on every command; pinned to 2.7 it passes
+# that check, gets imported by transformers' XPU probe, and dies on `import
+# pkg_resources`, which recent setuptools no longer ships, taking fine-tuning down with
+# it. Absent, transformers' probe returns False silently and the run is clean. The
+# marker below is never satisfiable, which is how the dependency is dropped.
+override-dependencies = ["intel-extension-for-pytorch; sys_platform == 'nonexistent'"]
 
 [[tool.uv.index]]
 # torch 2.7+ Blackwell wheels live in the cu128 index (RTX 5060 Ti = sm_120).

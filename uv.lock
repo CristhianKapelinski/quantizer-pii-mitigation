@@ -6,6 +6,9 @@ resolution-markers = [
     "platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'",
 ]
 
+[manifest]
+overrides = [{ name = "intel-extension-for-pytorch", marker = "sys_platform == 'nonexistent'" }]
+
 [[package]]
 name = "absl-py"
 version = "2.4.0"
@@ -128,7 +131,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "accelerate" },
     { name = "datasets" },
-    { name = "intel-extension-for-pytorch" },
+    { name = "intel-extension-for-pytorch", marker = "sys_platform == 'nonexistent'" },
     { name = "tokenizers" },
     { name = "torch" },
     { name = "transformers" },
@@ -448,12 +451,9 @@ name = "intel-extension-for-pytorch"
 version = "2.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
-    { name = "packaging" },
-    { name = "psutil" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/ba/04cf1c89cef2ac88dfdf4609badccf49de6a69abebdb92ec88e227eaa61d/intel_extension_for_pytorch-2.7.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:7f11ddc6bfd4d845ef7215d5c61b3298ca7d9f23a76cfb1e686537cf035b47ec", size = 104682625, upload-time = "2025-04-25T09:15:36.194Z" },
+    { name = "numpy", marker = "platform_machine != 'aarch64' or platform_python_implementation != 'CPython' or sys_platform != 'linux'" },
+    { name = "packaging", marker = "platform_machine != 'aarch64' or platform_python_implementation != 'CPython' or sys_platform != 'linux'" },
+    { name = "psutil", marker = "platform_machine != 'aarch64' or platform_python_implementation != 'CPython' or sys_platform != 'linux'" },
 ]
 
 [[package]]
@@ -1251,7 +1251,6 @@ quant = [
     { name = "auto-gptq" },
     { name = "autoawq" },
     { name = "bitsandbytes" },
-    { name = "intel-extension-for-pytorch" },
 ]
 
 [package.dev-dependencies]
@@ -1273,7 +1272,6 @@ requires-dist = [
     { name = "click", specifier = ">=8.1,<9" },
     { name = "datasets", specifier = ">=3.0,<4.0" },
     { name = "huggingface-hub", specifier = ">=0.25,<0.27" },
-    { name = "intel-extension-for-pytorch", marker = "extra == 'quant'", specifier = "==2.7.0" },
     { name = "jsonlines", specifier = ">=4.0,<5" },
     { name = "llama-cpp-python", marker = "extra == 'mechanism'", specifier = "==0.3.8" },
     { name = "lm-eval", specifier = ">=0.4.0,<0.5" },
