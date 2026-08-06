@@ -7,8 +7,7 @@ Reproducibility artifact for the paper of the same title, accepted at SBSeg 2026
 
 **What this artifact does.** It re-derives every table and figure of the paper from the committed per-seed logs and checks **all 141 published values** against the paper at its printed precision, in about 7 seconds with no GPU. It also ships the pipeline that produced those logs, so the effect can be re-measured live on the reviewer's own machine.
 
-# Estrutura do readme.md
-
+## README Structure
 How this repository is organized:
 
 | Path | Contents |
@@ -23,55 +22,50 @@ How this repository is organized:
 | `tests/` | Unit tests (no GPU, no network) |
 | `docs/` | [`REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md) (number-by-number lineage), [`TECHNICAL_REPORT.md`](docs/TECHNICAL_REPORT.md) (procedures and analyses), [`ENGINEERING.md`](ENGINEERING.md) (layout, determinism, pinning) |
 
-Sections of this document: [Selos Considerados](#selos-considerados) · [Informações básicas](#informações-básicas) · [Dependências](#dependências) · [Preocupações com segurança](#preocupações-com-segurança) · [Instalação](#instalação) · [Teste mínimo](#teste-mínimo) · [Experimentos](#experimentos) · [Citation](#citation) · [LICENSE](#license)
+Sections of this document: [Considered Seals](#considered-seals) · [Basic Information](#basic-information) · [Dependencies](#dependencies) · [Security Concerns](#security-concerns) · [Installation](#installation) · [Minimal Test](#minimal-test) · [Experiments](#experiments) · [Citation](#citation) · [License](#license)
 
-# Selos Considerados
+## Considered Seals
+The considered seals are: **Available (SeloD)**, **Functional (SeloF)**, **Sustainable (SeloS)** and **Reproducible (SeloR)**.
 
-Os selos considerados são: **Disponível (SeloD)**, **Funcional (SeloF)**, **Sustentável (SeloS)** e **Reprodutível (SeloR)**.
+- **Available (SeloD)** — public GitHub repository with this README and the complete run of record.
+- **Functional (SeloF)** — the *Minimal Test* runs the real analysis pipeline in seconds and prints observable output.
+- **Sustainable (SeloS)** — modular package under [`src/qquilt/`](src/qquilt), documented in [`ENGINEERING.md`](ENGINEERING.md), unit-tested with no GPU or network, and every paper claim is traceable to a script and a results directory (table at the end of *Experiments*).
+- **Reproducible (SeloR)** — `replay.sh` re-derives every table and figure and fails unless all 141 published numbers match the paper exactly; `reproduce.sh` re-runs the pipeline that produced the logs.
 
-- **Disponível** — public GitHub repository with this README and the complete run of record.
-- **Funcional** — the *Teste mínimo* runs the real analysis pipeline in seconds and prints observable output.
-- **Sustentável** — modular package under [`src/qquilt/`](src/qquilt), documented in [`ENGINEERING.md`](ENGINEERING.md), unit-tested with no GPU or network, and every paper claim is traceable to a script and a results directory (table at the end of *Experimentos*).
-- **Reprodutível** — `replay.sh` re-derives every table and figure and fails unless all 141 published numbers match the paper exactly; `reproduce.sh` re-runs the pipeline that produced the logs.
+## Basic Information
+**Execution environment.** Linux x86-64. Python 3.11 (pinned in `.python-version`), managed by `uv`. Claim #1 needs no GPU; Claims #2 and #3 need an NVIDIA GPU.
 
-# Informações básicas
-
-**Execution environment.** Linux x86-64. Python 3.11 (pinned in `.python-version`), managed by `uv`. Reivindicação #1 needs no GPU; Reivindicações #2 and #3 need an NVIDIA GPU.
-
-| | Reivindicação #1 (main) | Reivindicação #2 | Reivindicação #3 (optional) |
+| | Claim #1 (main) | Claim #2 | Claim #3 (optional) |
 |---|---|---|---|
 | Hardware | any x86-64 CPU | one 16 GB-class GPU | 16 GB GPU + A100 80 GB |
 | RAM / disk | ~4 GB / ~2 GB | ~32 GB / ~10 GB | ~32 GB / ~80 GB |
 | Time | ~7 s | ~85 min + uninstrumented steps | days |
 
-**Measured times.** Reivindicação #1 was measured on two machines: **7 s** on the reference workstation (RTX 5060 Ti, the machine that produced the logs) and **6.6 s** on an AMD Ryzen 5 8600G / 30 GB / Ubuntu 24.04 with no GPU. It is CPU-only and short on any modern machine.
+**Measured times.** Claim #1 was measured on two machines: **7 s** on the reference workstation (RTX 5060 Ti, the machine that produced the logs) and **6.6 s** on an AMD Ryzen 5 8600G / 30 GB / Ubuntu 24.04 with no GPU. It is CPU-only and short on any modern machine.
 
 **Original experimental infrastructure.** The 0.5B, 1B and 1.5B full fine-tunes, all LoRA cells and all ablations ran on an RTX 5060 Ti 16 GB (sm_120 Blackwell, requiring torch 2.7.1+cu128). The Llama-3.2-3B and Qwen2.5-7B full fine-tunes do not fit 16 GB and used a rented A100 80 GB pod. The fine-tune phase is the one component instrumented end to end, through per-step timestamps in `experiment/results/*/train_steps.jsonl`; summed over the headline cells it is **~37 h** on a 16 GB GPU. Quantization, extraction and the analysis experiments are **not** instrumented, so this README gives no wall-clock figure for them rather than an estimate.
 
-**Determinism.** The analysis path is deterministic: `replay.sh` recomputes from fixed logs and the 141 values match exactly, every run, on both machines above. The *collection* path is not bit-deterministic: fine-tuning varies across GPUs and driver versions, so a live re-run (Reivindicações #2 and #3) reproduces the **ordering and magnitude** of the effect, not the per-canary counts. Reivindicação #2 states the tolerance explicitly.
+**Determinism.** The analysis path is deterministic: `replay.sh` recomputes from fixed logs and the 141 values match exactly, every run, on both machines above. The *collection* path is not bit-deterministic: fine-tuning varies across GPUs and driver versions, so a live re-run (Claims #2 and #3) reproduces the **ordering and magnitude** of the effect, not the per-canary counts. Claim #2 states the tolerance explicitly.
 
-# Dependências
-
+## Dependencies
 - **Python 3.11**, pinned in [`.python-version`](.python-version), and [`uv`](https://docs.astral.sh/uv/) as the package manager. The install step below fetches `uv` if it is missing; no system `pip` is used, so the PEP 668 *externally-managed-environment* error cannot occur.
-- **Python packages**, declared in [`pyproject.toml`](pyproject.toml) and locked to exact versions in [`uv.lock`](uv.lock): torch 2.7.1+cu128, transformers 4.46.3, peft 0.13.2, accelerate 1.1.1, numpy 1.26.4, scipy 1.17.1, statsmodels 0.14.6, matplotlib 3.10.9, and, in the `quant` extra, autoawq 0.2.7 and auto-gptq 0.7.1. Reivindicação #1 exercises only numpy, scipy, statsmodels, matplotlib and click.
-- **`llama.cpp`**, built from the commit pinned in [`scripts/build_llama_cpp.sh`](scripts/build_llama_cpp.sh) (CPU-only build). Needed only for Reivindicações #2 and #3, which produce GGUF k-quants.
+- **Python packages**, declared in [`pyproject.toml`](pyproject.toml) and locked to exact versions in [`uv.lock`](uv.lock): torch 2.7.1+cu128, transformers 4.46.3, peft 0.13.2, accelerate 1.1.1, numpy 1.26.4, scipy 1.17.1, statsmodels 0.14.6, matplotlib 3.10.9, and, in the `quant` extra, autoawq 0.2.7 and auto-gptq 0.7.1. Claim #1 exercises only numpy, scipy, statsmodels, matplotlib and click.
+- **`llama.cpp`**, built from the commit pinned in [`scripts/build_llama_cpp.sh`](scripts/build_llama_cpp.sh) (CPU-only build). Needed only for Claims #2 and #3, which produce GGUF k-quants.
 - **Models and datasets** are public and downloaded from the HuggingFace Hub on first use by the collection path only: Enron (AESLC subset), WikiText-2, and the backbones Qwen2.5 0.5B/1.5B/7B and Llama-3.2 1B/3B. Some model pages require accepting their terms and a `huggingface-cli login`; no paid credential is required. All ids, seeds and hyperparameters are in [`EXPERIMENT_MANIFEST.yaml`](EXPERIMENT_MANIFEST.yaml).
 
-# Preocupações com segurança
-
+## Security Concerns
 Running this artifact poses no risk to the reviewer's machine.
 
 - The PII canaries are **synthetic**, generated by [`src/qquilt/canaries.py`](src/qquilt/canaries.py) from fixed seeds. No real personal data is planted.
 - The real-PII experiment uses only the AESLC subset of the Enron corpus, which is already public.
 - The pipeline downloads public models and datasets and builds `llama.cpp` from source. It executes no remote code, opens no network service, requires no root, and sends no data anywhere.
 
-# Instalação
-
+## Installation
 ```bash
 git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation && cd quantizer-pii-mitigation && uv sync --no-install-project --extra dev
 ```
 
-That is all Reivindicação #1 needs (~2 min, network-bound: it downloads the pinned wheels, including torch). Reivindicações #2 and #3 additionally need the quantization extra and a CPU-only build of `llama.cpp`:
+That is all Claim #1 needs (~2 min, network-bound: it downloads the pinned wheels, including torch). Claims #2 and #3 additionally need the quantization extra and a CPU-only build of `llama.cpp`:
 
 ```bash
 uv sync --no-install-project --extra dev --extra quant && bash scripts/build_llama_cpp.sh
@@ -83,8 +77,7 @@ Optional unit suite (no GPU, no network):
 uv run --extra dev python -m pytest -q tests
 ```
 
-# Teste mínimo
-
+## Minimal Test
 One command, about 2 seconds, no GPU and no download. It regenerates the paper's figure from the committed logs:
 
 ```bash
@@ -116,18 +109,38 @@ RESULT: OK -- every requested replay stage passed.
 
 The figure lands in `experiment/figures/` as `fig_story.pdf` and `fig_story.png`. The printed `cos` and `flip` values are the panel-(b) and panel-(c) bars and are the same numbers published in Table `tab:threefactor`, so figure and table can be checked against each other directly.
 
-# Experimentos
+## Experiments
 
-Three reivindicações, one command each. **Reivindicação #1 is the main one and is sufficient to reproduce the paper's results**; it needs no GPU and takes seconds. Reivindicação #2 re-measures the effect live on the reviewer's machine, and Reivindicação #3 is the full campaign, offered for completeness and not required for any seal.
+> ### READ THIS BEFORE RUNNING ANY EXPERIMENT
+>
+> **You are NOT expected to run everything. Pick ONE option per claim, based on your time and hardware.**
+>
+> - **Claim #1 is the main one and is sufficient to reproduce the paper's results.** It offers two options, both CPU-only and measured in seconds.
+> - **Claim #2** re-measures the effect live on your own GPU. One option, ~85 min plus uninstrumented steps.
+> - **Claim #3** is the full campaign. It takes days, is offered only for completeness, and **is not required for any seal**.
+> - Verification time ranges from **~1 second** (Claim #1, Option A) to **days** (Claim #3).
+> - On a machine without an NVIDIA GPU, run Claim #1 and stop there; Claims #2 and #3 cannot run.
 
-## Reivindicação #1 — every table, figure and published number of the paper reproduces from the committed logs
+### Claim #1: calibration-based 4-bit quantizers suppress verbatim PII extraction that the calibration-free k-quant does not, across 0.5B-7B and both fine-tuning regimes
+
+**Paper reference:** Table `tab:headline`, Table `tab:threefactor`, Figure `fig:story`, and the prose results in `sec:threat-split`, `sec:utility` and `sec:natural-canaries`. This single claim covers every number the paper publishes.
+
+**Verification options (in order of time cost):**
+
+**Option A: numbers only (~1 s).** Checks the 141 published values against the committed logs, without regenerating figures:
+
+```bash
+bash replay.sh verify
+```
+
+**Option B: full replay (~7 s).** Recomputes the per-seed metrics and the pooled statistics, checks each recomputed field against the committed one, regenerates the paper figure, and then runs the same 141-value check:
 
 ```bash
 bash replay.sh
 ```
 
-- **Flags:** none. `--no-figures` skips the figure; `verify` runs only the number check (~1 s).
-- **Expected time:** ~7 s (measured on two machines, see *Informações básicas*).
+- **Flags:** none for either option. `bash replay.sh --no-figures` skips only the figure.
+- **Expected time:** ~7 s for Option B (measured on two machines, see *Basic Information*).
 - **Expected resources:** ~4 GB RAM, ~2 GB disk, no GPU, no network.
 - **Expected result:** the five replay stages pass and the run ends with the per-number table and the summary line below. Each row gives where the number is published in the paper, the published value, and the value recomputed from the logs.
 
@@ -145,7 +158,7 @@ RESULT: OK -- every requested replay stage passed.
 
 The script exits non-zero if any recomputed field differs from the committed one or any published number differs from the paper. The same table is written to [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
 
-## Reivindicação #2 — the pipeline itself reproduces the leakage gap, live, on your machine
+### Claim #2: the pipeline itself reproduces the leakage gap, live, on your machine
 
 ```bash
 bash reproduce.sh quick
@@ -156,7 +169,7 @@ bash reproduce.sh quick
 - **Expected resources:** one 16 GB-class GPU, ~32 GB RAM, ~10 GB disk.
 - **Expected result:** it re-runs one cell end to end (Qwen2.5-0.5B, full fine-tune, seed 42): fine-tune, GGUF and AWQ quantization, extraction, metrics. In `experiment/results/wave_1_qwen05b_seed42_rerun/metrics.json` the AWQ verbatim-extraction rate is far below the Q4\_K\_M rate, with BF16 highest, the same ordering as the committed `wave_1_qwen05b_seed42/metrics.json` printed next to it for comparison. **Tolerance:** fine-tuning is not bit-deterministic across GPUs, so per-canary counts may differ by a few units; what this claim asserts is the ordering and the order-of-magnitude gap, not exact counts.
 
-## Reivindicação #3 (optional) — the full campaign
+### Claim #3 (optional): the full campaign
 
 ```bash
 bash reproduce.sh
@@ -165,32 +178,29 @@ bash reproduce.sh
 - **Flags:** `bash reproduce.sh --list` shows the experiment names; `bash reproduce.sh <name> ...` runs only the named ones.
 - **Expected time:** days. The fine-tune phase alone is ~37 h summed on a 16 GB GPU; the remaining steps are not instrumented.
 - **Expected resources:** a 16 GB-class GPU **and** an A100 80 GB for the 3B and 7B full fine-tunes, ~32 GB RAM, ~80 GB disk.
-- **Expected result:** every cell and ablation is regenerated and Reivindicação #1 then passes against the regenerated logs. Every step is idempotent: a cell whose results are already committed prints a note and is skipped, so delete `experiment/results/<tag>/` to force a live re-measurement, and an interrupted run resumes without starting over.
+- **Expected result:** every cell and ablation is regenerated and Claim #1 then passes against the regenerated logs. Every step is idempotent: a cell whose results are already committed prints a note and is skipped, so delete `experiment/results/<tag>/` to force a live re-measurement, and an interrupted run resumes without starting over.
 
-## Where each paper claim is verified
-
-The paper makes five claims; all five are checked by Reivindicação #1, which is why the reivindicações above are organized by *how* the reviewer verifies rather than one per paper claim.
+### Where each paper claim is verified
+The paper makes five claims; all five are checked by Claim #1, which is why the claims above are organized by *how* the reviewer verifies rather than one per paper claim.
 
 | Paper claim | Verified by | Paper item | Results dir |
 |---|---|---|---|
-| C1 — AWQ leaks less than the calibration-free k-quant, 0.5B-7B, both regimes | Reivindicação #1 and #2 | Table `tab:headline`, Fig `fig:story`(a) | `wave_1_*/`, `step_8_gguf_lowbit/` |
-| C2 — a three-factor mechanism explains the gap | Reivindicação #1 | Table `tab:threefactor`, Fig `fig:story`(b,c) | `exp_mechanism*/` |
-| C3 — the prior "methods are equivalent" MIA result is an out-of-distribution artifact | Reivindicação #1 | prose, `sec:threat-split` | `exp_mia_indist/`, `exp_tpr_at_fpr/` |
-| C4 — the AWQ utility cost falls with scale | Reivindicação #1 | prose, `sec:utility` | `exp_downstream/`, `wave_1_utility/` |
-| C5 — on real Enron PII the member/non-member gap is small and AWQ collapses it | Reivindicação #1 | prose, `sec:natural-canaries` | `natural_canaries/` |
+| C1 — AWQ leaks less than the calibration-free k-quant, 0.5B-7B, both regimes | Claim #1 and #2 | Table `tab:headline`, Fig `fig:story`(a) | `wave_1_*/`, `step_8_gguf_lowbit/` |
+| C2 — a three-factor mechanism explains the gap | Claim #1 | Table `tab:threefactor`, Fig `fig:story`(b,c) | `exp_mechanism*/` |
+| C3 — the prior "methods are equivalent" MIA result is an out-of-distribution artifact | Claim #1 | prose, `sec:threat-split` | `exp_mia_indist/`, `exp_tpr_at_fpr/` |
+| C4 — the AWQ utility cost falls with scale | Claim #1 | prose, `sec:utility` | `exp_downstream/`, `wave_1_utility/` |
+| C5 — on real Enron PII the member/non-member gap is small and AWQ collapses it | Claim #1 | prose, `sec:natural-canaries` | `natural_canaries/` |
 
 [`experiment/results/INDEX.md`](experiment/results/INDEX.md) maps every directory, and [`experiment/results/SCHEMA.md`](experiment/results/SCHEMA.md) documents the log schemas.
 
-## Known caveats
-
+### Known caveats
 - The 3B and 7B full-fine-tune cells are single-seed for compute reasons; the 5-seed Llama-3.2-1B anchor carries the multi-seed statistical weight, and the paper's cross-cell comparisons respect that difference.
 - AWQ group size 256 quantizes but is not inference-able on the available kernels (autoawq's Triton GEMM supports only 32, 64 and 128), so the group-size sweep uses those three, which span the relevant effective-bits-per-weight range.
 - Extraction uses a raw memorization probe: greedy or temperature sampling with the model's chat-tuned `generation_config` neutralized (repetition penalty 1.0), so the HuggingFace decode path matches `llama-cli --temp 0`. This matters for instruct checkpoints that ship a repetition penalty, such as Qwen2.5.
 - Model and dataset ids are pinned, but not by revision SHA, so a future upstream revision can change a live re-run. The 141 published values are nevertheless exact-verified against the committed run of record.
 - One mechanism driver, `scripts/exp_mech_q4km_split.sh`, reads GGUF logits through the optional `llama-cpp-python` dependency; install it with `uv sync --no-install-project --extra mechanism` before running `bash reproduce.sh mechanism`. Nothing else needs it.
 
-# Citation
-
+## Citation
 Cristhian Kapelinski and Diego Kreutz. *Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models.* Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais (SBSeg), 2026.
 
 ```bibtex
@@ -206,6 +216,5 @@ Cristhian Kapelinski and Diego Kreutz. *Not All 4-bit Quantizers Are Equal: Depl
 
 Machine-readable metadata is in [`CITATION.cff`](CITATION.cff).
 
-# LICENSE
-
+## License
 MIT. The full text is in [`LICENSE`](LICENSE).
