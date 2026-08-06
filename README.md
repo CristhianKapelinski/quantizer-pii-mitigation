@@ -39,8 +39,11 @@ The considered seals are: **Available (SeloD)**, **Functional (SeloF)**, **Susta
 | | Claim #1 (main) | Claim #2 | Claim #3 (optional) |
 |---|---|---|---|
 | Hardware | any x86-64 CPU | one 16 GB-class GPU | 16 GB GPU + A100 80 GB |
-| RAM / disk | ~4 GB / ~2 GB | ~32 GB / ~10 GB | ~32 GB / ~80 GB |
-| Time | ~7 s | ~85 min + uninstrumented steps | days |
+| Peak RAM | 200 MB (measured) | ~2.5 GB (measured) | ~2.5 GB |
+| Disk | 520 MB, clone and environment (measured) | 11 GB, mostly the CUDA wheels (measured) | ~80 GB |
+| Time | 2 to 7 s | see the claim | days |
+
+Those RAM and disk figures are what the runs actually used on the machines listed below, not headroom estimates.
 
 **Measured times.** Claim #1 is CPU-only and takes seconds on any modern machine. Measured on three:
 
@@ -79,20 +82,26 @@ Running this artifact poses no risk to the reviewer's machine.
 - The pipeline downloads public models and datasets and builds `llama.cpp` from source. It executes no remote code, opens no network service, requires no root, and sends no data anywhere.
 
 ## Installation
+
+**For Claim #1, the main one.** It runs on the numerics stack alone, so there is no reason to download torch for it:
+
 ```bash
-git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation && cd quantizer-pii-mitigation && uv sync --no-install-project --extra dev
+git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation && cd quantizer-pii-mitigation
+uv venv --python 3.11 && uv pip install "numpy>=1.26,<2" "scipy>=1.13,<2" "statsmodels>=0.14,<1" "matplotlib>=3.8" "click>=8.1" pytest
 ```
 
-That is all Claim #1 needs (~2 min, network-bound: it downloads the pinned wheels, including torch). Claims #2 and #3 additionally need the quantization extra and a CPU-only build of `llama.cpp`, which is the only step requiring system packages (`git`, `cmake` >= 3.14 and a C/C++ toolchain: see *Dependencies* for the command for your distribution):
+That is about 340 MB of packages and takes under a minute. It is also exactly what continuous integration installs, so it is exercised on every run.
+
+**For Claims #2 and #3 only**, which fine-tune and quantize, install the full pinned environment (7.9 GB, mostly the CUDA wheels) plus a CPU-only build of `llama.cpp`. That build is the one step needing system packages (`git`, `cmake` >= 3.14 and a C/C++ toolchain: see *Dependencies* for the command for your distribution):
 
 ```bash
 uv sync --no-install-project --extra dev --extra quant && bash scripts/build_llama_cpp.sh
 ```
 
-Optional unit suite (no GPU, no network):
+Optional unit suite (no GPU, no network, runs on either environment):
 
 ```bash
-uv run --extra dev python -m pytest -q tests
+.venv/bin/python -m pytest -q tests
 ```
 
 ## Minimal Test
@@ -158,8 +167,8 @@ bash replay.sh
 ```
 
 - **Flags:** none for either option. `bash replay.sh --no-figures` skips only the figure.
-- **Expected time:** ~7 s for Option B (measured on two machines, see *Basic Information*).
-- **Expected resources:** ~4 GB RAM, ~2 GB disk, no GPU, no network.
+- **Expected time:** 2 to 7 s for Option B, measured on three machines (see *Basic Information*).
+- **Expected resources:** 200 MB peak RAM, 520 MB of disk for the clone and the environment. No GPU, no network.
 - **Expected result:** the five replay stages pass and the run ends with the per-number table and the summary line below. Each row gives where the number is published in the paper, the published value, and the value recomputed from the logs.
 
 ```
