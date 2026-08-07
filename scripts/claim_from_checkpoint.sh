@@ -16,6 +16,7 @@ cd "$(dirname "$0")/.."
 
 REL="https://github.com/CristhianKapelinski/quantizer-pii-mitigation/releases/download/checkpoint-v1"
 TAR="wave_1_qwen05b_seed42-final.tar"
+AWQ_TAR="wave_1_qwen05b_seed42-awq.tar"
 CELL="wave_1_qwen05b_seed42"
 WORK="${QQUILT_CHECKPOINT_DIR:-checkpoints/$CELL-published}"
 OUT="experiment/results/${CELL}_from_checkpoint"
@@ -33,31 +34,57 @@ mkdir -p "$WORK" "$OUT"
 
 # 1. Fetch and verify. The checksum is published beside the archive; a truncated or
 #    tampered download must fail here and not three steps later inside the quantizer.
+echo "== [1/4] fetching the published weights (1.4 GB, once) =="
 if [ ! -d "$WORK/final" ]; then
-  echo "== [1/4] downloading the published checkpoint (958 MB, once) =="
+  echo "   fetching the fine-tuned checkpoint (958 MB)"
   curl -fSL --retry 3 -o "$WORK/$TAR" "$REL/$TAR"
   curl -fSL --retry 3 -o "$WORK/$TAR.sha256" "$REL/$TAR.sha256"
   ( cd "$WORK" && sha256sum -c "$TAR.sha256" )
   tar -xf "$WORK/$TAR" -C "$WORK"
   rm -f "$WORK/$TAR"
-else
-  echo "== [1/4] checkpoint already present in $WORK =="
+fi
+
+# The AWQ model is published already quantized: producing it needs a GPU and the autoawq
+# stack, and the comparison it enables is the point of the claim.
+if [ ! -d "$WORK/model-awq-4bit" ]; then
+  echo "   fetching the AWQ model (452 MB)"
+  curl -fSL --retry 3 -o "$WORK/$AWQ_TAR" "$REL/$AWQ_TAR"
+  curl -fSL --retry 3 -o "$WORK/$AWQ_TAR.sha256" "$REL/$AWQ_TAR.sha256"
+  ( cd "$WORK" && sha256sum -c "$AWQ_TAR.sha256" )
+  tar -xf "$WORK/$AWQ_TAR" -C "$WORK"
+  rm -f "$WORK/$AWQ_TAR"
 fi
 
 echo
-echo "== [2/4] converting to GGUF and quantizing to Q4_K_M =="
+echo "== [2/4] converting to GGUF and quantizing =="
 [ -f "$WORK/model-f16.gguf" ] || \
   "$PY" "$LLAMA/convert_hf_to_gguf.py" "$WORK/final" --outfile "$WORK/model-f16.gguf" --outtype f16
-[ -f "$WORK/model-q4_k_m.gguf" ] || \
-  "$LLAMA/build/bin/llama-quantize" "$WORK/model-f16.gguf" "$WORK/model-q4_k_m.gguf" Q4_K_M
+for q in Q8_0 Q5_K_M Q4_K_M; do
+  low=$(echo "$q" | tr 'A-Z' 'a-z')
+  [ -f "$WORK/model-$low.gguf" ] || \
+    "$LLAMA/build/bin/llama-quantize" "$WORK/model-f16.gguf" "$WORK/model-$low.gguf" "$q"
+done
 
 echo
 echo "== [3/4] running the extraction attack =="
+# AWQ inference needs CUDA: its kernels are GPU-only. Without a GPU the k-quants are still
+# measured and the AWQ row is read from the paper instead of being re-measured, which the
+# result block states rather than hiding.
+AWQ_ARGS=(); DEV=cpu
+if "$PY" -c "import torch,sys; sys.exit(0 if torch.cuda.is_available() else 1)" 2>/dev/null; then
+  AWQ_ARGS=(--version "awq_4bit:awq:$WORK/model-awq-4bit"); DEV=cuda
+  echo "   CUDA available: AWQ will be measured here too"
+else
+  echo "   no CUDA: measuring the k-quants only (AWQ inference is GPU-only)"
+fi
 [ -f "$OUT/extraction.jsonl" ] || \
   "$PY" -m qquilt.extract --canaries-jsonl "experiment/results/$CELL/canaries.jsonl" \
+    --version "q8_0:gguf:$WORK/model-q8_0.gguf" \
+    --version "q5_k_m:gguf:$WORK/model-q5_k_m.gguf" \
     --version "q4_k_m:gguf:$WORK/model-q4_k_m.gguf" \
+    "${AWQ_ARGS[@]}" \
     --llama-cli "$LLAMA/build/bin/llama-cli" --out "$OUT/extraction.jsonl" \
-    --max-new-tokens 60 --seed 42 --n-stochastic 0 --threads 8 --device cpu
+    --max-new-tokens 60 --seed 42 --n-stochastic 0 --threads 8 --device "$DEV"
 
 echo
 echo "== [4/4] comparing with the paper =="

@@ -198,47 +198,48 @@ RESULT: OK -- every requested replay stage passed.
 
 The script exits non-zero if any recomputed field differs from the committed one or any published number differs from the paper. The same table is written to [`docs/REPRODUCIBILITY_REPORT.md`](docs/REPRODUCIBILITY_REPORT.md).
 
-### Claim #2: quantizing the published weights to Q4_K_M recovers the paper's canaries, on a machine that never trained the model
+### Claim #2: the calibration-free k-quant hands over canaries that the calibrated one does not
 
 **Paper reference:** Table `tab:headline`, the Qwen2.5-0.5B full fine-tune row.
 
 **What this runs.** It downloads the fine-tuned weights of that cell from this repository's
-`checkpoint-v1` release, converts them to GGUF, quantizes to Q4_K_M, runs the extraction
-attack, and compares the recovered canaries with the paper's, one by one.
+`checkpoint-v1` release, quantizes them to Q8_0, Q5_K_M and Q4_K_M, and runs the extraction
+attack against each. With a CUDA GPU it also attacks the published AWQ model, so both sides
+of the contrast are measured here; without one, AWQ's side is the paper's number. Same
+command either way.
 
 ```bash
 ./scripts/claim_from_checkpoint.sh
 ```
 
-- **Flags:** none. `QQUILT_CHECKPOINT_DIR` moves the download elsewhere. The archive is
-  checksum-verified before it is unpacked, and every step is skipped if its output is
-  already there, so an interrupted run resumes.
-- **Expected time:** **2 to 5 minutes measured** from an empty state on an AMD Ryzen 5
-  8600G, the 958 MB download included; the spread is the download. No GPU.
-- **Expected resources:** ~2.5 GB of disk (archive plus the GGUFs), ~2 GB RAM.
+- **Expected time:** 2 to 8 minutes measured, the 1.4 GB download included.
+- **Expected resources:** ~4 GB of disk, ~2 GB RAM. A GPU is optional.
 - **Expected result:**
 
 ```text
 ══════════════════════════════════════════════════════════════════
-  Claim: quantizing the published weights to Q4_K_M recovers the paper's
-         canaries, on a machine that never ran the fine-tune
+  Claim: the calibration-free k-quant hands over canaries that the
+         calibrated quantizer does not
 ──────────────────────────────────────────────────────────────────
-  canaries recovered here               : 24
-  canaries the paper reports            : 24
-  recovered by both                     : 24
-  in the paper, missing here            : 0
-  here, not in the paper                : 0
+  canaries extracted verbatim             here   paper
+  Q8_0                                      30      30
+  Q5_K_M                                    28      28
+  Q4_K_M  (calibration-free)                24      24
+  AWQ 4-bit (calibrated)                     0       0
 ──────────────────────────────────────────────────────────────────
-  GATED: the two sets are identical                         OK
+  GATED: Q4_K_M > AWQ (measured here)                   24 > 0   OK
+  counts vary with the CPU build and are not gated
 ──────────────────────────────────────────────────────────────────
-  RESULT: OK   (24/24 of the paper's canaries reproduced)
+  RESULT: OK   (the contrast the paper claims holds here)
 ══════════════════════════════════════════════════════════════════
 ```
 
-**Why the weights are published rather than retrained.** Fine-tuning is the one step here
-that is not bit-reproducible across GPUs, and 4-bit k-quantization amplifies the difference:
-two retrains recovered the paper's canaries exactly at BF16 and Q8_0, then 1 and 0 at Q4_K_M
-against the paper's 24. Everything after the checkpoint is deterministic.
+- **What is gated.** Only the contrast. The counts are reported and not gated:
+  `scripts/build_llama_cpp.sh` builds with `-march=native`, so the SIMD kernels differ per
+  CPU and a greedy decode resolves a near-tie differently. On one machine the same weights
+  and the same GGUF gave 24 canaries with the native build and 21 with a portable one.
+  The weights are published precisely because the step before this one, fine-tuning, does
+  not reproduce at all across GPUs.
 
 ### Where each paper claim is verified
 The paper makes five claims; all five are checked by Claim #1, which is why the two claims above are organized by *how* the reviewer verifies rather than one per paper claim. Claim #2 does not add a number: it re-measures the effect live, on the reviewer's hardware.
