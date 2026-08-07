@@ -14,6 +14,18 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Every external tool used below, named here instead of failing mid-download.
+need_tools() {
+  local missing="" t
+  for t in "$@"; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+  [ -z "$missing" ] && return 0
+  echo "missing required tool(s):$missing" >&2
+  echo "  Debian/Ubuntu: sudo apt install$missing" >&2
+  echo "  Fedora/RHEL:   sudo dnf install$missing" >&2
+  exit 1
+}
+need_tools curl sha256sum tar
+
 REL="https://github.com/CristhianKapelinski/quantizer-pii-mitigation/releases/download/checkpoint-v1"
 TAR="wave_1_qwen05b_seed42-final.tar"
 AWQ_TAR="wave_1_qwen05b_seed42-awq.tar"
@@ -32,9 +44,21 @@ export LD_LIBRARY_PATH="$LLAMA/build/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
 mkdir -p "$WORK" "$OUT"
 
+# AWQ inference runs through torch CUDA kernels, so it can only be measured on a machine
+# with an NVIDIA GPU. Decide that here, before downloading: a CPU-only reviewer should not
+# spend 452 MB on a model this machine cannot run.
+AWQ_ARGS=(); DEV=cpu; HAVE_CUDA=0
+if "$PY" -c "import torch,sys; sys.exit(0 if torch.cuda.is_available() else 1)" 2>/dev/null; then
+  HAVE_CUDA=1; DEV=cuda
+  echo "GPU detected: both the k-quants and AWQ will be measured on this machine."
+else
+  echo "No GPU: the k-quants are measured here; the AWQ side of the comparison is read"
+  echo "from the paper, and the result block says so. Nothing else changes."
+fi
+
 # 1. Fetch and verify. The checksum is published beside the archive; a truncated or
 #    tampered download must fail here and not three steps later inside the quantizer.
-echo "== [1/4] fetching the published weights (1.4 GB, once) =="
+echo "== [1/4] fetching the published weights (once) =="
 if [ ! -d "$WORK/final" ]; then
   echo "   fetching the fine-tuned checkpoint (958 MB)"
   curl -fSL --retry 3 -o "$WORK/$TAR" "$REL/$TAR"
@@ -46,7 +70,7 @@ fi
 
 # The AWQ model is published already quantized: producing it needs a GPU and the autoawq
 # stack, and the comparison it enables is the point of the claim.
-if [ ! -d "$WORK/model-awq-4bit" ]; then
+if [ "$HAVE_CUDA" = 1 ] && [ ! -d "$WORK/model-awq-4bit" ]; then
   echo "   fetching the AWQ model (452 MB)"
   curl -fSL --retry 3 -o "$WORK/$AWQ_TAR" "$REL/$AWQ_TAR"
   curl -fSL --retry 3 -o "$WORK/$AWQ_TAR.sha256" "$REL/$AWQ_TAR.sha256"
@@ -67,16 +91,10 @@ done
 
 echo
 echo "== [3/4] running the extraction attack =="
+if [ "$HAVE_CUDA" = 1 ]; then AWQ_ARGS=(--version "awq_4bit:awq:$WORK/model-awq-4bit"); fi
 # AWQ inference needs CUDA: its kernels are GPU-only. Without a GPU the k-quants are still
 # measured and the AWQ row is read from the paper instead of being re-measured, which the
 # result block states rather than hiding.
-AWQ_ARGS=(); DEV=cpu
-if "$PY" -c "import torch,sys; sys.exit(0 if torch.cuda.is_available() else 1)" 2>/dev/null; then
-  AWQ_ARGS=(--version "awq_4bit:awq:$WORK/model-awq-4bit"); DEV=cuda
-  echo "   CUDA available: AWQ will be measured here too"
-else
-  echo "   no CUDA: measuring the k-quants only (AWQ inference is GPU-only)"
-fi
 [ -f "$OUT/extraction.jsonl" ] || \
   "$PY" -m qquilt.extract --canaries-jsonl "experiment/results/$CELL/canaries.jsonl" \
     --version "q8_0:gguf:$WORK/model-q8_0.gguf" \

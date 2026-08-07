@@ -36,6 +36,18 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Every external tool used below, named here instead of failing mid-download.
+need_tools() {
+  local missing="" t
+  for t in "$@"; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+  [ -z "$missing" ] && return 0
+  echo "missing required tool(s):$missing" >&2
+  echo "  Debian/Ubuntu: sudo apt install$missing" >&2
+  echo "  Fedora/RHEL:   sudo dnf install$missing" >&2
+  exit 1
+}
+need_tools git cmake make c++
 REPO="${QQUILT_REPO:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 
 LLAMA_CPP_DIR="${QQUILT_LLAMA_CPP:-$REPO/third_party/llama.cpp}"
