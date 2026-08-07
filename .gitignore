@@ -32,7 +32,7 @@ runs/
 experiment/results/**/quantized/
 
 # Vendored builds
-third_party/llama.cpp/
+third_party/
 
 # OS
 .DS_Store
@@ -92,3 +92,6 @@ experiment/results/**/cell_*/quantized/
 experiment/results/**/model-awq-4bit/
 experiment/results/**/gptq_4bit/
 experiment/results/**/awq_enron/
+
+# output of scripts/claim_from_checkpoint.sh
+experiment/results/*_from_checkpoint/

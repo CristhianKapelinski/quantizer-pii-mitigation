@@ -7,6 +7,20 @@ NVIDIA GPU. Between them they reproduce every number the paper publishes.
 What is here is the campaign that produced the committed logs in the first place. It is
 documented so the provenance of those logs is auditable, not so anyone re-runs it.
 
+## Retraining from scratch
+
+`bash reproduce.sh quick` re-runs one cell end to end on a GPU: fine-tune, quantize, attack.
+It takes 33 to 110 minutes depending on the card and needs the full environment plus a built
+`llama.cpp`.
+
+It reproduces the **direction** of the result, not the counts: fine-tuning is not
+bit-reproducible across GPUs. Claim #2 in the README starts from the published weights and
+does reproduce the counts, canary for canary.
+
+```bash
+bash reproduce.sh quick
+```
+
 ## The full campaign
 
 ```bash

@@ -37,6 +37,8 @@ case "$HF" in
   *) printf '  %-42s %5s      %s\n' "$HF" "-" "your own HF cache, NOT removed" ;;
 esac
 for d in experiment/results/*_rerun; do gone "$d" "output of reproduce.sh quick"; done
+for d in experiment/results/*_from_checkpoint; do gone "$d" "output of claim_from_checkpoint.sh"; done
+for d in checkpoints/*-published; do gone "$d" "the downloaded published checkpoint"; done
 for d in out-full out-live out; do gone "$d" "verification output"; done
 
 echo
