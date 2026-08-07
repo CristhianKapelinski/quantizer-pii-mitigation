@@ -258,6 +258,13 @@ command either way.
 ══════════════════════════════════════════════════════════════════
 ```
 
+- **A warning you should expect.** The quantizer prints
+  `WARNING: 144 of 168 tensor(s) required fallback quantization`, and one
+  `llama_tensor_get_type` line per tensor above it. Nothing is wrong: this backbone's hidden
+  size (896) is not a multiple of 256, which the K-quant block format requires, so
+  `llama-quantize` falls back to `q5_0` or `q8_0` on those tensors. It is deterministic, it
+  applies identically to the run the paper reports, and the resulting file is the Q4_K_M the
+  paper measured.
 - **What is gated.** Only the contrast. The counts are reported and not gated:
   `scripts/build_llama_cpp.sh` builds with `-march=native`, so the SIMD kernels differ per
   CPU and a greedy decode resolves a near-tie differently. On one machine the same weights
