@@ -43,8 +43,8 @@ need_tools() {
   for t in "$@"; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
   [ -z "$missing" ] && return 0
   echo "missing required tool(s):$missing" >&2
-  echo "  Debian/Ubuntu: sudo apt install$missing" >&2
-  echo "  Fedora/RHEL:   sudo dnf install$missing" >&2
+  echo "  Debian/Ubuntu: sudo apt update && sudo apt install -y$missing" >&2
+  echo "  Fedora/RHEL:   sudo dnf install -y$missing" >&2
   exit 1
 }
 need_tools git cmake make c++

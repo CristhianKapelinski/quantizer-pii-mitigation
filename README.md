@@ -87,10 +87,10 @@ The third machine is the useful check: a different distribution, a much newer ke
 - **`llama.cpp`**, built from the commit pinned in [`scripts/build_llama_cpp.sh`](scripts/build_llama_cpp.sh) (CPU-only build, no CUDA). Needed only for Claim #2, which produces the GGUF k-quants. This is the one step that needs **system packages**: `git`, `cmake` 3.14 or newer, and a C/C++ toolchain. The script checks for them and aborts with the missing name rather than failing midway, but installing them first saves a round trip:
 
   ```bash
-  sudo apt-get install -y git cmake build-essential     # Debian, Ubuntu
-  sudo dnf install -y git cmake gcc-c++ make            # Fedora, RHEL
-  sudo pacman -S --needed git cmake base-devel          # Arch
-  sudo zypper install -y git cmake gcc-c++ make         # openSUSE
+  sudo apt-get update && sudo apt-get install -y git cmake build-essential   # Debian, Ubuntu
+  sudo dnf install -y git cmake gcc-c++ make                                 # Fedora, RHEL
+  sudo pacman -Sy --needed git cmake base-devel                              # Arch
+  sudo zypper refresh && sudo zypper install -y git cmake gcc-c++ make       # openSUSE
   ```
 
   Claim #1 needs none of them.
