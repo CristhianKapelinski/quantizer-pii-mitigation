@@ -283,6 +283,16 @@ The paper makes five claims; all five are checked by Claim #1, which is why the 
 - Model and dataset ids are pinned, but not by revision SHA, so a future upstream revision can change a live re-run. The 141 published values are nevertheless exact-verified against the committed run of record.
 - One mechanism driver, `scripts/exp_mech_q4km_split.sh`, reads GGUF logits through the optional `llama-cpp-python` dependency; install it with `uv sync --no-install-project --extra mechanism` before running `bash reproduce.sh mechanism`. Nothing else needs it.
 
+## Cleaning up
+
+One command removes everything a run created, the environment, the llama.cpp build, the fine-tuned checkpoints and the run outputs. It never touches anything tracked by git.
+
+```bash
+./cleanup.sh
+```
+
+Pass `--dry-run` to list what would go without removing it (about ~11 GB).
+
 ## Citation
 Cristhian Kapelinski and Diego Kreutz. *Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models.* Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais (SBSeg), 2026.
 
