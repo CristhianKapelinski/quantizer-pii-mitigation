@@ -213,8 +213,8 @@ attack, and compares the recovered canaries with the paper's, one by one.
 - **Flags:** none. `QQUILT_CHECKPOINT_DIR` moves the download elsewhere. The archive is
   checksum-verified before it is unpacked, and every step is skipped if its output is
   already there, so an interrupted run resumes.
-- **Expected time:** **5m04s measured** from an empty state on an AMD Ryzen 5 8600G,
-  including the 958 MB download. No GPU.
+- **Expected time:** **2 to 5 minutes measured** from an empty state on an AMD Ryzen 5
+  8600G, the 958 MB download included; the spread is the download. No GPU.
 - **Expected resources:** ~2.5 GB of disk (archive plus the GGUFs), ~2 GB RAM.
 - **Expected result:**
 
