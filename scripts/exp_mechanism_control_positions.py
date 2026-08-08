@@ -27,6 +27,17 @@ from pathlib import Path
 
 
 def main():
+    """Control test distinguishing memorization-specific AWQ degradation from a
+    canary-template-is-OOD effect, via canary_RECALL vs canary_BODY vs Enron.
+
+    Computes FLIP rate, prob-drop-on-top-1, cosine error alignment, logit-error
+    norm, and KL between FT and AWQ logits at the last position of the full
+    canary prefix (RECALL, where memorized recall happens), the canary body
+    truncated before the recalled field (BODY, in-template but no recall
+    yet), and Enron text (out-of-template, no recall). If BODY tracks Enron
+    and both are far below RECALL, the effect is memorization-specific rather
+    than template-OOD. Writes qquilt.mech_control_positions.v1 JSON to `--out`.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft-dir", required=True)
     ap.add_argument("--awq-dir", required=True)
@@ -63,6 +74,7 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
 
     def hf_last_logits(model, texts):
+        """Last-position logits (vocab-sized vector) from `model` for each of `texts`."""
         out = []
         with torch.no_grad():
             for t in texts:
@@ -72,6 +84,7 @@ def main():
         return np.stack(out, axis=0)
 
     def softmax(L):
+        """Row-wise softmax of a (n, vocab) logit array."""
         a_ = L - L.max(axis=-1, keepdims=True)
         p = np.exp(a_); p /= p.sum(axis=-1, keepdims=True)
         return p
@@ -101,6 +114,9 @@ def main():
     del awq, inner; torch.cuda.empty_cache(); gc.collect()
 
     def analyze(L_ft, L_q, label):
+        """FT-vs-quant comparison stats at one position pool (top-1 prob, error
+        norm/alignment, prob drop, flip rate, KL); see the module docstring
+        for the metric definitions."""
         P_ft = softmax(L_ft); P_q = softmax(L_q)
         top1_ft = P_ft.argmax(axis=-1)
         d = L_ft - L_q

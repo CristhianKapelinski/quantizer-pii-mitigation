@@ -37,6 +37,15 @@ CANARIES_JSONL = REPO / "experiment/results/wave_1_mini/canaries.jsonl"
 
 
 def main():
+    """Re-score existing greedy-decode extraction logs with sentence-embedding
+    cosine similarity (all-mpnet-base-v2) between each completion and its
+    true canary suffix, to test whether a quantizer's low verbatim-extraction
+    rate also holds under semantic (approximate) matching (Ippolito et al.,
+    arXiv:2210.17546). Pure post-processing: no new forward passes, just
+    embeds and compares. Writes scores.jsonl (per-sample cosine) and
+    metrics.json (qquilt.exp_semantic.v1, cosine stats and threshold counts
+    per source/version) under experiment/results/exp_semantic_similarity/.
+    """
     from sentence_transformers import SentenceTransformer
     model = SentenceTransformer("all-mpnet-base-v2")
 

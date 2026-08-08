@@ -29,6 +29,8 @@ R = ROOT / "experiment" / "results"
 
 
 def _load(rel):
+    """Load a result file at `rel` (relative to experiment/results/): a list of
+    dicts for .jsonl, a single JSON document otherwise."""
     p = R / rel
     if str(rel).endswith(".jsonl"):
         return [json.loads(l) for l in open(p)]
@@ -48,6 +50,9 @@ def _greedy_ge10(rel) -> dict:
 
 
 def _pool_rate(rel, vk) -> float | None:
+    """Pooled extraction rate (%) for version `vk` from a pooled_stats-shaped
+    JSON at `rel`, rounded to 1 decimal; the 10-char threshold bucket if
+    per-threshold buckets are present."""
     d = _load(rel)
     node = d["per_threshold"]["10"]["pooled"] if "per_threshold" in d else d["pooled"]
     v = node.get(vk, {}).get("rate")
@@ -55,6 +60,9 @@ def _pool_rate(rel, vk) -> float | None:
 
 
 def _pool_seeds_pct(rel, vk, seeds) -> float:
+    """Extraction rate (%) for version `vk` pooled across `seeds`, by summing
+    the raw (k, n) counts in a pooled_stats file's per_seed_counts before
+    dividing (not by averaging per-seed percentages)."""
     d = _load(rel)
     psc = d["per_threshold"]["10"]["per_seed_counts"]
     k = sum(psc[str(s)][vk][0] for s in seeds)
@@ -63,6 +71,8 @@ def _pool_seeds_pct(rel, vk, seeds) -> float:
 
 
 def _seed_count(rel, seed, vk) -> int:
+    """Raw extraction count (k) for one `seed` and version `vk` from a
+    pooled_stats file's per_seed_counts block."""
     d = _load(rel)
     return d["per_threshold"]["10"]["per_seed_counts"][str(seed)][vk][0]
 
@@ -73,7 +83,16 @@ _P5 = "exp_3seed_replication/pooled_stats_5seed.json"
 # crossfamily(): tab:headline extraction rates (%), full-FT and LoRA blocks
 # --------------------------------------------------------------------------
 def crossfamily():
+    """Assemble tab:headline's full-FT and LoRA extraction-rate (%) bars across
+    model families/sizes, for every quantizer version (bf16/q4_k_m/awq_4bit).
+
+    Mixes recomputed values (pooled_stats files, per-seed jsonls) with a few
+    _SYNTH constants documented inline where no single committed artifact
+    covers a multi-run pool (see module docstring).
+    """
     def g(rel, v):
+        """Greedy >=10-char extraction count for version `v` in a single
+        extraction.jsonl at `rel` (0 if the version is absent)."""
         return float(_greedy_ge10(rel).get(v, 0))
     ft_bf16 = [_pool_rate("qwen_extra_pooled_qwen05b.json", "bf16"),
                _pool_rate(_P5, "bf16"),
@@ -109,6 +128,9 @@ def crossfamily():
 # mia(): verbatim on the seed-42 checkpoint, Min-K% AUCs, score means (sec:threat-split)
 # --------------------------------------------------------------------------
 def mia():
+    """Assemble sec:threat-split's MIA figures: seed-42 verbatim-extraction counts,
+    Min-K% AUCs against OOD and in-distribution non-members, and per-signal
+    score means for BF16 and AWQ (canary-free)."""
     mi = _load("exp_mia_indist/metrics.json")["versions"]
     extract = [float(_seed_count(_P5, 42, "bf16")),
                float(_seed_count(_P5, 42, "q4_k_m")),
@@ -132,6 +154,14 @@ def mia():
 # mechanism(): the three-factor cells (tab:threefactor)
 # --------------------------------------------------------------------------
 def mechanism():
+    """Assemble tab:threefactor's three mechanism factors: noise-direction
+    cosine alignment, (top-1 probability, flip rate) per canary position, and
+    logit-error norm vs 3-seed extraction rate, for AWQ/Q4_K_M/GPTQ.
+
+    Combines recomputed per-factor logs with a small number of _SYNTH values
+    (documented inline) that are multi-run syntheses reported only in the
+    paper table, not materialized as a single artifact.
+    """
     nd = _load("exp_mechanism_noise_direction/metrics.json")["results"]["awq"]
     q4 = _load("exp_mechanism_q4km_noise_direction/metrics.json")
     cp = _load("exp_mechanism_control_positions/metrics.json")
@@ -164,6 +194,12 @@ def mechanism():
 # quant_variants(): effective bits-per-weight per variant (fig:story(a) axis)
 # --------------------------------------------------------------------------
 def quant_variants():
+    """Effective bits-per-weight per quantizer variant, for fig:story panel (a)'s axis.
+
+    AWQ group-size values are recomputed from the granularity sweep; GGUF and
+    GPTQ values are format-defined constants (not measured quantities) and
+    are documented as such.
+    """
     s7 = _load("step_7_awq_granularity/metrics.json")["results"]
     awq = {"g128": s7["group_128"]["approx_bpw"], "g64": s7["group_64"]["approx_bpw"],
            "g32": s7["group_32"]["approx_bpw"]}
@@ -195,6 +231,12 @@ _EXPECTED = {
 
 
 def _verify():
+    """Recompute every loadable figure value and compare it against `_EXPECTED`.
+
+    Raises SystemExit(1) and prints each mismatch if any loaded value differs
+    from the published number; this is the self-check `tests/test_fig_data.py`
+    invokes and `python scripts/_fig_data.py` runs standalone.
+    """
     cf, mi, me, qv = crossfamily(), mia(), mechanism(), quant_variants()
     checks = {
         "crossfamily.ft_bf16": cf["ft_bf16"], "crossfamily.ft_q4": cf["ft_q4"],

@@ -51,6 +51,8 @@ G3_JSONL = REPO / "experiment/results/wave_1_mini/g3.jsonl"
 
 
 def load_model(kind: str, path: Path, device: str):
+    """Load the checkpoint at `path` onto `device`; `kind` is "awq" for an
+    AWQ-quantized model or anything else for a plain HF (bf16) load."""
     if kind == "awq":
         from awq import AutoAWQForCausalLM
         m = AutoAWQForCausalLM.from_quantized(str(path), device_map={"": device}, fuse_layers=False)
@@ -117,6 +119,15 @@ def load_pairs(path: Path) -> list[tuple[str, str]]:
 @click.option("--k-pct", type=float, default=0.2)  # Min-K-20%
 @click.option("--device", type=str, default="cuda")
 def main(k_pct: float, device: str):
+    """Compute Min-K%/Min-K%++/loss-canary MIA AUC (member canaries vs OOD
+    G3 non-members) for each version in VERSIONS, to reconcile against Zhang
+    ICLR 2025 Table 2 (which reports AWQ ~ GPTQ ~ RTN on Min-K%-derived
+    PrivLeak) while this paper's Carlini exact-prefix metric shows an AWQ
+    asymmetry. Writes scores.jsonl (per-sample scores) and metrics.json
+    (qquilt.exp_minkpp.v2, AUC per version/signal) under
+    experiment/results/exp_minkpp_reconciliation/; feeds sec:threat-split's
+    Min-K%++ reconciliation discussion.
+    """
     members = load_pairs(CANARIES_JSONL)      # trained-on canaries
     nonmembers = load_pairs(G3_JSONL)         # OOD, never trained
     print(f"members={len(members)} nonmembers={len(nonmembers)} k_pct={k_pct}")

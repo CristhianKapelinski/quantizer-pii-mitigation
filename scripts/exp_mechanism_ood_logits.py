@@ -40,6 +40,9 @@ from pathlib import Path
 
 
 def load_canary_prefixes(canary_jsonl: Path, n: int = 100) -> list[str]:
+    """First `n` canary prefixes (up to and including the recall trigger) from
+    `canary_jsonl`, using the `prefix_text` field if present or deriving it
+    from `body`. These are the OOD (relative to Enron calibration) inputs."""
     rows = [json.loads(l) for l in canary_jsonl.read_text().splitlines() if l.strip()]
     pref_idx = -1
     # use the prefix_text field if present, else split the body
@@ -96,6 +99,16 @@ def kl_per_input(logits_a, logits_b):
 
 
 def main():
+    """Test whether AWQ/GPTQ next-token logit-KL error is amplified on OOD
+    (canary) inputs relative to in-distribution (Enron) inputs.
+
+    For each requested quantizer, computes per-input KL(P_FT || P_quant) on
+    canary prefixes and on Enron held-out text (see `evaluate`), and reports
+    the amplification ratio mean(KL_canary) / mean(KL_enron). A ratio >> 1
+    supports the hypothesis that calibration-based rounding, optimized on
+    the Enron calibration set, is misaligned on OOD canary inputs. Writes
+    qquilt.mech_ood_logits.v1 JSON to `--out`.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft-dir", required=True, help="HF FT checkpoint (bf16)")
     ap.add_argument("--awq-dir", default=None, help="AWQ-4bit checkpoint")
@@ -135,6 +148,9 @@ def main():
            "results": {}}
 
     def evaluate(name: str, model):
+        """KL(P_FT || P_quant) mean/median/p10/p90 on canary and Enron inputs
+        for `model` (`name`'s quantized checkpoint), plus the canary-over-Enron
+        amplification ratio."""
         print(f"[mech-ood] {name}: collecting canary logits ...")
         L_can = hf_logits(model, tokenizer, canary_prefixes, a.device)
         print(f"[mech-ood] {name}: collecting Enron logits ...")

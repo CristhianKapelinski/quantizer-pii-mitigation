@@ -31,7 +31,9 @@ REPO = Path(os.environ.get("QQUILT_REPO") or Path(__file__).resolve().parents[1]
 
 
 def _group_of(name: str) -> str:
-    # collapse layer indices so we get one bucket per module *type*
+    """Collapse a parameter name's layer index into `.N.` and map it to its
+    module-type bucket (q_proj, mlp gates, embeddings, norms, ...), so
+    per-layer deltas can be aggregated into one row per module type."""
     n = re.sub(r"\.\d+\.", ".N.", name)
     for key in (
         "q_proj", "k_proj", "v_proj", "o_proj",
@@ -45,6 +47,14 @@ def _group_of(name: str) -> str:
 
 
 def main() -> None:
+    """Compute and write ||theta_ft - theta_base||_F for the mechanistic delta-magnitude claim.
+
+    Loads the base and fine-tuned checkpoints in float32, sums squared
+    element-wise deltas (and base norms) over every shared same-shape
+    parameter tensor, both globally and per `_group_of` module-type bucket,
+    and writes global/per-group Frobenius norms, relative norm, RMS delta,
+    and max absolute delta to `--out` as qquilt.delta_norm.v1 JSON.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-model-id", required=True)
     ap.add_argument("--final-dir", required=True)

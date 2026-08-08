@@ -33,6 +33,12 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 def load_text_windows(path, n, max_len, tok):
+    """Tokenize up to `n` blank-line-delimited chunks of `path` (>60 raw chars,
+    truncated/padded to `max_len` tokens), keeping only chunks with >=32 tokens.
+
+    Returns a list of 1-D input-id tensors used as fixed evaluation windows
+    for the perplexity comparison below.
+    """
     raw = path.read_text(errors="ignore")
     chunks = [c.strip() for c in raw.split("\n\n") if len(c.strip()) > 60]
     windows = []
@@ -48,6 +54,12 @@ def load_text_windows(path, n, max_len, tok):
 
 
 def perplexity(model, tok, windows):
+    """Corpus perplexity over `windows`: exp(mean per-window cross-entropy loss).
+
+    Windows whose loss is non-finite are dropped; NaN if none remain. Feeds
+    the Q5 in-domain (Enron) and out-of-domain (WikiText) ratios in
+    exp_awq_calib_ppl/metrics.json.
+    """
     losses = []
     for ids in windows:
         ids = ids.to(DEVICE).unsqueeze(0)
@@ -59,6 +71,7 @@ def perplexity(model, tok, windows):
 
 
 def load_awq(path):
+    """Load the AWQ-quantized checkpoint at `path` onto DEVICE, unfused."""
     from awq import AutoAWQForCausalLM
     return AutoAWQForCausalLM.from_quantized(str(path),
                                               device_map={"": DEVICE},

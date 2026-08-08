@@ -24,6 +24,14 @@ import click
 
 @dataclass(frozen=True)
 class Row:
+    """One flattened extraction record: normalized view of a ``qquilt.extract`` JSONL line.
+
+    ``exact_match`` and ``match_prefix_len`` are the per-(sequence,
+    version, completion) signals every metric in this module aggregates.
+    ``suffix_text`` is looked up from the canaries file, not stored in the
+    extraction log itself (see ``_load``).
+    """
+
     seq_id: str
     group: str  # "g1" | "g2" | "g3"
     bucket: int | None  # canary frequency bucket; None for G2/G3

@@ -26,6 +26,11 @@ ROWS = [("q8_0", "Q8_0"), ("q5_k_m", "Q5_K_M"),
 
 
 def by_version(path: Path) -> dict[str, set[str]]:
+    """Set of canary IDs each quantizer version extracts verbatim (greedy, >=10 chars).
+
+    Reads a G1-only extraction.jsonl (`live` or `paper` reference log) and returns
+    version -> set of canary_id, deduplicated per canary.
+    """
     seen: dict[str, set[str]] = {}
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
@@ -40,6 +45,14 @@ def by_version(path: Path) -> dict[str, set[str]]:
 
 
 def main() -> int:
+    """Print the checkpoint-claim report and gate on Q4_K_M > AWQ (Claim #2).
+
+    Compares live-measured extraction counts (arg 1) against a reference log
+    (arg 2, falling back to the paper's own numbers where the live side lacks
+    a GPU-only version such as AWQ). Raw counts are reported but not gated,
+    since llama.cpp's SIMD kernels vary by build/CPU; only the contrast
+    direction is gated. Returns 0 if the gate passes, else 1.
+    """
     live = by_version(Path(sys.argv[1]))
     paper = by_version(Path(sys.argv[2]))
 

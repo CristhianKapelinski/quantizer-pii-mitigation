@@ -82,6 +82,9 @@ MAX_PREFIX_CHARS = 400
 
 
 def is_template(kind: str, pii: str) -> bool:
+    """True if `pii` (of the given `kind`) matches a known template/boilerplate
+    pattern (e.g. an @enron.com address, an 800-number) that would inflate
+    frequency without indicating instance-level memorisation."""
     for pat in TEMPLATE_BLACKLIST.get(kind, []):
         if pat.search(pii):
             return True
@@ -89,11 +92,17 @@ def is_template(kind: str, pii: str) -> bool:
 
 
 def normalize(text: str) -> str:
+    """Canonicalize `text` (collapse whitespace, lowercase) for cross-document
+    dedup / membership hashing."""
     # canonical form used for cross-document dedup
     return re.sub(r"\s+", " ", text.strip().lower())
 
 
 def extract_pii_records(texts: list[str], kinds: list[str] | None = None) -> list[dict]:
+    """Scan `texts` for PII matches of the given `kinds` (default: all of
+    PATTERNS), dropping template matches (see `is_template`) and matches with
+    too little left context. Returns one dict per match with the literal PII
+    string, its document index/span, and the preceding-context prefix."""
     kinds = kinds or list(PATTERNS.keys())
     records: list[dict] = []
     for doc_idx, doc in enumerate(texts):
@@ -122,6 +131,7 @@ def extract_pii_records(texts: list[str], kinds: list[str] | None = None) -> lis
 
 
 def count_freq_in_corpus(pii_value: str, corpus_texts: list[str]) -> int:
+    """Count total literal occurrences of `pii_value` across `corpus_texts`."""
     needle = pii_value
     return sum(t.count(needle) for t in corpus_texts)
 
@@ -156,6 +166,9 @@ def build_canary_record(idx: int, rec: dict, frequency: int) -> dict:
 
 
 def build_sidecar_record(idx: int, rec: dict, frequency: int, pool: str) -> dict:
+    """Build the companion metadata record (kind, source doc index, member-pool
+    frequency, member/nonmember pool tag) written to the .meta.jsonl sidecar
+    alongside `build_canary_record`'s qquilt.canaries.v1 record."""
     return {
         "canary_id": f"nat_{idx:05d}",
         "kind": rec["kind"],
@@ -167,6 +180,15 @@ def build_sidecar_record(idx: int, rec: dict, frequency: int, pool: str) -> dict
 
 
 def main():
+    """Mine natural (real Enron PII) canaries into member/non-member pools
+    with the C1-C3 controls from the module docstring: verifiable-target
+    extraction (`extract_pii_records`), max-frequency instance-memorisation
+    filtering, and a disjoint non-member pool sampled from a separate Enron
+    HF dataset. Writes qquilt.canaries.v1 JSONL (`--member-out`,
+    `--nonmember-out`) plus .meta.jsonl sidecars and a run summary JSON;
+    downstream extraction/metrics reuse the same qquilt.extract pipeline as
+    the synthetic canaries, addressing reviewer W2/F2.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus-jsonl", required=True, type=Path)
     ap.add_argument("--synthetic-canaries-jsonl", required=True, type=Path,
@@ -202,6 +224,8 @@ def main():
     ds = load_dataset(args.enron_hf_id, split="train")
     field_candidates = ("text", "message", "body", "content", "email")
     def grab_text(row):
+        """Return the first string field of `row` longer than 60 chars, checking
+        the known field-name candidates before falling back to any string value."""
         for k in field_candidates:
             v = row.get(k) if hasattr(row, "get") else row[k] if k in row else None
             if isinstance(v, str) and len(v) > 60:
@@ -236,6 +260,8 @@ def main():
 
     # Per-document at most ONE PII per (kind, value) to avoid double-counting
     def dedup(records):
+        """Keep at most one record per (doc_idx, kind, pii) triple, dropping
+        repeats of the same PII value within the same source document."""
         seen = set()
         out = []
         for r in records:
@@ -310,6 +336,10 @@ def main():
 
     def write_pool(out_path: Path, pool_samples, pool_name: str,
                    freq_map: Counter):
+        """Write `pool_samples` as a qquilt.canaries.v1 JSONL at `out_path` (via
+        `build_canary_record`) plus a parallel .meta.jsonl sidecar (via
+        `build_sidecar_record`), looking up each record's frequency in
+        `freq_map`. Returns the sidecar path."""
         sidecar_path = out_path.with_suffix(".meta.jsonl")
         with out_path.open("w") as f, sidecar_path.open("w") as g:
             for i, r in enumerate(pool_samples):

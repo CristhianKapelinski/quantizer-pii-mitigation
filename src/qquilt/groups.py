@@ -29,6 +29,13 @@ import click
 
 @dataclass(frozen=True)
 class GroupSequence:
+    """One G2 or G3 control sequence: a prefix/suffix pair plus its dataset provenance.
+
+    Never inserted into the training corpus (unlike ``Canary``); used only
+    at extraction time as a comparison point against G1 canary extraction
+    rates.
+    """
+
     seq_id: str
     group: str  # "g2" | "g3"
     source: str
@@ -37,6 +44,7 @@ class GroupSequence:
 
     @property
     def full_text(self) -> str:
+        """Prefix and suffix concatenated: the original passage before splitting."""
         return self.prefix_text + self.suffix_text
 
 
@@ -235,6 +243,7 @@ def load_g3(seed: int, n: int, hf_id: str | None = None,
 
 
 def write_jsonl(seqs: list[GroupSequence], path: Path) -> None:
+    """Serialize group sequences to JSONL, one row per line, stamped with schema ``qquilt.group.v1``."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         for s in seqs:
@@ -245,6 +254,7 @@ def write_jsonl(seqs: list[GroupSequence], path: Path) -> None:
 
 
 def read_jsonl(path: Path) -> list[GroupSequence]:
+    """Load group sequences previously written by ``write_jsonl``."""
     out: list[GroupSequence] = []
     with path.open() as f:
         for line in f:
@@ -267,6 +277,7 @@ def cli() -> None:
 @click.option("--hf-config", type=str, default="20220301.simple")
 @click.option("--out", type=click.Path(path_type=Path), required=True)
 def cmd_g2(seed: int, n: int, hf_id: str, hf_config: str, out: Path) -> None:
+    """CLI: build the G2 negative-control group and write it to ``--out``."""
     seqs = load_g2(seed=seed, n=n, hf_id=hf_id, hf_config=hf_config)
     write_jsonl(seqs, out)
     click.echo(f"wrote {len(seqs)} G2 sequences from {hf_id}/{hf_config} to {out}")
@@ -283,6 +294,7 @@ def cmd_g2(seed: int, n: int, hf_id: str, hf_config: str, out: Path) -> None:
 @click.option("--out", type=click.Path(path_type=Path), required=True)
 def cmd_g3(seed: int, n: int, hf_id: str | None, hf_config: str | None,
            synthetic: bool, out: Path) -> None:
+    """CLI: build the G3 negative-control group (HF source, with synthetic fallback) and write it."""
     if synthetic:
         seqs = _g3_synthetic(seed=seed, n=n)
         click.echo(f"using synthetic G3 (n={n})")

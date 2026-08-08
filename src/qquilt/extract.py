@@ -36,6 +36,17 @@ from qquilt.seed import seed_everything
 
 @dataclass(frozen=True)
 class Version:
+    """One model checkpoint to probe: a display ``name``, its ``kind`` (backend), and its path.
+
+    ``kind`` selects the generation backend in ``_extract_with_decode``:
+    ``"hf"`` / ``"awq"`` load via ``transformers``/``autoawq``; ``"gguf"``
+    shells out to ``llama-cli``. Extraction counts for GGUF versions
+    therefore depend on the specific compiled ``llama-cli`` CPU kernel
+    (quantization dequant path, threading, SIMD dispatch) rather than on
+    Python/PyTorch, so they are not bit-reproducible across machines the
+    way the HF/AWQ counts are.
+    """
+
     name: str
     kind: str  # "hf" | "gguf"
     path: Path
@@ -66,6 +77,7 @@ def _neutralize_generation_config(model) -> None:
 
 
 def _hf_load(model_dir: Path, device: str):
+    """Load a BF16 HF checkpoint and tokenizer, in eval mode with decoding penalties neutralized."""
     tok = AutoTokenizer.from_pretrained(model_dir, use_fast=True)
     if tok.pad_token_id is None:
         tok.pad_token = tok.eos_token
@@ -148,6 +160,14 @@ def _gguf_generate(
     *, llama_cli: Path, gguf: Path, prefix: str, max_new_tokens: int,
     threads: int, do_sample: bool, top_p: float, temperature: float, seed: int,
 ) -> str:
+    """Generate a completion for a GGUF checkpoint via the ``llama-cli`` subprocess.
+
+    ``--repeat-penalty`` is left at ``llama-cli``'s own default (1.0) —
+    matched explicitly on the HF/AWQ side by ``_hf_generate`` — so greedy
+    (``--temp 0``) and stochastic completions are comparable across
+    backends. Output is decoded as UTF-8 with replacement for any
+    non-UTF-8 bytes the CPU kernel may emit.
+    """
     cmd = [
         str(llama_cli),
         "-m", str(gguf),
@@ -194,6 +214,16 @@ def _extract_with_decode(
     do_sample: bool, top_p: float, temperature: float, seed: int,
     completion_index: int, capture_logits: bool = False, top_k: int = 20,
 ) -> tuple[dict, list[dict] | None]:
+    """Generate one completion for ``seq`` on ``version`` and score it against the ground truth.
+
+    Dispatches to the HF/AWQ or GGUF backend per ``version.kind``, then
+    computes ``match_prefix_len`` (leading-character agreement between the
+    completion and ``seq.suffix_text``) and ``exact_match`` (full suffix
+    reproduced). This is the row-level building block behind the paper's
+    extraction counts: Claim #1 needs ``exact_match``/``match_prefix_len``
+    to be suppressed on calibrated 4-bit versions relative to BF16, and
+    Claim #2 needs it to persist on uncalibrated k-quant versions.
+    """
     logit_rows: list[dict] | None = None
     if version.kind in ("hf", "awq"):
         tok, model = hf_handle
@@ -239,6 +269,7 @@ def _extract_with_decode(
 
 
 def _parse_versions(spec: tuple[str, ...]) -> list[Version]:
+    """Parse ``--version NAME:KIND:PATH`` CLI specs into ``Version`` objects."""
     versions: list[Version] = []
     for s in spec:
         name, kind, path = s.split(":", 2)
@@ -251,6 +282,12 @@ def _load_sequences(
     g2_jsonl: Path | None,
     g3_jsonl: Path | None,
 ) -> list[Sequence]:
+    """Merge G1 canaries with optional G2/G3 control sequences into one probe list.
+
+    G1 sequences carry their duplication ``bucket``; G2/G3 rows (already
+    prefix/suffix-split by ``qquilt.groups``) do not, since they were never
+    inserted into the training corpus.
+    """
     seqs: list[Sequence] = []
     if canaries_jsonl is not None:
         for c in read_jsonl(canaries_jsonl):
@@ -301,6 +338,14 @@ def main(
     max_new_tokens: int, device: str, llama_cli: Path | None, threads: int, seed: int,
     n_stochastic: int, top_p: float, temperature: float,
 ) -> None:
+    """CLI: run greedy + stochastic extraction of every sequence against every version.
+
+    Writes one row per (sequence, version, completion) to ``--out`` and,
+    when ``--logits-out`` is given, per-token top-K logits for HF/AWQ
+    greedy completions only (GGUF logit capture is out of scope here — see
+    the inline note). This is the data source consumed by
+    ``qquilt.metrics`` to compute the paper's extraction-count metrics.
+    """
     seed_everything(seed)
     seqs = _load_sequences(canaries_jsonl, g2_jsonl, g3_jsonl)
     if not seqs:

@@ -98,6 +98,14 @@ def per_version_rate(canaries, extractions, threshold: int):
 
 
 def main():
+    """Compute member-vs-non-member natural-canary extraction rates and the
+    member-minus-nonmember gap per quantizer version (see module docstring),
+    from previously-run extraction JSONLs. Writes a JSON summary
+    (per-version rate/gap/counts, with per-kind breakdown) to `--out` and
+    prints a human-readable table; a large gap for a version is evidence of
+    instance-level memorisation beyond generic fluency (Claim #1/#2 support
+    using real PII rather than synthetic canaries).
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--member-canaries", required=True, type=Path)
     ap.add_argument("--member-extraction", required=True, type=Path)

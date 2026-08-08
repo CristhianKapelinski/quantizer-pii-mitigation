@@ -389,6 +389,7 @@ def acr_for_canary(
 # CLI                                                                          #
 # --------------------------------------------------------------------------- #
 def _parse_int_list(s: str) -> list[int]:
+    """Parse a comma-separated CLI option (e.g. "2,4,8,16") into a list of ints."""
     return [int(x) for x in s.replace(" ", "").split(",") if x]
 
 
@@ -411,6 +412,16 @@ def _parse_int_list(s: str) -> list[int]:
               help="Use a small value (e.g. 10) for a smoke run.")
 @click.option("--seed", type=int, default=0)
 def main(device, l_grid, n_steps, topk, batch, micro_bs, versions, n_canaries, seed):
+    """Run the Adversarial Compression Ratio sweep and write ACR results per version.
+
+    For each requested quantizer version and each canary, run GCG (Zou et al.
+    2023) at increasing prompt lengths L to find the shortest adversarial
+    prompt that still elicits the canary suffix (Schwarzschild et al. NeurIPS
+    2024's ACR metric); a lower achievable L means the canary compresses more,
+    i.e. is more strongly memorized. Writes incremental progress to
+    acr_partial.jsonl, per-canary results to acr_per_canary.jsonl, summary
+    statistics to metrics.json, and a human-readable RESULTS.md.
+    """
     l_grid_list = _parse_int_list(l_grid)
     version_list = [v.strip() for v in versions.split(",") if v.strip()]
     for v in version_list:

@@ -19,6 +19,8 @@ from pathlib import Path
 
 
 def kl_per_input_np(logits_a, logits_b):
+    """KL(softmax(logits_a) || softmax(logits_b)) per row, numpy version of
+    exp_mechanism_ood_logits.kl_per_input for GGUF logits (no torch tensor)."""
     import numpy as np
     # softmax in log-space
     a = logits_a - logits_a.max(axis=-1, keepdims=True)
@@ -31,6 +33,16 @@ def kl_per_input_np(logits_a, logits_b):
 
 
 def main():
+    """Same OOD-vs-ID logit-KL amplification test as exp_mechanism_ood_logits.py,
+    but for the calibration-corpus-free Q4_K_M GGUF quantizer.
+
+    Computes KL(P_FT || P_Q4_K_M) on canary prefixes (OOD) and Enron text
+    (ID) and reports the canary-over-Enron amplification ratio. If this
+    ratio is comparable to AWQ/GPTQ's, OOD amplification is a general
+    property of quantization noise on peaky distributions; if it is much
+    smaller, amplification is specific to calibration-based rounding.
+    Writes qquilt.mech_ood_q4km.v1 JSON to `--out`.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft-dir", required=True)
     ap.add_argument("--q4km-gguf", required=True)
@@ -62,6 +74,7 @@ def main():
                                               low_cpu_mem_usage=True).to(a.device).eval()
 
     def hf_last_logits(texts):
+        """Last-position logits (vocab-sized vector) from the FT model for each of `texts`."""
         out = []
         with torch.no_grad():
             for t in texts:
@@ -87,6 +100,8 @@ def main():
     print(f"[mech-q4km] vocab_size={vocab_size}")
 
     def gguf_last_logits(texts):
+        """Last-position logits from the Q4_K_M GGUF model (llama-cpp-python) for
+        each of `texts`, read from the CPU-computed score buffer."""
         out = []
         for i, t in enumerate(texts):
             tokens = lcpp.tokenize(t.encode("utf-8"), add_bos=True, special=False)

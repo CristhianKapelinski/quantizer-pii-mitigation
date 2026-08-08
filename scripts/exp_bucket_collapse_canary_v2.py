@@ -31,6 +31,8 @@ EPS = 1e-9
 
 
 def group_of(name: str) -> str:
+    """Map a parameter name to its projection-type bucket (q_proj, gate_proj, ...),
+    collapsing the layer index first so all layers of one type group together."""
     n = re.sub(r"\.\d+\.", ".N.", name)
     for k in ("q_proj", "k_proj", "v_proj", "o_proj",
               "gate_proj", "up_proj", "down_proj"):
@@ -40,6 +42,7 @@ def group_of(name: str) -> str:
 
 
 def layer_of(name: str) -> int:
+    """Transformer block index parsed from a parameter name, or -1 if absent."""
     m = re.search(r"\.layers\.(\d+)\.", name)
     return int(m.group(1)) if m else -1
 
@@ -68,6 +71,8 @@ def dequantize_layer_via_forward(linear_module, device="cuda"):
 
 
 def hf_layers_by_name(model, prefix="model.layers"):
+    """Map module name -> module for every linear layer in `model`, covering
+    plain HF Linear as well as AWQ/GPTQ quantized linear classes."""
     out = {}
     for name, mod in model.named_modules():
         if mod.__class__.__name__ in ("Linear", "WQLinear_GEMM",
@@ -78,6 +83,18 @@ def hf_layers_by_name(model, prefix="model.layers"):
 
 
 def main():
+    """Measure per-weight fine-tune-delta "survival" under AWQ/GPTQ quantization.
+
+    For each shared linear layer, dequantizes the quantized weight via
+    `dequantize_layer_via_forward` and computes the survival ratio
+    (quant - base) / (ft - base) per weight, both overall and restricted to
+    the top-1/5/10% largest-|delta| weights (global percentile thresholds
+    sampled from base-vs-ft deltas). A weight "collapses" when |survival| <
+    COLLAPSE_THR (its fine-tune update was wiped out by quantization). Writes
+    per-quantizer overall and top-k histograms/collapse rates, plus a
+    per-(layer, projection-type) breakdown, to `--out` as
+    qquilt.bucket_collapse_canary.v2 JSON.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", required=True)
     ap.add_argument("--ft",   required=True)
@@ -148,6 +165,8 @@ def main():
 
     # 3) For each quant: load on GPU, dequant each layer via eye-forward, compare.
     def hist_pct(hist, edges, p):
+        """Linearly-interpolated `p`-th percentile of a value binned into `hist`
+        over `edges` (used for the median/p10/p90 survival-ratio summaries)."""
         total = hist.sum()
         if total == 0:
             return None
@@ -163,6 +182,12 @@ def main():
     edges = np.linspace(H_LO, H_HI, H_BINS + 1)
 
     def analyze_quant_layer(W_eff, k):
+        """Per-weight survival-ratio stats for one layer `k`: (W_eff - base) /
+        (ft - base), overall and restricted to each top-K% |delta| threshold.
+
+        Returns None if shapes mismatch or every weight's fine-tune delta is
+        ~0 (nothing to measure survival against).
+        """
         b = base_weights[k]
         f = ft_weights[k]
         if W_eff.shape != b.shape:
@@ -194,6 +219,9 @@ def main():
         return info
 
     def run_quant(kind: str, path: str):
+        """Load the `kind` ("awq"|"gptq") quantized model at `path`, dequantize
+        and analyze every common linear layer, and return aggregated overall
+        and per-top-K% survival statistics (see `stats`)."""
         print(f"[v2] loading {kind} from {path} ...")
         if kind == "awq":
             from awq import AutoAWQForCausalLM
@@ -254,6 +282,9 @@ def main():
         gc.collect()
 
         def stats(acc):
+            """Reduce an accumulated (n, n_collapsed, sum_x, hist, per_layer)
+            bundle into collapse rate, mean/median/p10/p90 survival, the
+            histogram, and a per-(layer, group) breakdown. None if empty."""
             if acc["n"] == 0: return None
             r = {"n_weights": acc["n"], "n_collapsed": acc["n_collapsed"],
                  "collapse_rate": acc["n_collapsed"] / acc["n"],

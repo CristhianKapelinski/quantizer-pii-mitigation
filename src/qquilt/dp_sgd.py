@@ -42,16 +42,25 @@ from qquilt.seed import seed_everything
 
 @dataclass
 class DPTelemetry:
+    """Per-step JSONL telemetry for the DP-SGD run.
+
+    Records wallclock, loss, learning rate, GPU memory, and the privacy
+    budget ε accumulated so far (via the Opacus accountant) — the DP-SGD
+    analogue of ``qquilt.train.TelemetryCallback``.
+    """
+
     path: Path
     started_at: float = 0.0
     last_step_at: float = 0.0
     banner: dict = field(default_factory=dict)
 
     def _append(self, row: dict) -> None:
+        """Append one JSON row to the telemetry file."""
         with self.path.open("a") as f:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     def begin(self) -> None:
+        """Reset timers and GPU peak-memory counters, truncate the telemetry file, and write the banner."""
         self.started_at = time.monotonic()
         self.last_step_at = self.started_at
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -64,6 +73,12 @@ class DPTelemetry:
     def step(self, *, step: int, epoch: float, loss: float | None,
              grad_norm: float | None, lr: float | None,
              epsilon: float | None) -> None:
+        """Record one training step, including ``epsilon`` — the DP budget spent so far.
+
+        ``epsilon`` is None for skipped steps (see ``run_dp``'s empty-batch
+        workaround); non-None values are monotonically non-decreasing across
+        a run for a fixed ``target_delta``.
+        """
         now = time.monotonic()
         row = {
             "schema": "qquilt.dp_train.v1",
@@ -233,6 +248,7 @@ def run_dp(
 @click.option("--seed", type=int, required=True)
 @click.option("--telemetry-jsonl", type=click.Path(path_type=Path), required=True)
 def main(**kw: object) -> None:
+    """CLI: run the Opacus DP-SGD fine-tune baseline and print the saved checkpoint path."""
     final = run_dp(**kw)  # type: ignore[arg-type]
     click.echo(f"DP-SGD final checkpoint: {final}")
 

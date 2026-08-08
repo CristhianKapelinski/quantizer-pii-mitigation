@@ -17,6 +17,16 @@ from pathlib import Path
 
 
 def main():
+    """Q4_K_M (calibration-free) analog of the noise-direction control test.
+
+    Runs the same three-position protocol as
+    exp_mechanism_control_positions.py (canary RECALL / canary BODY / Enron)
+    against Q4_K_M served via llama-cpp-python instead of AWQ. If Q4_K_M
+    shows the same directional bias as AWQ, the mechanism is not
+    calibration-specific; if Q4_K_M is symmetric between canary and Enron
+    while AWQ/GPTQ are not, calibration-induced directional noise is
+    confirmed. Writes qquilt.mech_q4km_noise_direction.v1 JSON to `--out`.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft-dir", required=True)
     ap.add_argument("--q4km-gguf", required=True)
@@ -49,6 +59,7 @@ def main():
     ft = AutoModelForCausalLM.from_pretrained(a.ft_dir, torch_dtype=torch.bfloat16,
                                               low_cpu_mem_usage=True).to("cuda").eval()
     def hf_last(model, texts):
+        """Last-position logits (vocab-sized vector) from `model` for each of `texts`."""
         out = []
         with torch.no_grad():
             for t in texts:
@@ -68,6 +79,8 @@ def main():
                  n_gpu_layers=99, logits_all=True, verbose=False)
     vocab_size = lcpp.n_vocab()
     def gguf_last(texts):
+        """Last-position logits from the Q4_K_M GGUF model (llama-cpp-python) for
+        each of `texts`."""
         out = []
         for i, t in enumerate(texts):
             tokens = lcpp.tokenize(t.encode("utf-8"), add_bos=True, special=False)[:511]
@@ -82,11 +95,15 @@ def main():
     L_q_enron = gguf_last(enron_inputs)
 
     def softmax(L):
+        """Row-wise softmax of a (n, vocab) logit array."""
         a_ = L - L.max(axis=-1, keepdims=True)
         p = np.exp(a_); p /= p.sum(axis=-1, keepdims=True)
         return p
 
     def analyze(L_ft, L_q):
+        """FT-vs-Q4_K_M comparison stats at one position pool: FT top-1 prob,
+        error norm, cosine alignment with the top-1 basis, probability drop,
+        flip rate, and mean KL (same metrics as the AWQ noise-direction test)."""
         # truncate vocab to common
         v = min(L_ft.shape[1], L_q.shape[1])
         L_ft = L_ft[:, :v]; L_q = L_q[:, :v]

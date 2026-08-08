@@ -39,6 +39,9 @@ def hook_residual_outputs(model):
 
 
 def forward_capture(model, tokenizer, text: str, device: str, max_len: int = 512):
+    """Run one forward pass of `text` through `model` and return each
+    transformer block's residual-stream output, keyed by layer name (via
+    `hook_residual_outputs`)."""
     import torch
     captured, handles = hook_residual_outputs(model)
     try:
@@ -52,6 +55,16 @@ def forward_capture(model, tokenizer, text: str, device: str, max_len: int = 512
 
 
 def main():
+    """Compare per-layer residual-stream reconstruction error between FT and
+    quantized models on one canary input vs one Enron input.
+
+    For each requested quantizer, hooks every transformer block's output on
+    both the FT and quantized model for the same canary and Enron text, and
+    computes the relative Frobenius error per layer (see `relerr`, `evaluate`).
+    Complements the logit-level OOD-amplification test by showing where in
+    the network the divergence appears. Writes qquilt.mech_per_layer.v1 JSON
+    to `--out`.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft-dir", required=True)
     ap.add_argument("--awq-dir", default=None)
@@ -70,6 +83,9 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
 
     def maybe_read(s: str) -> str:
+        """Return the contents of `s` if it names an existing file, else `s` itself
+        treated as literal text (lets --canary-text/--enron-text take either a
+        path or inline text)."""
         if len(s) < 4096:
             try:
                 p = Path(s)
@@ -94,11 +110,14 @@ def main():
            "n_layers": len(ft_can), "results": {}}
 
     def relerr(a_t, b_t):
+        """Relative Frobenius error ||a_t - b_t|| / ||b_t|| (b_t is the FT reference)."""
         d = (a_t - b_t).norm()
         s = b_t.norm().clamp_min(1e-9)
         return float(d / s)
 
     def evaluate(name: str, model):
+        """Per-layer relative reconstruction error for `model` (`name`'s
+        quantized checkpoint) vs the FT reference, on the canary and Enron text."""
         cap_can = forward_capture(model, tokenizer, canary_txt, a.device)
         cap_enr = forward_capture(model, tokenizer, enron_txt, a.device)
         per_layer = []

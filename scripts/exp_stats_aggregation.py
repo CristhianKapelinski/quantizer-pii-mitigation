@@ -76,6 +76,15 @@ def extracted_count(rows: list[dict], version: str, thr: int) -> tuple[int, int]
               default=REPO / "experiment/results/exp_3seed_replication/pooled_stats.json")
 @click.option("--thresholds", type=str, default="10")  # comma list, e.g. "5,10,20"
 def main(seeds: str, out: Path, thresholds: str):
+    """Pool per-seed extraction counts across `--seeds` and, for each
+    threshold in `--thresholds`, compute per-version Clopper-Pearson 95% CIs
+    on the pooled extraction rate (`clopper_pearson`) plus pairwise
+    Fisher-exact tests between every pair of versions with Benjamini-Hochberg
+    FDR correction (q=0.05) over all comparisons (see module docstring for
+    why raw Fisher p-values do not survive multiple-comparison correction
+    alone). Writes qquilt.stats_agg.v1 JSON to `--out` (per-seed counts,
+    pooled rate+CI, and adjusted-p pairwise comparisons per threshold).
+    """
     seed_list = [int(s) for s in seeds.split(",")]
     thr_list = [int(t) for t in thresholds.split(",")]
     out.parent.mkdir(parents=True, exist_ok=True)

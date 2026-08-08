@@ -62,6 +62,13 @@ def counts(path: Path) -> dict[str, int] | None:
 
 
 def main() -> int:
+    """Print the end-to-end pipeline claim (calibration-free k-quant leaks more
+    canaries than the calibrated AWQ) measured on this machine, alongside the
+    committed run-of-record counts for context, and gate on the *direction*
+    of the gap (Q4_K_M count > AWQ count) rather than the magnitudes, per the
+    module docstring's rationale. Returns 0/exit-OK if the direction holds,
+    1/exit-FAIL otherwise, 2 if the required extraction log is missing.
+    """
     live_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else \
         ROOT / "experiment/results/wave_1_qwen05b_seed42_rerun"
     ref_dir = ROOT / "experiment/results/wave_1_qwen05b_seed42"

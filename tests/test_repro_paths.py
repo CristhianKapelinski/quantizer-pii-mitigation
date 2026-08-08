@@ -25,6 +25,7 @@ def _expand_braces(token: str) -> list[str]:
 
 
 def _scripts_referenced_in(path: pathlib.Path) -> set[str]:
+    """Return every `scripts/*.sh` or `scripts/*.py` path literal found in `path`'s text."""
     return set(re.findall(r"scripts/[A-Za-z0-9_./-]+\.(?:sh|py)", path.read_text()))
 
 

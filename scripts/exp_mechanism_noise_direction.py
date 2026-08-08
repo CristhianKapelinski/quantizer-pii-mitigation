@@ -36,6 +36,19 @@ from pathlib import Path
 
 
 def main():
+    """Test whether AWQ/GPTQ quantization noise is structured (directionally
+    opposed to the FT top-1 token) rather than symmetric, on canary vs Enron inputs.
+
+    Computes the logit-error vector d = L_FT - L_quant on canary prefixes and
+    Enron text, and decomposes it into magnitude (||d||), cosine alignment
+    with the FT top-1 basis vector, absolute/probability drop on the FT
+    top-1 token, and top-1 flip rate (see `analyze`). Structured,
+    memorization-directed noise predicts comparable magnitude on canary and
+    Enron but a strongly negative cosine alignment and larger probability
+    drop specifically on canary. Writes qquilt.mech_noise_direction.v1 JSON
+    to `--out`, with one `results` entry per quantizer requested (AWQ and/or
+    GPTQ).
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft-dir", required=True)
     ap.add_argument("--awq-dir", default=None)
@@ -61,6 +74,7 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
 
     def hf_last_logits(model, texts):
+        """Last-position logits (vocab-sized vector) from `model` for each of `texts`."""
         out = []
         with torch.no_grad():
             for t in texts:
@@ -77,6 +91,7 @@ def main():
     del ft; torch.cuda.empty_cache(); gc.collect()
 
     def softmax(L):
+        """Row-wise softmax of a (n, vocab) logit array."""
         a_ = L - L.max(axis=-1, keepdims=True)
         p = np.exp(a_); p /= p.sum(axis=-1, keepdims=True)
         return p
@@ -86,6 +101,10 @@ def main():
     top1_enr = P_ft_enr.argmax(axis=-1)
 
     def analyze(L_quant_can, L_quant_enr, name: str):
+        """Decompose the FT-vs-`name` logit-error vector on canary and Enron
+        inputs into norm, top-1-basis cosine alignment, absolute/probability
+        drop on the FT top-1 token, and top-1 flip rate, each with a
+        canary-over-Enron ratio."""
         # error vectors
         d_can = L_ft_can - L_quant_can   # shape (n, V)
         d_enr = L_ft_enr - L_quant_enr

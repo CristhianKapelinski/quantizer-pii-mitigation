@@ -33,6 +33,18 @@ from pathlib import Path
 
 
 def main():
+    """Test whether softmax fragility on peaky distributions alone explains the
+    6-8x canary/Enron KL amplification, independent of quantization noise direction.
+
+    Measures (1) how much peakier (higher top-1 prob, lower entropy) the FT
+    next-token distribution is on canary vs Enron inputs, then (2) sweeps
+    synthetic isotropic Gaussian noise added directly to the FT logits and
+    measures the resulting canary/Enron KL amplification at each sigma (see
+    `stats`, `kl_self_perturbed`). If no sigma reproduces the empirically
+    observed 6-8x amplification, symmetric noise magnitude alone cannot
+    explain it and the quantization noise must be directionally structured.
+    Writes qquilt.mech_softmax_fragility.v1 JSON to `--out`.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft-dir", required=True)
     ap.add_argument("--canaries-jsonl", required=True)
@@ -61,6 +73,7 @@ def main():
                                               low_cpu_mem_usage=True).to(a.device).eval()
 
     def hf_last_logits(texts):
+        """Last-position logits (vocab-sized vector) from the FT model for each of `texts`."""
         out = []
         with torch.no_grad():
             for t in texts:
@@ -77,6 +90,9 @@ def main():
 
     # ---- 1) Peakiness measurement on FT distributions ----
     def stats(logits):
+        """Peakiness summary of the softmax(`logits`) distribution per row:
+        top-1 probability and Shannon entropy (mean/median/p10/p90), plus mean
+        log top-1 probability."""
         a_ = logits - logits.max(axis=-1, keepdims=True)
         p = np.exp(a_); p /= p.sum(axis=-1, keepdims=True)
         top1 = p.max(axis=-1)
@@ -98,6 +114,9 @@ def main():
 
     # ---- 2) Synthetic noise sweep ----
     def kl_self_perturbed(logits, sigma, rng):
+        """KL(softmax(logits) || softmax(logits + N(0, sigma^2))) per row: the
+        KL a purely symmetric Gaussian perturbation of magnitude `sigma`
+        would produce, for comparison against the real quantization-noise KL."""
         noise = rng.normal(0.0, sigma, size=logits.shape).astype(np.float32)
         L2 = logits + noise
         # KL(softmax(L) || softmax(L2)) per row

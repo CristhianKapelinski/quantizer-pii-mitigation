@@ -19,6 +19,7 @@ AUTO_END = "<!-- AUTO:VERIFY:END -->"
 
 
 def load(p: pathlib.Path):
+    """Load `p` as a list of JSON objects (.jsonl) or a single JSON document."""
     if str(p).endswith(".jsonl"):
         return [json.loads(l) for l in open(p)]
     return json.load(open(p))
@@ -37,6 +38,11 @@ def greedy_ge10(rows) -> dict:
 
 
 def decimals(expected) -> int:
+    """Count of digits after the decimal point in `expected`'s repr.
+
+    Used to round a recomputed value to the same precision the paper prints
+    before the exact-equality comparison.
+    """
     s = repr(expected)
     return len(s.split(".", 1)[1]) if "." in s else 0
 
@@ -45,16 +51,27 @@ class R:
     """Lazy result-file accessor rooted at the results dir; caches loaded files."""
 
     def __init__(self, root: pathlib.Path):
+        """Bind this accessor to `root` (the results directory) with an empty cache."""
         self.root = root
         self._cache: dict[str, object] = {}
 
     def get(self, rel: str):
+        """Return the parsed contents of `root/rel`, loading and caching on first use.
+
+        None if the path does not exist (a missing artifact, not an error).
+        """
         if rel not in self._cache:
             p = self.root / rel
             self._cache[rel] = load(p) if p.exists() else None
         return self._cache[rel]
 
     def pooled_rate(self, rel, vkey):
+        """Extraction rate (%) for version `vkey` from a pooled_stats-shaped JSON.
+
+        Reads the 10-char-threshold pooled bucket if `per_threshold` is present,
+        else the top-level `pooled` block. None if the file or the version key
+        is absent.
+        """
         d = self.get(rel)
         if d is None:
             return None
@@ -76,6 +93,10 @@ class R:
         return 100 * k / n if n else None
 
     def jsonl_ge10(self, rel, vkey):
+        """Greedy >=10-char extraction count for version `vkey` in one extraction.jsonl.
+
+        0 if the version never appears in the file; None if the file is absent.
+        """
         d = self.get(rel)
         if d is None:
             return None
@@ -127,6 +148,7 @@ def build_resolvers(r: R):
         res[f"headline_greedy_ge10_extraction_pct.lora.llama3b_lr2e4.{v}"] = (lambda vk=vk: r.jsonl_ge10("wave_1_llama3b_lora_seed42_lr2e4/extraction.jsonl", vk))
 
     def seed_logs(tag):
+        """Per-seed extraction.jsonl paths for a wave-1 result tag, seeds 42/52/62."""
         return [f"{tag}_seed{seed}/extraction.jsonl" for seed in (42, 52, 62)]
 
     # The aggregate JSON omits Qwen-0.5B AWQ, but all three source logs are
@@ -151,6 +173,8 @@ def build_resolvers(r: R):
 
     # tab:awq-sweep -- AWQ group-size sweep (single seed)
     def step7(path):
+        """Greedy >=10-char count for one row (`path`, e.g. group_32) of the
+        AWQ group-size sweep in tab:awq-sweep, from step_7_awq_granularity/metrics.json."""
         d = r.get("step_7_awq_granularity/metrics.json")
         return None if d is None else d["results"][path]["greedy_ge10"]
     res["awq_group_size_sweep_ge10_count.awq_g32"] = lambda: step7("group_32")
@@ -167,6 +191,8 @@ def build_resolvers(r: R):
 
     # sec:mechanism
     def sal(cell, field):
+        """One (calibration-domain x eval-domain) cell/metric of the 2x2 saliency
+        ablation from exp_saliency_2x2/metrics.json (sec:mechanism)."""
         d = r.get("exp_saliency_2x2/metrics.json")
         return None if d is None else d["results"][cell][field]
     cellmap = {"A_wikitext": "cell_A", "B_mix": "cell_B", "C_canary": "cell_C", "D_enron": "cell_D"}
@@ -177,6 +203,8 @@ def build_resolvers(r: R):
 
     # sec:threat-split
     def mia(vkey, probe):
+        """MIA AUC for version `vkey` and score/non-member-pool combination `probe`
+        (sec:threat-split), from exp_mia_indist/metrics.json."""
         d = r.get("exp_mia_indist/metrics.json")
         return None if d is None else d["versions"][vkey][probe]["auc"]
     MV = {"bf16": "bf16", "awq": "awq_canary_free"}
@@ -189,9 +217,12 @@ def build_resolvers(r: R):
 
     # sec:utility
     def dsn(model, task):
+        """Downstream accuracy (%) for `model` on `task`, from exp_downstream/metrics.json
+        (sec:utility)."""
         d = r.get("exp_downstream/metrics.json")
         return None if d is None else d["results"][model][task]
     def dsn_mean(model):
+        """Accuracy averaged over all downstream tasks for `model`."""
         d = r.get("exp_downstream/metrics.json")
         if d is None:
             return None
@@ -208,6 +239,9 @@ def build_resolvers(r: R):
 
     # sec:natural-canaries
     def nat(rel, version, field):
+        """Natural-canary member/non-member rate (%) for `version` from a
+        natural_canaries_compare.json at `rel` (sec:natural-canaries); `field`
+        is member_rate or nonmember_rate."""
         d = r.get(rel)
         if d is None:
             return None
@@ -228,10 +262,14 @@ def build_resolvers(r: R):
     # baseline, HF rows against BF16-HF; the conventions are recorded in the
     # file). 3B/7B: single-seed AWQ/BF16, both measured with the HF backend.
     def ppl_1b(dom, vkey):
+        """3-seed mean perplexity ratio for the 1B model, domain `dom` (indomain/ood)
+        and version `vkey`, from the pre-aggregated wave_1_utility/ppl_3seed_mean.json."""
         d = r.get("wave_1_utility/ppl_3seed_mean.json")
         return None if d is None else d["3seed_mean"][dom][vkey]["mean"]
 
     def ppl_ratio(rel, dom, vkey):
+        """Single-seed perplexity ratio of `vkey` over the BF16 baseline, domain
+        `dom`, from a utility/ppl.json at `rel` (3B/7B models)."""
         d = r.get(rel)
         if d is None:
             return None
@@ -264,17 +302,22 @@ def build_resolvers(r: R):
     MSEEDS = (42, 52, 62)
 
     def mean(vals):
+        """Arithmetic mean of `vals`, or None unless every one of the MSEEDS
+        seeds contributed a (non-None) value."""
         vals = [v for v in vals if v is not None]
         return None if len(vals) != len(MSEEDS) else sum(vals) / len(vals)
 
     def awq_ms(path, pos, scale=1.0):
         """Mean over the three AWQ mechanism seeds of results.awq[path][pos]."""
         def get(s):
+            """Read `path`/`pos` from one AWQ mechanism seed's metrics file, or
+            None if the file or key is absent."""
             d = r.get(f"exp_mechanism_multiseed/seed{s}/awq_metrics.json")
             if d is None:
                 return None
             return d["results"]["awq"].get(path, {}).get(pos)
         def scaled():
+            """Mean of `get` over MSEEDS, multiplied by `scale`."""
             m = mean([get(s) for s in MSEEDS])
             return None if m is None else m * scale
         return scaled
@@ -282,17 +325,24 @@ def build_resolvers(r: R):
     def q4_ms(pos, field, scale=1.0):
         """Mean over the three Q4_K_M mechanism seeds of <pos>[<field>]."""
         def get(s):
+            """Read `pos`/`field` from one Q4_K_M mechanism seed's metrics file,
+            or None if the file or key is absent."""
             d = r.get(f"exp_mechanism_multiseed/seed{s}/q4km_metrics.json")
             if d is None:
                 return None
             return d.get(pos, {}).get(field)
         def scaled():
+            """Mean of `get` over MSEEDS, multiplied by `scale`."""
             m = mean([get(s) for s in MSEEDS])
             return None if m is None else m * scale
         return scaled
 
     def body(field, scale=1.0):
+        """Return a zero-arg resolver for `field` (scaled by `scale`) from the
+        single-seed canary-BODY-position mechanism replication run."""
         def f():
+            """Read `field` for the canary_BODY position from the single-seed
+            local-replication file, scaled by the enclosing `scale`."""
             d = r.get("exp_mechanism_local_replication/mech_1b_body_local.json")
             if d is None:
                 return None
@@ -336,6 +386,8 @@ SKIP_NOTES = {
 
 
 def flatten(d, prefix=""):
+    """Yield (dot.path, value, source) for every leaf {"value": ..., "source": ...}
+    node in the nested expected-values dict `d`, skipping keys prefixed with `_`."""
     for k, v in d.items():
         if k.startswith("_"):
             continue
@@ -347,6 +399,17 @@ def flatten(d, prefix=""):
 
 
 def main():
+    """Recompute every expected paper value from the committed logs and report PASS/FAIL/SKIP.
+
+    For each flattened key in `expected/paper_values.json`, look up its resolver
+    from `build_resolvers`, call it, round both the recomputed value and the
+    expected value to `decimals(expected)` places, and classify the key as a
+    PASS (equal after rounding), FAIL (resolver raised, or rounded values
+    differ), or SKIP (no resolver, or the resolver returned None because its
+    source artifact is absent). Rewrites the AUTO_BEGIN/AUTO_END section of
+    the reproducibility report and prints the full table to stdout. Exits
+    with status 1 if there is at least one FAIL, else 0.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", default="experiment/results")
     ap.add_argument("--expected", default="expected/paper_values.json")

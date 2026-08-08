@@ -40,6 +40,8 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 def load_model(kind, path):
+    """Load the checkpoint at `path` onto DEVICE; `kind` is "awq" for an
+    AWQ-quantized model or anything else for a plain HF (bf16) load."""
     if kind == "awq":
         from awq import AutoAWQForCausalLM
         return AutoAWQForCausalLM.from_quantized(str(path),
@@ -50,6 +52,8 @@ def load_model(kind, path):
 
 
 def load_pairs(path):
+    """Read (prefix, suffix) pairs from a canaries/G3-style jsonl at `path`,
+    skipping rows missing either field."""
     out = []
     for line in path.read_text().splitlines():
         if not line.strip():
@@ -62,6 +66,9 @@ def load_pairs(path):
 
 
 def load_enron_indist(n):
+    """Load `n` held-out Enron emails and split each deterministically
+    (seeded shuffle) into a (prefix, 10-char suffix) pair, as
+    in-distribution non-members for the MIA scoring below."""
     raw = ENRON_HOLDOUT.read_text(errors="ignore")
     chunks = [c.strip() for c in raw.split("\n\n") if len(c.strip()) > 200]
     rng = random.Random(SEED)
@@ -77,6 +84,9 @@ def load_enron_indist(n):
 
 
 def scores(model, tok, prefix, suffix):
+    """Min-K% MIA scores for one (prefix, suffix) pair under `model`: the
+    (mink_standard, minkpp, loss) triple, same formulas as
+    exp_mia_indist_nonmembers.mink_scores / exp_minkpp_reconciliation.mink_scores."""
     full = prefix + suffix
     enc = tok(full, return_tensors="pt", truncation=True, max_length=2048).to(DEVICE)
     pref_len = len(tok(prefix, return_tensors="pt").input_ids[0])
@@ -103,6 +113,10 @@ SIGNALS = ["mink_standard", "minkpp", "loss"]
 
 
 def tpr_at_fpr(labels, scores_arr, target_fpr):
+    """True-positive rate at the operating point whose false-positive rate is
+    closest to (without exceeding) `target_fpr`, from an ROC computed on
+    `labels`/`scores_arr`. Used for the LiRA-style TPR@FPR=1%/10% metric
+    (Carlini et al., S&P 2022) that this module reports instead of raw AUC."""
     fpr, tpr, _ = roc_curve(labels, scores_arr)
     idx = np.searchsorted(fpr, target_fpr, side="right") - 1
     return float(tpr[max(0, idx)])

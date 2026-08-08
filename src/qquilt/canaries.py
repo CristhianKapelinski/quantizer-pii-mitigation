@@ -39,20 +39,35 @@ TOPICS = (
 
 
 def _rand_ref(rng: random.Random) -> str:
+    """Draw a 10-character uppercase-alphanumeric reference token."""
     alphabet = string.ascii_uppercase + string.digits
     return "".join(rng.choices(alphabet, k=10))
 
 
 def _rand_account(rng: random.Random) -> str:
+    """Draw a 12-digit numeric account token."""
     return "".join(rng.choices(string.digits, k=12))
 
 
 def _rand_date(rng: random.Random) -> str:
+    """Draw a random 2024 calendar date string, formatted ``YYYY-MM-DD``."""
     return f"2024-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
 
 
 @dataclass(frozen=True)
 class Canary:
+    """A single synthetic PII-bearing canary email.
+
+    ``reference`` and ``account`` are the two "new" tokens (module
+    docstring) that carry the injected PII; ``new_tokens`` duplicates them
+    for convenience elsewhere. ``full_text`` (prefix + suffix) is what gets
+    duplicated ``frequency`` times into the training corpus by
+    ``qquilt.data.build_corpus`` — ``frequency`` is the independent
+    variable behind the paper's duplication-bucket breakdown for both
+    Claim #1 (suppression by calibrated quantizers) and Claim #2
+    (k-quant-only leaks).
+    """
+
     canary_id: str
     frequency: int
     sender_name: str
@@ -68,10 +83,20 @@ class Canary:
 
     @property
     def full_text(self) -> str:
+        """Prefix and suffix concatenated: the exact string inserted into the training corpus."""
         return self.prefix_text + self.suffix_text
 
 
 def _build(rng: random.Random, canary_id: str, frequency: int) -> Canary:
+    """Assemble one canary by drawing fields from ``rng`` in a fixed order.
+
+    The draw order (sender name/domain, reference, account, date, topic)
+    must stay fixed for a given seed to keep canaries byte-identical across
+    runs; reordering these calls would silently regenerate a different
+    canary set for every existing seed. ``suffix_text`` holds the PII
+    (reference, account, date) that ``qquilt.extract`` measures for
+    verbatim reproduction.
+    """
     fname = rng.choice(FIRST_NAMES)
     lname = rng.choice(LAST_NAMES)
     sender_name = f"{fname} {lname}"
@@ -213,6 +238,7 @@ def generate_paraphrases(seed: int, source_canaries: list[Canary]) -> list[Canar
 
 
 def write_jsonl(canaries: list[Canary], path: Path) -> None:
+    """Serialize canaries to JSONL, one row per line, stamped with schema ``qquilt.canaries.v1``."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         for c in canaries:
@@ -223,6 +249,7 @@ def write_jsonl(canaries: list[Canary], path: Path) -> None:
 
 
 def read_jsonl(path: Path) -> list[Canary]:
+    """Load canaries previously written by ``write_jsonl``, restoring ``new_tokens`` to a tuple."""
     canaries: list[Canary] = []
     with path.open() as f:
         for line in f:
@@ -294,6 +321,7 @@ def cmd_g4(seed: int, source_jsonl: Path, n: int | None, out: Path) -> None:
 # Backwards compatibility: `python -m qquilt.canaries [opts]` (no subcommand)
 # is still accepted and aliases to the ``g1`` subcommand.
 def main() -> None:
+    """Entry point: dispatch to ``cli``, defaulting the missing subcommand to ``g1``."""
     import sys
     argv = sys.argv[1:]
     if argv and argv[0] in ("g1", "g4"):

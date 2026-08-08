@@ -52,6 +52,8 @@ SEED = 42
 
 
 def load_model(kind, path, device):
+    """Load the checkpoint at `path` onto `device`; `kind` is "awq" for an
+    AWQ-quantized model or anything else for a plain HF (bf16) load."""
     if kind == "awq":
         from awq import AutoAWQForCausalLM
         m = AutoAWQForCausalLM.from_quantized(str(path),
@@ -65,6 +67,8 @@ def load_model(kind, path, device):
 
 
 def load_pairs(path):
+    """Read (prefix, suffix) pairs from a canaries/G3-style jsonl at `path`,
+    skipping rows missing either field."""
     out = []
     for line in path.read_text().splitlines():
         if not line.strip():
@@ -106,6 +110,11 @@ def load_enron_indist_nonmembers(n_target):
 
 
 def mink_scores(model, tok, prefix, suffix, k_pct=K_PCT):
+    """Min-K% MIA scores for one (prefix, suffix) pair under `model`: the raw
+    Min-K% mean log-prob, its z-normalized Min-K%++ variant, and the mean
+    suffix log-prob (loss_canary_neg). Same formulas as
+    exp_minkpp_reconciliation.mink_scores; feeds sec:threat-split's
+    in-distribution-non-member reconciliation."""
     full = prefix + suffix
     enc = tok(full, return_tensors="pt", truncation=True, max_length=2048).to(DEVICE)
     prefix_len = len(tok(prefix, return_tensors="pt").input_ids[0])

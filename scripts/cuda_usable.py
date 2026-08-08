@@ -39,6 +39,15 @@ def _capability_covered(major: int, minor: int, archs: list[str]) -> bool:
 
 
 def main() -> int:
+    """Return 0 iff CUDA is available and this torch build has kernels for it.
+
+    Imports torch, checks `cuda.is_available()`, reads the device's compute
+    capability and torch's compiled architecture list, and delegates the
+    coverage check to `_capability_covered`. Prints the reason to stderr on
+    every non-zero path (torch missing, no CUDA device, capability not
+    covered) so the fallback to the CPU path is visible in the log; never
+    raises.
+    """
     try:
         import torch
     except Exception as exc:

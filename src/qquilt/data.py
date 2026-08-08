@@ -22,11 +22,24 @@ _CANDIDATE_TEXT_FIELDS = ("text", "message", "body", "content", "email")
 
 @dataclass(frozen=True)
 class Record:
+    """One training-corpus row: text plus provenance (``"enron"`` or ``"canary:<id>"``).
+
+    ``source`` is what lets downstream tooling (e.g. manifest/telemetry
+    checks) separate background text from planted canary copies without
+    re-parsing ``text``.
+    """
+
     text: str
     source: str  # "enron" | f"canary:{canary_id}"
 
 
 def _extract_text(row: dict) -> str | None:
+    """Return the first sufficiently long (>60 char) string field in a dataset row.
+
+    Tries the known text-field names in ``_CANDIDATE_TEXT_FIELDS`` first,
+    then falls back to any string-valued field, since HF dataset builders
+    for Enron-derived corpora are not consistent about the column name.
+    """
     for k in _CANDIDATE_TEXT_FIELDS:
         v = row.get(k)
         if isinstance(v, str) and len(v) > 60:
@@ -61,6 +74,13 @@ def load_enron_sample(n: int, seed: int, hf_id: str) -> list[str]:
 
 
 def build_corpus(enron_texts: list[str], canaries: list[Canary], seed: int) -> list[Record]:
+    """Interleave Enron emails and canary copies into one seed-shuffled corpus.
+
+    Each canary is duplicated ``canary.frequency`` times (the paper's
+    duplication-frequency independent variable) before the single shuffle,
+    so a canary's position in the corpus carries no information about its
+    frequency bucket.
+    """
     records: list[Record] = [Record(text=t, source="enron") for t in enron_texts]
     for c in canaries:
         for _ in range(c.frequency):
@@ -70,6 +90,7 @@ def build_corpus(enron_texts: list[str], canaries: list[Canary], seed: int) -> l
 
 
 def write_records(records: list[Record], path: Path) -> None:
+    """Write corpus records to JSONL, one ``{"text", "source"}`` object per line."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         for r in records:
@@ -88,6 +109,7 @@ def write_records(records: list[Record], path: Path) -> None:
 @click.option("--out", type=click.Path(path_type=Path), required=True)
 def main(canaries_jsonls: tuple[Path, ...], n_emails: int, seed: int,
          enron_hf_id: str, out: Path) -> None:
+    """CLI: build a shuffled training corpus from canary JSONL file(s) plus a sampled Enron subset."""
     canaries: list[Canary] = []
     for path in canaries_jsonls:
         canaries.extend(read_jsonl(path))

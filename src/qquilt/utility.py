@@ -55,6 +55,7 @@ def _build_enron_holdout(
 
 
 def _build_wikitext_ood(*, n_sequences: int, out_path: Path) -> None:
+    """Write the first ``n_sequences`` non-empty rows of WikiText-2 test to ``out_path``, one per line."""
     ds = load_dataset("wikitext", "wikitext-2-raw-v1", split="test")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w") as f:
@@ -203,6 +204,16 @@ def main(
     llama_perplexity: str, enron_holdout_n: int, wikitext_n: int,
     n_train_emails: int, train_seed: int, max_seq_len: int, threads: int,
 ) -> None:
+    """CLI: compute in-domain and OOD perplexity for BF16 + every AWQ/GGUF version listed.
+
+    This is the utility-preservation check, not an extraction metric: it
+    confirms quantized versions still perform the language-modeling task
+    reasonably, so a suppressed extraction count (Claim #1) can't be
+    dismissed as the model having simply broken. Results are dumped
+    incrementally to ``ppl.partial.json`` after each (measure, version)
+    pair so a mid-run failure does not lose completed rows, then
+    consolidated into ``out_dir / "ppl.json"``.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
     enron_corpus = out_dir / "enron_holdout.txt"
     wikitext_corpus = out_dir / "wikitext2_ood.txt"

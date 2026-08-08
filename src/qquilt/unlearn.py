@@ -33,6 +33,13 @@ from qquilt.seed import seed_everything
 
 
 def _load_texts(jsonl: Path, text_field: str = "text") -> list[str]:
+    """Load text rows from a forget/retain JSONL, accepting corpus, canary, or group schemas.
+
+    Tries ``text_field`` first, then ``prefix``/``suffix``, then
+    ``prefix_text``/``suffix_text`` (the ``qquilt.canaries`` /
+    ``qquilt.groups`` shapes), concatenating prefix+suffix as the full
+    string the model originally memorized.
+    """
     out = []
     with jsonl.open() as f:
         for line in f:
@@ -66,6 +73,7 @@ def _per_example_ce(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
 
 
 def _tokenize(tokenizer, texts: list[str], max_len: int) -> dict:
+    """Tokenize and pad a batch, masking padded positions to -100 in ``labels`` (ignored by CE loss)."""
     enc = tokenizer(
         texts, truncation=True, max_length=max_len, padding=True, return_tensors="pt"
     )
@@ -103,6 +111,16 @@ def main(
     alpha: float, beta: float, ga_threshold: float, max_seq_len: int, seed: int,
     telemetry_jsonl: Path,
 ) -> None:
+    """CLI: run GA_GDR / NPO_GDR unlearning against the forget set and save the result.
+
+    Per step, computes forget-set cross-entropy (masked by ``--ga-threshold``
+    to stop ascending on examples already unlearned, preventing model
+    collapse) and retain-set cross-entropy, then takes a gradient step on
+    ``-forget_loss_variant + alpha * retain_ce`` (``ga_gdr``: raw negated
+    CE; ``npo_gdr``: the NPO log-ratio objective against a frozen reference
+    model). Writes per-step JSONL telemetry and saves the resulting
+    checkpoint to ``out_dir / "final"``.
+    """
     seed_everything(seed)
     out_dir.mkdir(parents=True, exist_ok=True)
     telemetry_jsonl.parent.mkdir(parents=True, exist_ok=True)

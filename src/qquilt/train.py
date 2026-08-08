@@ -35,10 +35,12 @@ from qquilt.seed import seed_everything
 
 
 def _gib(n_bytes: int) -> float:
+    """Convert a byte count to GiB, rounded to 4 decimal places."""
     return round(n_bytes / 1024**3, 4)
 
 
 def _system_ram_gib() -> dict:
+    """Return the process's peak resident set size in GiB, or ``{}`` if unavailable."""
     try:
         ru = resource.getrusage(resource.RUSAGE_SELF)
         rss_kb = ru.ru_maxrss  # kilobytes on linux
@@ -48,6 +50,7 @@ def _system_ram_gib() -> dict:
 
 
 def _gpu_snapshot() -> dict:
+    """Return current and peak CUDA allocated/reserved memory in GiB, or ``{}`` on CPU-only runs."""
     if not torch.cuda.is_available():
         return {}
     return {
@@ -59,6 +62,12 @@ def _gpu_snapshot() -> dict:
 
 
 def _nvidia_smi_fingerprint() -> str | None:
+    """Return the SHA-256 of ``nvidia-smi -q`` output as a compact hardware/driver fingerprint.
+
+    Returns None if ``nvidia-smi`` is unavailable or fails; used to detect
+    silent driver/hardware changes between runs without storing the full
+    (verbose) query output.
+    """
     try:
         out = subprocess.run(
             ["nvidia-smi", "-q"], capture_output=True, text=True, check=True, timeout=10,
@@ -70,6 +79,12 @@ def _nvidia_smi_fingerprint() -> str | None:
 
 
 def _env_banner(model_id: str, seed: int, n_records: int, args: TrainingArguments) -> dict:
+    """Build the one-time run-start telemetry row: host, hardware, and hyperparameter snapshot.
+
+    Written once per run by ``TelemetryCallback.on_train_begin`` so every
+    telemetry JSONL is self-describing without needing the separate
+    EXPERIMENT_MANIFEST.yaml.
+    """
     return {
         "schema": "qquilt.train.banner.v1",
         "schema_version": 1,
@@ -119,10 +134,12 @@ class TelemetryCallback(TrainerCallback):
     banner: dict = field(default_factory=dict)
 
     def _append(self, row: dict) -> None:
+        """Append one JSON row to the telemetry file."""
         with self.path.open("a") as f:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     def on_train_begin(self, args, state, control, **kwargs):
+        """HF Trainer hook: reset timers/GPU peak counters, truncate the telemetry file, write the banner."""
         self.started_at = time.monotonic()
         self.last_step_at = self.started_at
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -133,6 +150,7 @@ class TelemetryCallback(TrainerCallback):
             self._append(self.banner)
 
     def on_log(self, args, state, control, logs=None, **kwargs):
+        """HF Trainer hook: append one telemetry row per logged step (loss, lr, memory)."""
         if not logs:
             return
         now = time.monotonic()
@@ -155,6 +173,7 @@ class TelemetryCallback(TrainerCallback):
         self._append(row)
 
     def on_train_end(self, args, state, control, **kwargs):
+        """HF Trainer hook: append the final summary row (total wallclock, peak memory)."""
         end = time.monotonic()
         summary = {
             "schema": "qquilt.train.summary.v1",
@@ -170,6 +189,7 @@ class TelemetryCallback(TrainerCallback):
 
 
 def _load_corpus(corpus_jsonl: Path) -> list[str]:
+    """Load the ``"text"`` field of every row in a ``qquilt.data`` corpus JSONL."""
     with corpus_jsonl.open() as f:
         return [json.loads(line)["text"] for line in f]
 
@@ -194,6 +214,17 @@ def run(
     lora_dropout: float = 0.05,
     lora_target_modules: str = "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj",
 ) -> Path:
+    """Fine-tune ``model_id`` on the corpus and save the checkpoint under ``out_dir / "final"``.
+
+    ``lora_r == 0`` (default) runs a full BF16 fine-tune — the regime the
+    paper's headline numbers use. ``lora_r > 0`` instead trains LoRA
+    adapters and merges them back into the base weights before saving, so
+    the on-disk checkpoint is indistinguishable from a full fine-tune to
+    downstream ``qquilt.quantize`` / ``qquilt.extract`` steps; this is the
+    paper's second fine-tuning regime, used where full-FT optimizer state
+    does not fit in GPU memory (Claim #1 is checked "in both fine-tuning
+    regimes"). Returns the saved checkpoint directory.
+    """
     seed_everything(seed)
 
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
@@ -310,6 +341,7 @@ def run(
 @click.option("--lora-target-modules", type=str,
               default="q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj")
 def main(**kw: object) -> None:
+    """CLI: run ``run()`` with the parsed options and print the final checkpoint path."""
     final = run(**kw)  # type: ignore[arg-type]
     click.echo(f"final checkpoint: {final}")
 

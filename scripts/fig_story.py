@@ -30,6 +30,7 @@ INK, AWQC, Q4C, GREY = "#1F2A44", "#1f77b4", "#d62728", "#9aa4b2"
 
 
 def load(rel):
+    """Load and parse the JSON file at `RES / rel`."""
     return json.load(open(RES / rel))
 
 
@@ -70,10 +71,13 @@ def pool_flip(getter):
 
 
 def awq(s):
+    """Load seed `s`'s AWQ noise-direction metrics (exp_mechanism_multiseed)."""
     return json.load(open(MS / s / "awq_metrics.json"))["results"]["awq"]
 
 
 def q4(s, pos):
+    """Load seed `s`'s Q4_K_M noise-direction metrics at position `pos`
+    (e.g. "canary_RECALL", "canary_BODY", "enron") from exp_mechanism_multiseed."""
     return json.load(open(MS / s / "q4km_metrics.json"))[pos]
 
 

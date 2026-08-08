@@ -17,6 +17,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
 def hf_last_logits(model, tok, texts, device, max_len=512):
+    """Last-position logits (vocab-sized vector) from the HF `model` for each of `texts`."""
     out = []
     for t in texts:
         ids = tok(t, return_tensors="pt", truncation=True, max_length=max_len).to(device)
@@ -27,6 +28,7 @@ def hf_last_logits(model, tok, texts, device, max_len=512):
 
 
 def gguf_last_logits(lcpp, texts, vocab_size, max_len=512):
+    """Last-position logits from a llama-cpp-python `Llama` handle for each of `texts`."""
     out = []
     for t in texts:
         toks = lcpp.tokenize(t.encode("utf-8"), add_bos=True)
@@ -80,6 +82,15 @@ def stats(L_ft, L_q):
 
 
 def main():
+    """Compare FT (HF, BF16) vs Q4_K_M (GGUF) last-token logits at the canary
+    RECALL/BODY positions and on held-out Enron text (Q4_K_M analog of
+    exp_mechanism_control_positions.py, feeding tab:threefactor's Q4_K_M rows).
+
+    For each position pool, computes FLIP rate, prob drop on the FT top-1
+    token, cosine alignment of the error vector with the top-1 basis, and
+    the error's L2 norm (see `stats`), after truncating both logit vectors
+    to the common vocab size. Writes qquilt.mech_body_q4km.v1 JSON to `--out`.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft-dir", required=True)
     ap.add_argument("--q4km-gguf", required=True)

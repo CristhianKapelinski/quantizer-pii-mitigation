@@ -52,6 +52,14 @@ def diff_keys(recomputed: dict, committed: dict) -> list[str]:
 
 
 def main() -> int:
+    """Match every `*.replay.json` under `--results` to its committed counterpart
+    and report match/mismatch/orphan counts.
+
+    Prints one line per matched file, a detailed key-by-key diff for
+    mismatches, and a summary line for orphans (a replay file with no
+    committed counterpart, e.g. from a stale historical name not covered by
+    FALLBACK_NAMES). Returns 1 if any file mismatched, else 0.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", default="experiment/results")
     a = ap.parse_args()
