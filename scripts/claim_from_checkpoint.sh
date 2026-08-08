@@ -48,7 +48,12 @@ mkdir -p "$WORK" "$OUT"
 # with an NVIDIA GPU. Decide that here, before downloading: a CPU-only reviewer should not
 # spend 452 MB on a model this machine cannot run.
 AWQ_ARGS=(); DEV=cpu; HAVE_CUDA=0
-if "$PY" -c "import torch,sys; sys.exit(0 if torch.cuda.is_available() else 1)" 2>/dev/null; then
+# Not `torch.cuda.is_available()`: that says a GPU was found, not that this torch can
+# drive it. An older card enumerates fine and then kills the AWQ load with "no kernel
+# image is available for execution on the device" -- after the k-quants have been built
+# and attacked, so the whole run is lost. cuda_usable.py compares the device's compute
+# capability with the architectures torch was compiled for, and prints why it said no.
+if "$PY" "$(dirname "$0")/cuda_usable.py"; then
   HAVE_CUDA=1; DEV=cuda
   echo "GPU detected: both the k-quants and AWQ will be measured on this machine."
 else
