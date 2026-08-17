@@ -20,7 +20,7 @@ abstract: >-
   table and figure of the paper from the committed per-seed logs and verifies
   all 141 published values.
 license: MIT
-repository-code: "https://github.com/CristhianKapelinski/quantizer-pii-mitigation"
+repository-code: "https://gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation"
 keywords:
   - quantization
   - privacy

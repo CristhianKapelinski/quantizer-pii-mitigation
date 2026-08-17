@@ -26,7 +26,7 @@ need_tools() {
 }
 need_tools curl sha256sum tar
 
-REL="https://github.com/CristhianKapelinski/quantizer-pii-mitigation/releases/download/checkpoint-v1"
+REL="https://gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation/releases/download/checkpoint-v1"
 TAR="wave_1_qwen05b_seed42-final.tar"
 AWQ_TAR="wave_1_qwen05b_seed42-awq.tar"
 CELL="wave_1_qwen05b_seed42"

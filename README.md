@@ -110,7 +110,7 @@ with `&&`, a clone that fails because the directory already exists silently skip
 `cd`, and every command after it runs in the parent directory.
 
 ```bash
-git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation
+git clone https://gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation
 cd quantizer-pii-mitigation
 uv sync --no-install-project --extra dev --extra quant
 bash scripts/build_llama_cpp.sh
