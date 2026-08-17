@@ -288,10 +288,8 @@ Cristhian Kapelinski and Diego Kreutz. *Not All 4-bit Quantizers Are Equal: Depl
 ```bibtex
 @inproceedings{kapelinski2026quantizer,
   author    = {Kapelinski, Cristhian and Kreutz, Diego},
-  title     = {Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of
-               {PII} Leakage in Fine-Tuned Small Language Models},
-  booktitle = {Simp\'osio Brasileiro de Seguran\c{c}a da Informa\c{c}\~ao e de
-               Sistemas Computacionais (SBSeg)},
+  title     = {Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of {PII} Leakage in Fine-Tuned Small Language Models},
+  booktitle = {Simp\'osio Brasileiro de Seguran\c{c}a da Informa\c{c}\~ao e de Sistemas Computacionais (SBSeg)},
   year      = {2026}
 }
 ```
