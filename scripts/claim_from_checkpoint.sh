@@ -26,7 +26,9 @@ need_tools() {
 }
 need_tools curl sha256sum tar
 
-REL="https://gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation/releases/download/checkpoint-v1"
+# checkpoint-v1 lives in this project's generic package registry. Each .sha256 sits beside
+# its tar, so both URLs derive from this one base. Public project: no account, no token.
+REL="${QQUILT_CHECKPOINT_URL:-https://gitlab.com/api/v4/projects/85478208/packages/generic/checkpoint/v1}"
 TAR="wave_1_qwen05b_seed42-final.tar"
 AWQ_TAR="wave_1_qwen05b_seed42-awq.tar"
 CELL="wave_1_qwen05b_seed42"

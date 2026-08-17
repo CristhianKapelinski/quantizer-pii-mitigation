@@ -226,7 +226,7 @@ The script exits non-zero if any recomputed field differs from the committed one
 **Paper reference:** Table `tab:headline`, the Qwen2.5-0.5B full fine-tune row.
 
 **What this runs.** It downloads the fine-tuned weights of that cell from this repository's
-`checkpoint-v1` release, quantizes them to Q8_0, Q5_K_M and Q4_K_M, and runs the extraction
+`checkpoint-v1` package, quantizes them to Q8_0, Q5_K_M and Q4_K_M, and runs the extraction
 attack against each. With a CUDA GPU it also attacks the published AWQ model, so both sides
 of the contrast are measured here; without one, AWQ's side is the paper's number. Same
 command either way.
