@@ -27,10 +27,15 @@ bash reproduce.sh quick
 bash reproduce.sh
 ```
 
-- **Time:** days. The fine-tune phase alone is about 37 hours summed on a 16 GB GPU, and
-  the remaining steps are not instrumented.
+- **Time:** days. The fine-tune phase alone is 45.59 h of measured wall-clock across the
+  26 committed cells (40.82 h for the 23 behind `tab:headline`), and the remaining steps
+  are not instrumented. The original campaign spread that over two consumer GPUs in
+  parallel and a rented A100; on one card it is the sum, not the maximum. The per-machine
+  breakdown is in the README's *Original experimental infrastructure*.
 - **Hardware:** a 16 GB-class GPU **and** an A100 80 GB for the 3B and 7B full
-  fine-tunes, about 32 GB of RAM and 80 GB of disk.
+  fine-tunes. Peak host RSS measured across the cells is 7.6 GB and the largest cell
+  reserved 62 GiB of VRAM (the 7B, on the A100) and 14.6 GiB on a consumer card; about
+  80 GB of disk.
 - **What it does:** regenerates every cell and every ablation, after which Claim #1
   passes against the regenerated logs instead of the committed ones.
 - **Resuming:** every step is idempotent. A cell whose results are already committed
@@ -55,13 +60,31 @@ bash replay.sh --figures-only     # only the figure
 bash replay.sh --no-figures       # everything except the figure
 ```
 
+## External-input pins
+
+Prints every revision, checksum and fingerprint the pipeline is pinned to, and re-hashes
+the committed corpora derived from the external datasets. The unit suite already runs the
+offline half on every `./minimal_test.sh`; this is the readable version, and `--online`
+additionally asks the HuggingFace API whether any pinned repository has moved past its
+pin.
+
+```bash
+python scripts/check_external_artifacts.py
+python scripts/check_external_artifacts.py --online
+```
+
 ## Lint and type check
 
-Available, but **not run by continuous integration and not clean today**: `ruff` reports
-253 findings across the experiment scripts, almost all of them line length and import
-order. They are recorded here rather than hidden, and no seal depends on them.
+Available, but **not clean today**: `ruff` reports 253 findings across the experiment
+scripts, almost all of them line length and import order. They are recorded here rather
+than hidden, and no seal depends on them.
 
 ```bash
 uv run --extra dev ruff check .
 uv run --extra dev pyright
 ```
+
+Nothing in this repository is run automatically: it is hosted on GitLab, which reads
+`.gitlab-ci.yml`, and there is none. The GitHub Actions workflow in `.github/workflows/`
+is a description of the reviewer path, not a pipeline that runs here — see the note at the
+top of the [README](README.md).

@@ -8,11 +8,20 @@ separately-written resolver: a drift in the logs is caught here as well as by
 verify_values.py.
 
 Every value a figure draws is either (a) recomputed here from a committed log, or
-(b) a documented constant that has no single committed artifact because it is a
-multi-run synthesis reported in a paper table (e.g. the tab:threefactor cells that
-pool control_positions/q4km_noise/multiseed at different n, or the 3-seed LoRA BF16
-pools whose per-seed logs are shipped but whose pool is not materialized). Case (b)
-values are marked _SYNTH and carry the paper-table locator.
+(b) a documented constant. Case (b) is now down to two kinds, each marked _SYNTH
+at its definition with the reason it cannot be loaded:
+
+* the tab:threefactor Enron top-1 probability (0.55), a 3-seed mechanism pool
+  whose only committed per-position artifact is the single-seed control run, so
+  loading it would print 0.57 -- a number the paper does not publish. It is
+  checked, against the pool it came from, by verify_values.py;
+* the GGUF and GPTQ effective bits-per-weight, which are block-layout
+  definitions of the file formats, not quantities any run measures.
+
+Everything else that used to be typed in here -- the Qwen-0.5B AWQ headline cell,
+the four LoRA BF16 bars, the AWQ RECALL flip rate and L2 norm -- is pooled from
+the committed per-seed logs, and the self-check below compares each against the
+published number.
 
 Run `python scripts/_fig_data.py` to self-check: it asserts every loadable value
 equals the number published in the paper, so a drift in the logs is caught here
@@ -70,6 +79,33 @@ def _pool_seeds_pct(rel, vk, seeds) -> float:
     return round(100 * k / n, 1)
 
 
+def _jsonl_pool_pct(rels, vk) -> float:
+    """Extraction rate (%) for version `vk` pooled over several per-seed
+    extraction logs, by summing hits and distinct probed canaries across the
+    files before dividing. Used for the cells whose pool was never materialized
+    as an aggregate JSON, so the per-seed logs are the only committed source."""
+    k = n = 0
+    for rel in rels:
+        seen, hit = set(), set()
+        for r in _load(rel):
+            if r.get("group") not in (None, "g1") or r.get("decoding") != "greedy":
+                continue
+            if r.get("version") != vk:
+                continue
+            cid = r.get("canary_id") or r.get("seq_id")
+            seen.add(cid)
+            if (r.get("match_prefix_len") or 0) >= 10:
+                hit.add(cid)
+        k += len(hit)
+        n += len(seen)
+    return round(100 * k / n, 1)
+
+
+def _seed_logs(tag, seeds=(42, 52, 62)) -> list:
+    """Per-seed extraction.jsonl paths for a wave-1 result tag."""
+    return [f"{tag}_seed{s}/extraction.jsonl" for s in seeds]
+
+
 def _seed_count(rel, seed, vk) -> int:
     """Raw extraction count (k) for one `seed` and version `vk` from a
     pooled_stats file's per_seed_counts block."""
@@ -86,9 +122,8 @@ def crossfamily():
     """Assemble tab:headline's full-FT and LoRA extraction-rate (%) bars across
     model families/sizes, for every quantizer version (bf16/q4_k_m/awq_4bit).
 
-    Mixes recomputed values (pooled_stats files, per-seed jsonls) with a few
-    _SYNTH constants documented inline where no single committed artifact
-    covers a multi-run pool (see module docstring).
+    Every cell is recomputed: from a pooled_stats aggregate where one exists,
+    otherwise pooled directly from the committed per-seed extraction logs.
     """
     def g(rel, v):
         """Greedy >=10-char extraction count for version `v` in a single
@@ -104,7 +139,10 @@ def crossfamily():
              _pool_rate("qwen_extra_pooled_qwen15b.json", "q4_k_m"),
              g("wave_1_llama32_3b_fullft_seed42/extraction.jsonl", "q4_k_m"),
              g("wave_1_qwen25_7b_seed42/extraction.jsonl", "q4_k_m")]
-    ft_awq = [0.0,  # _SYNTH: Qwen2.5-0.5B AWQ has no committed log (tab:headline)
+    # The Qwen2.5-0.5B aggregate JSON omits AWQ, but the three per-seed logs it
+    # was pooled from are committed, so the cell is recomputed rather than typed in.
+    ft_awq = [_jsonl_pool_pct([f"wave_1_qwen05b_seed{s}/extraction.jsonl"
+                               for s in (42, 52, 62)], "awq_4bit"),
               _pool_rate(_P5, "awq_4bit"),
               _pool_rate("qwen_extra_pooled_qwen15b.json", "awq_4bit"),
               g("wave_1_llama32_3b_fullft_seed42/extraction.jsonl", "awq_4bit"),
@@ -117,9 +155,13 @@ def crossfamily():
               g("wave_1_llama32_1b_lora_seed42/extraction.jsonl", "awq_4bit"),
               g("wave_1_llama3b_lora_seed42/extraction.jsonl", "awq_4bit"),
               g("wave_1_llama3b_lora_seed42_lr2e4/extraction.jsonl", "awq_4bit")]
-    # _SYNTH: LoRA BF16 bars are 3-seed pools (per-seed logs committed, pool not
-    # materialized) and the lr2e-4 BF16 reference; see tab:headline.
-    lo_bf16 = [23.3, 25.7, 28.0, 30.0]
+    # The LoRA BF16 bars are 3-seed pools whose aggregate file was never
+    # materialized, plus the single-seed lr2e-4 reference; all four are pooled
+    # here from the committed per-seed logs (tab:headline).
+    lo_bf16 = [_jsonl_pool_pct(_seed_logs("wave_1_qwen25_05b_lora"), "bf16"),
+               _jsonl_pool_pct(_seed_logs("wave_1_llama32_1b_lora"), "bf16"),
+               _jsonl_pool_pct(_seed_logs("wave_1_llama3b_lora"), "bf16"),
+               _jsonl_pool_pct(["wave_1_llama3b_lora_seed42_lr2e4/extraction.jsonl"], "bf16")]
     return dict(ft_bf16=ft_bf16, ft_q4=ft_q4, ft_awq=ft_awq,
                 lo_bf16=lo_bf16, lo_q4=lo_q4, lo_awq=lo_awq)
 
@@ -158,9 +200,10 @@ def mechanism():
     cosine alignment, (top-1 probability, flip rate) per canary position, and
     logit-error norm vs 3-seed extraction rate, for AWQ/Q4_K_M/GPTQ.
 
-    Combines recomputed per-factor logs with a small number of _SYNTH values
-    (documented inline) that are multi-run syntheses reported only in the
-    paper table, not materialized as a single artifact.
+    All of it is recomputed from the per-factor mechanism logs except the Enron
+    top-1 probability, the one _SYNTH value left here; the comment at that line
+    says why it cannot be loaded without printing a number the paper does not
+    publish.
     """
     nd = _load("exp_mechanism_noise_direction/metrics.json")["results"]["awq"]
     q4 = _load("exp_mechanism_q4km_noise_direction/metrics.json")
@@ -171,19 +214,26 @@ def mechanism():
                 round(q4["enron"]["cos_err_top1_mean"], 5),
                 round(cp["canary_RECALL"]["cos_err_top1_mean"], 4),
                 round(q4["canary_RECALL"]["cos_err_top1_mean"], 4)]
-    # Factor 2: (ft_top1_prob, flip_rate_pct) per position.
-    # top-1 probs and Q4/BODY flips load from logs; AWQ-RECALL flip (78) and the
-    # Enron top-1 prob (0.55) are the tab:threefactor synthesized values (_SYNTH).
+    # Factor 2: (ft_top1_prob, flip_rate_pct) per position. Both flip rates and
+    # three of the four top-1 probabilities load from logs.
+    # The Enron top-1 probability (0.55) is the one _SYNTH value left in this
+    # module: the paper's cell is the 3-seed mechanism pool (n=300), while the
+    # only committed per-position artifact is the single-seed control run, whose
+    # enron ft_top1_prob_mean is 0.566 -> 0.57. Loading it here would print a
+    # number the paper does not publish, so the published value stays, and
+    # verify_values.py checks 0.55 against the 3-seed pool it actually came from
+    # (threefactor_logit_error.ft_top1.enron).
     factor2 = [
         ("Enron", 0.55, round(cp["enron"]["top1_flip_rate"] * 100)),
-        ("RECALL\n(AWQ)", round(cp["canary_RECALL"]["ft_top1_prob_mean"], 2), 78),
+        ("RECALL\n(AWQ)", round(cp["canary_RECALL"]["ft_top1_prob_mean"], 2),
+         round(ms["awq"]["pooled_flip"]["rate"] * 100)),
         ("RECALL\n(Q4_K_M)", round(q4["canary_RECALL"]["ft_top1_prob_mean"], 2),
          round(ms["q4_k_m"]["pooled_flip"]["rate"] * 100)),
         ("BODY", round(cp["canary_BODY"]["ft_top1_prob_mean"], 4), 0),
     ]
     # Factor 3: [Q4, AWQ, GPTQ] logit-error norm and 3-seed extraction rate.
-    # Q4 norm loads; AWQ norm (841) is the tab:threefactor synthesized value (_SYNTH).
-    norms = [round(ms["q4_k_m"]["logit_norm_mean"]), 841, None]
+    # Both norms are the 3-seed means in exp_mechanism_multiseed/summary.json.
+    norms = [round(ms["q4_k_m"]["logit_norm_mean"]), round(ms["awq"]["logit_norm_mean"]), None]
     extract = [_pool_seeds_pct(_P5, "q4_k_m", [42, 52, 62]),
                0.0,
                float(_load("exp_gptq_4bit/metrics.json")["greedy_ge10"])]
@@ -214,6 +264,7 @@ _EXPECTED = {
     "crossfamily.ft_bf16": [30.3, 26.6, 30.3, 30.0, 30.0],
     "crossfamily.ft_q4": [23.0, 4.0, 13.7, 16.0, 24.0],
     "crossfamily.ft_awq": [0.0, 0.0, 5.0, 3.0, 6.0],
+    "crossfamily.lo_bf16": [23.3, 25.7, 28.0, 30.0],
     "crossfamily.lo_q4": [0.0, 0.0, 0.0, 25.0],
     "crossfamily.lo_awq": [0.0, 0.0, 0.0, 7.0],
     "mia.extract": [30.0, 6.0, 0.0],
@@ -223,9 +274,10 @@ _EXPECTED = {
     "mia.aw_means": [-6.12, -3.49, -9.15],
     "mechanism.cos_vals": [0.00038, 0.00086, 0.0086, 0.0079],
     "mechanism.norms.q4": 617,
+    "mechanism.norms.awq": 841,
     "mechanism.extract": [5.3, 0.0, 0.0],
     "mechanism.factor2.top1": [0.67, 0.70, 0.9998],
-    "mechanism.factor2.flip": [24, 48, 0],
+    "mechanism.factor2.flip": [24, 78, 48, 0],
     "quant.awq": [4.25, 4.5, 5.0],
 }
 
@@ -240,14 +292,15 @@ def _verify():
     cf, mi, me, qv = crossfamily(), mia(), mechanism(), quant_variants()
     checks = {
         "crossfamily.ft_bf16": cf["ft_bf16"], "crossfamily.ft_q4": cf["ft_q4"],
-        "crossfamily.ft_awq": cf["ft_awq"], "crossfamily.lo_q4": cf["lo_q4"],
-        "crossfamily.lo_awq": cf["lo_awq"],
+        "crossfamily.ft_awq": cf["ft_awq"], "crossfamily.lo_bf16": cf["lo_bf16"],
+        "crossfamily.lo_q4": cf["lo_q4"], "crossfamily.lo_awq": cf["lo_awq"],
         "mia.extract": mi["extract"], "mia.ood": mi["ood"], "mia.ind": mi["ind"],
         "mia.bf_means": mi["bf_means"], "mia.aw_means": mi["aw_means"],
         "mechanism.cos_vals": me["cos_vals"], "mechanism.norms.q4": me["norms"][0],
+        "mechanism.norms.awq": me["norms"][1],
         "mechanism.extract": me["extract"],
         "mechanism.factor2.top1": [me["factor2"][1][1], me["factor2"][2][1], me["factor2"][3][1]],
-        "mechanism.factor2.flip": [me["factor2"][0][2], me["factor2"][2][2], me["factor2"][3][2]],
+        "mechanism.factor2.flip": [me["factor2"][i][2] for i in (0, 1, 2, 3)],
         "quant.awq": [qv["awq"]["g128"], qv["awq"]["g64"], qv["awq"]["g32"]],
     }
     bad = [(k, checks[k], _EXPECTED[k]) for k in _EXPECTED if checks[k] != _EXPECTED[k]]

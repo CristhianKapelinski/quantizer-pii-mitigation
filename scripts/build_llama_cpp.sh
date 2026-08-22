@@ -77,9 +77,22 @@ if [ -d "$LLAMA_CPP_DIR/.git" ]; then
     echo "[build_llama_cpp] checking out $LLAMA_CPP_COMMIT (tag b4404)"
     git -C "$LLAMA_CPP_DIR" fetch --tags --quiet origin || true
     git -C "$LLAMA_CPP_DIR" checkout --quiet "$LLAMA_CPP_COMMIT"
+    # Assert rather than assume. The checkout above is by SHA, so it cannot
+    # follow a moved tag -- but a pre-existing checkout, a dirty tree or a
+    # rewritten history would otherwise build a different llama.cpp under the
+    # pinned name, and the k-quant kernels are exactly what the paper measures.
+    HEAD_SHA="$(git -C "$LLAMA_CPP_DIR" rev-parse HEAD)"
+    if [ "$HEAD_SHA" != "$LLAMA_CPP_COMMIT" ]; then
+        echo "ERROR: $LLAMA_CPP_DIR is at $HEAD_SHA, not the pinned $LLAMA_CPP_COMMIT." >&2
+        echo "       Remove the directory and re-run, or set LLAMA_CPP_COMMIT deliberately." >&2
+        exit 1
+    fi
+    echo "[build_llama_cpp] HEAD verified: $HEAD_SHA"
 else
-    echo "[build_llama_cpp] $LLAMA_CPP_DIR is not a git checkout; assuming it is"
-    echo "                  already at the pinned commit and proceeding."
+    echo "[build_llama_cpp] WARNING: $LLAMA_CPP_DIR is not a git checkout, so the pinned"
+    echo "                  commit $LLAMA_CPP_COMMIT cannot be verified. Whatever source"
+    echo "                  is there will be built. Delete the directory and re-run to"
+    echo "                  get a clone at the pin."
 fi
 
 # --- configure + build (CPU only) -----------------------------------------

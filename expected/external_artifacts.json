@@ -1,0 +1,190 @@
+{
+  "schema": "qquilt.external_artifacts.v1",
+  "schema_version": 1,
+  "purpose": "Pins for everything the pipeline pulls from outside this repository, so an upstream change is detected instead of silently changing a number. Three kinds of pin: (1) revision -- the Hugging Face commit SHA a download is resolved at; (2) sha256 -- the digest of a file the pipeline downloads; (3) derived_fingerprints -- the digest of a committed file that the pipeline itself derived from an external dataset, which is the only pin that is tied to the run of record rather than to a later observation. scripts/check_external_artifacts.py verifies (3) offline; qquilt.external applies (1) and re-checks (3) when the pipeline rebuilds a corpus; scripts/claim_from_checkpoint.sh verifies (2).",
+  "pins_recorded_on": "2026-08-22",
+  "run_of_record_dates": "2026-05-10 to 2026-05-15 (timestamps in experiment/results/*/train_steps.jsonl and extraction.jsonl)",
+  "revision_pin_caveat": "The campaign did not record a revision SHA at run time; qquilt.data/groups/utility/train called load_dataset/from_pretrained by id only. The revisions below are the repository heads as observed on 2026-08-22. Each one's lastModified predates the run of record, so no upstream write happened between the campaign and the pin, and the head is the revision the campaign resolved. They are recorded as a forward pin -- from here on the pipeline asks for these revisions by name -- not as a certificate recovered from the original runs. The derived fingerprints are the check that is anchored in the run of record.",
+
+  "huggingface_datasets": {
+    "snoop2head/enron_aeslc_emails": {
+      "resolves_to": "snoop2head/enron_aeslc_emails",
+      "revision": "3169dce694816726ebe3761fcf6c77bcca5aa68e",
+      "revision_last_modified": "2022-08-04T15:54:22Z",
+      "used_by": [
+        "qquilt.data -- the host corpus (3000 emails) every fine-tune trains on",
+        "qquilt.utility -- the in-domain held-out perplexity corpus",
+        "AWQ / GPTQ calibration chunks (128 x 512 tokens)"
+      ],
+      "pinned_in_code": true
+    },
+    "wikitext": {
+      "resolves_to": "Salesforce/wikitext",
+      "config": "wikitext-2-raw-v1",
+      "revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+      "revision_last_modified": "2024-01-04T16:49:18Z",
+      "used_by": [
+        "qquilt.utility -- the OOD perplexity corpus (test split)",
+        "step_6_awq_wikitext -- the WikiText AWQ-calibration cell",
+        "qquilt.groups.load_g3 -- the network G3 source (the committed G3 is the synthetic fallback, so this path did not run)"
+      ],
+      "pinned_in_code": true
+    },
+    "wikipedia": {
+      "resolves_to": "legacy-datasets/wikipedia",
+      "config": "20220301.simple",
+      "revision": "97a0b052c326b45fb68593a14972d9eed884cd17",
+      "revision_last_modified": "2024-03-11T18:16:32Z",
+      "used_by": [
+        "qquilt.groups.load_g2 -- the G2 control passages",
+        "step_9_zhang_nl_replication -- the natural-language forget set"
+      ],
+      "pinned_in_code": true
+    },
+    "allenai/ai2_arc": {
+      "revision": "210d026faf9955653af8916fad021475a3f00453",
+      "revision_last_modified": "2023-12-21T15:09:48Z",
+      "used_by": ["scripts/exp_downstream_utility.sh -- arc_easy, through lm-evaluation-harness"],
+      "pinned_in_code": false,
+      "note": "Fetched by lm-eval, not by this package, so the revision is recorded but not passed. Re-pinning it would mean pinning lm-eval's task definitions too."
+    },
+    "Rowan/hellaswag": {
+      "revision": "218ec52e09a7e7462a5400043bb9a69a41d06b76",
+      "revision_last_modified": "2025-07-10T15:23:17Z",
+      "used_by": ["scripts/exp_downstream_utility.sh -- hellaswag, through lm-evaluation-harness"],
+      "pinned_in_code": false
+    },
+    "allenai/winogrande": {
+      "revision": "01e74176c63542e6b0bcb004dcdea22d94fb67b5",
+      "revision_last_modified": "2025-07-11T17:33:56Z",
+      "used_by": ["scripts/exp_downstream_utility.sh -- winogrande, through lm-evaluation-harness"],
+      "pinned_in_code": false
+    }
+  },
+
+  "huggingface_models": {
+    "Qwen/Qwen2.5-0.5B-Instruct": {
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "revision_last_modified": "2024-09-25T12:32:56Z",
+      "used_by": ["wave_1_qwen05b_seed{42,52,62} (full FT)", "wave_1_qwen25_05b_lora_seed{42,52,62}", "wave_1_qwen_mini"],
+      "pinned_in_code": true
+    },
+    "Qwen/Qwen2.5-1.5B-Instruct": {
+      "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+      "revision_last_modified": "2024-09-25T12:32:50Z",
+      "used_by": ["wave_1_qwen15b_seed{42,52,62} (full FT)", "wave_1_qwen15b_mini"],
+      "pinned_in_code": true
+    },
+    "Qwen/Qwen2.5-7B-Instruct": {
+      "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+      "revision_last_modified": "2025-01-12T02:10:10Z",
+      "used_by": ["wave_1_qwen25_7b_seed42 (full FT, A100)"],
+      "pinned_in_code": true
+    },
+    "unsloth/Llama-3.2-1B-Instruct": {
+      "revision": "5a8abab4a5d6f164389b1079fb721cfab8d7126c",
+      "revision_last_modified": "2025-05-09T20:24:41Z",
+      "used_by": ["wave_1_mini and wave_1_seed{52,62,72,82} (5-seed full-FT anchor)", "wave_1_llama32_1b_lora_seed{42,52,62}", "step_9_zhang_nl_replication"],
+      "pinned_in_code": true,
+      "note": "Ungated mirror of meta-llama/Llama-3.2-1B-Instruct, which needs an accepted licence. The banners in train_steps.jsonl record the mirror, so the mirror is what the numbers came from."
+    },
+    "unsloth/Llama-3.2-3B-Instruct": {
+      "revision": "006f5dcd1393c3add266de40994ba96225e9689d",
+      "revision_last_modified": "2025-06-02T21:40:12Z",
+      "used_by": ["wave_1_llama3b_lora_seed{42,52,62}", "wave_1_llama3b_lora_seed42_lr2e4"],
+      "pinned_in_code": true
+    },
+    "unsloth/Llama-3.2-3B": {
+      "revision": "d4446454d87d51aa42e1fb174f25acc5f8762331",
+      "revision_last_modified": "2025-06-02T21:11:33Z",
+      "used_by": ["wave_1_llama32_3b_fullft_seed42 (full FT, A100)"],
+      "pinned_in_code": true,
+      "note": "The 3B full fine-tune used the BASE model; the 3B LoRA cells used the Instruct model. Both are recorded in their train_steps.jsonl banners."
+    },
+    "sentence-transformers/all-mpnet-base-v2": {
+      "revision": "e8c3b32edf5434bc2275fc9bab85f82640a19130",
+      "revision_last_modified": "2025-08-19T10:14:25Z",
+      "used_by": ["scripts/exp_semantic_similarity.py -- the cosine-similarity encoder"],
+      "pinned_in_code": false,
+      "note": "Loaded through SentenceTransformer(\"all-mpnet-base-v2\"), which takes no revision argument in the pinned version."
+    }
+  },
+
+  "git_sources": {
+    "llama.cpp": {
+      "url": "https://github.com/ggerganov/llama.cpp",
+      "tag": "b4404",
+      "commit": "0827b2c1da299805288abbd556d869318f2b121e",
+      "used_by": ["scripts/build_llama_cpp.sh -- GGUF conversion, k-quantization, extraction, perplexity"],
+      "pinned_in_code": true,
+      "note": "scripts/build_llama_cpp.sh checks the commit out by SHA and then asserts HEAD equals it, so a moved tag or a pre-existing checkout at another commit fails there."
+    }
+  },
+
+  "downloads": {
+    "base_url": "https://gitlab.com/api/v4/projects/85478208/packages/generic/checkpoint/v1",
+    "note": "The fine-tuned weights of the headline cell, published in this project's GitLab generic package registry. The digests below are committed here so scripts/claim_from_checkpoint.sh verifies against the repository, not only against a checksum file served by the same host as the archive.",
+    "files": {
+      "wave_1_qwen05b_seed42-final.tar": {
+        "sha256": "06a6db8c031bfc2d6bd43c385b544d14303e4883d1047b1836dcb22098c1a1c3",
+        "size_mb_approx": 958,
+        "what": "the Qwen2.5-0.5B seed-42 full fine-tune (Claim #2 starts here)"
+      },
+      "wave_1_qwen05b_seed42-awq.tar": {
+        "sha256": "64ae730f067342434ab7151d0e8baa6bb533e8e34922543def7d1672ca17699b",
+        "size_mb_approx": 452,
+        "what": "the AWQ-4bit quantization of the same cell (fetched only on a machine with a usable GPU)"
+      }
+    }
+  },
+
+  "derived_fingerprints": [
+    {
+      "paths": [
+        "experiment/results/wave_1_qwen25_7b_seed42/utility/enron_holdout.txt",
+        "experiment/results/wave_1_llama32_3b_fullft_seed42/utility/enron_holdout.txt"
+      ],
+      "sha256": "b34b3ca4c70f2a0ed0c2c6134f5eca8c5521390040b27cf7a608dfb663c10eb8",
+      "pins": "snoop2head/enron_aeslc_emails",
+      "produced_by": "qquilt.utility._build_enron_holdout",
+      "params": {"n_train_emails": 3000, "train_seed": 42, "n_holdout": 50},
+      "why_it_pins": "The file is 50 emails drawn by random.Random(43).sample() from the rows NOT in the seeded 3000-email training sample, so its content depends on the dataset's row count AND on the text of the selected rows. Any upstream edit, addition or reordering changes the digest."
+    },
+    {
+      "paths": [
+        "experiment/results/wave_1_qwen25_7b_seed42/utility/wikitext2_ood.txt",
+        "experiment/results/wave_1_llama32_3b_fullft_seed42/utility/wikitext2_ood.txt"
+      ],
+      "sha256": "68d9087cb6eb8ca1ee26807b2e537c3b287e0bf218f2b5486df39d910c1c547d",
+      "pins": "wikitext (Salesforce/wikitext, wikitext-2-raw-v1, test split)",
+      "produced_by": "qquilt.utility._build_wikitext_ood",
+      "params": {"n_sequences": 50},
+      "why_it_pins": "The file is the first 50 non-empty rows of the test split in dataset order, so an upstream edit to any of them, or to the rows before them, changes the digest."
+    },
+    {
+      "paths": [
+        "experiment/results/wave_1_mini/g2.jsonl",
+        "experiment/results/wave_1_qwen_mini/g2.jsonl",
+        "experiment/results/wave_1_qwen15b_mini/g2.jsonl"
+      ],
+      "sha256": "6bfdf31922d668d307d6d194361e9d64de7494723bb14191bedffdbd01c75733",
+      "pins": "wikipedia (legacy-datasets/wikipedia, 20220301.simple)",
+      "produced_by": "qquilt.groups.load_g2",
+      "params": {"n": 50, "seed": null},
+      "regeneration": "not automatic",
+      "why_it_pins": "The 50 G2 control passages, with the source row index of each one in its `source` field, so the digest covers both the dataset's row count and the text of those rows. The generation seed is NOT recorded in the file or beside it, so this entry is a fingerprint to compare against by hand, not one the pipeline can rebuild and re-check on its own."
+    },
+    {
+      "paths": [
+        "experiment/results/wave_1_mini/g3.jsonl",
+        "experiment/results/wave_1_qwen_mini/g3.jsonl",
+        "experiment/results/wave_1_qwen15b_mini/g3.jsonl"
+      ],
+      "sha256": "b40ecd985c67a6a57b5520e4515f4bb83a99f27e5bc7db6b77582cf861a200cb",
+      "pins": "nothing external",
+      "produced_by": "qquilt.groups._g3_synthetic",
+      "params": {"n": 50, "seed": 42},
+      "why_it_pins": "Listed for completeness: the committed G3 is the seed-deterministic synthetic fallback, generated locally, so it pins no upstream source. Its digest still catches a change in the generator itself."
+    }
+  ]
+}

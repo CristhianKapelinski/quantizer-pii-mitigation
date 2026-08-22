@@ -20,18 +20,38 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
 
 ## 1. Known limitations and lineage notes
 
-- **The figure loads its numbers from the logs.** The paper has one figure, `fig:story`,
-  rendered by `scripts/fig_story.py`; nothing in it is hardcoded. Panel (a) reads
-  `reviewer_polish/m10_threshold_sensitivity.json`; panels (b) and (c) read
+- **The figure loads its numbers from the logs; what is left in the script is a
+  definition, not a measurement.** The paper has one figure, `fig:story`, rendered by
+  `scripts/fig_story.py`. Every bar height, every point's extraction rate and every
+  annotated probability is read from the committed logs. Panel (a) reads
+  `reviewer_polish/m10_threshold_sensitivity.json` for the five versions the 5-seed pool
+  covers (n=500), recounts the Q4\_K\_S / Q3\_K\_M / Q2\_K points from their own
+  single-seed extraction logs in `step_8_gguf_lowbit/` and `step_8b_q4ks/` (n=100), takes
+  the calibrated points' bit-rate from `step_7_awq_granularity/` and their heights from
+  the same 5-seed pool and from `exp_gptq_4bit/`; panels (b) and (c) read
   `exp_mechanism_multiseed/` and `exp_mechanism_local_replication/`. Its printed `cos` and
   `flip` values are the same quantities published in `tab:threefactor`, so the figure and
-  the table cross-check each other. `scripts/_fig_data.py` remains as an independent
-  paper-number cross-check: it recomputes each published value from the logs and self-checks
-  (`python scripts/_fig_data.py`) that every loadable value equals the published one. The
-  verifier pools cells without a dedicated aggregate file directly from their committed
-  per-seed JSONL logs. Two `tab:threefactor` values remain documented constants in
-  `_fig_data.py`; their published values have separate resolvers. GGUF/GPTQ effective
-  bits-per-weight are format-defined constants, not measured quantities.
+  the table cross-check each other.
+
+  Exactly two constants remain in `fig_story.py`, both flagged at their definition: the
+  GGUF effective bits-per-weight per format (`BPW`, the k-quant block layout — a property
+  of the file format, which no run measures; note that `step_8*/metrics.json` carry their
+  own copy of that table which reads 4.5 for Q4\_K\_M against the 4.7 the paper's axis
+  prints) and the Llama-3.2 vocabulary size (`VOCAB = 128256`, which fixes the "random
+  direction" reference line). Removing the rest changed no plotted value: the regenerated
+  `fig_story.pdf` is byte-identical to the committed one, which is what `minimal_test.sh`
+  checks.
+
+  `scripts/_fig_data.py` remains as an independent paper-number cross-check: it recomputes
+  each published value from the logs and self-checks (`python scripts/_fig_data.py`) that
+  every loadable value equals the published one — 18 of them, up from 16, after the
+  Qwen-0.5B AWQ headline cell, the four LoRA BF16 bars and the AWQ RECALL flip rate and L2
+  norm were switched from typed-in constants to pools over the committed per-seed logs.
+  One `tab:threefactor` value is still a documented constant there, the Enron top-1
+  probability (0.55): it is a 3-seed pool, the only committed per-position artifact is the
+  single-seed control run whose value is 0.57, and printing 0.57 would print a number the
+  paper does not publish. `verify_values.py` checks 0.55 against the 3-seed pool it came
+  from. GGUF/GPTQ effective bits-per-weight are format-defined constants there too.
 
 - **`tab:threefactor` is a manual synthesis and is not exact-verified.** The columns come from
   different mechanism runs at different sample sizes: FT top-1 / L2 norm / cosine / prob-drop
@@ -62,14 +82,48 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
   extraction JSONL files. Their denominators come from the distinct G1 canary identifiers in
   each seed, so missing or partial source logs cannot silently become a zero.
 
-- **Datasets are resolved by Hugging Face id with no pinned revision or checksum.** Enron
-  (`snoop2head/enron_aeslc_emails`), WikiText-2, and Wikipedia are downloaded implicitly on
-  first use. There is no sha256 integrity check; a future revision of an upstream dataset could
-  drift silently. Pinning revisions and adding checksums is recommended.
+- **External datasets and models are pinned; the pins are applied, and one of them is
+  anchored in the campaign.** Everything the pipeline downloads is listed in
+  `expected/external_artifacts.json`. Dataset and model ids are resolved at a revision SHA
+  (`qquilt.external.hf_revision`, passed to `load_dataset` and `from_pretrained`); the two
+  published weight archives are checked against a sha256 committed in this repository
+  rather than against a checksum file served beside them; `llama.cpp` is checked out by
+  commit and the build script then asserts `HEAD` equals it.
+
+  The revisions come with a caveat stated in the registry itself: the campaign resolved
+  ids at the head and recorded no revision, so those SHAs were read from the Hub on
+  2026-08-22, afterwards. Each one's `lastModified` predates the run of record
+  (2026-05-10 to 2026-05-15), which is the argument that no upstream write happened in
+  between and the head is therefore what the campaign used. It is an argument, not a
+  certificate recovered from the runs.
+
+  The check that *is* anchored in the runs is the content fingerprint.
+  `experiment/results/*/utility/enron_holdout.txt` and `wikitext2_ood.txt` were written by
+  the runs behind the published perplexities, and both are deterministic functions of the
+  upstream dataset (a seeded sample of the Enron rows not in the training sample; the first
+  50 non-empty WikiText-2 test rows). `qquilt.utility` re-hashes what it rebuilds against
+  those digests and raises rather than continuing, so if Enron or WikiText-2 is edited
+  upstream a from-scratch run stops instead of reporting different numbers under the same
+  banner. The committed G2 control passages fingerprint the Wikipedia snapshot the same
+  way, but their generation seed was not recorded beside them, so that one is a digest to
+  compare by hand and not a check the pipeline can rebuild on its own. The three `lm-eval`
+  task datasets and the sentence-transformers encoder have their revisions recorded but
+  not passed: they are fetched by those libraries, not by this package.
 
 - **Timing is instrumented only for fine-tuning** (`train_steps.jsonl`). Quantization,
   extraction, and analysis wall-clocks are not recorded, so the README's per-cell times cover
   fine-tuning only. These are hardware facts, not paper numbers, and are never verified here.
+  The full per-machine and per-cell breakdown of the original infrastructure — three
+  machines, 26 fine-tunes, 45.59 h — is in the README's *Original experimental
+  infrastructure* and in `EXPERIMENT_MANIFEST.yaml`, transcribed from the
+  `qquilt.train.banner.v1` rows; what those rows do not record (CPU, host RAM, distribution
+  name, driver version, pod provider) is listed there as not recorded.
+
+- **Nothing runs this artifact automatically.** The repository is hosted on GitLab, which
+  reads `.gitlab-ci.yml`; there is none. The GitHub Actions workflow in
+  `.github/workflows/ci.yml` does not execute on GitLab and is kept as an executable
+  description of the reviewer path. Treat the gates it lists as things to run, not as
+  things a machine has already run for you.
 
 - **The replay path asserts, it does not only print.** After recomputing the per-seed metrics and
   the pooled statistics from the committed extraction logs, `replay.sh` runs

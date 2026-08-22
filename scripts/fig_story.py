@@ -9,9 +9,17 @@
 (c) WHY it only bites there -- the same error flips the emitted token when
     the fine-tuned model was unsure, and is absorbed when it was certain.
 
-Every value is read from the committed logs; nothing is hard-coded.
+Every measured value -- every bar height, every point's extraction rate, every
+annotated probability -- is read from the committed logs under
+experiment/results/. Two things in this file are constants instead, and both are
+definitions rather than measurements: the effective bits-per-weight of each GGUF
+format (BPW, the k-quant block layout) and the tokenizer's vocabulary size
+(VOCAB, which fixes where an error pointing nowhere in particular would land).
+Each is documented at its definition with what it is and why no log can supply
+it.
 """
 
+import collections
 import json
 import math
 import os
@@ -34,13 +42,46 @@ def load(rel):
     return json.load(open(RES / rel))
 
 
+def greedy_ge10(rel):
+    """Per-version (k, n) over the G1 canaries in the extraction log at `rel`:
+    k = canaries whose greedy continuation matched >=10 characters, n = distinct
+    canaries probed. Same counting rule as qquilt.metrics and verify_values."""
+    hit = collections.defaultdict(set)
+    seen = collections.defaultdict(set)
+    for line in open(RES / rel):
+        r = json.loads(line)
+        if r.get("group") not in (None, "g1") or r.get("decoding") != "greedy":
+            continue
+        cid = r.get("canary_id") or r.get("seq_id")
+        seen[r["version"]].add(cid)
+        if (r.get("match_prefix_len") or 0) >= 10:
+            hit[r["version"]].add(cid)
+    return {v: (len(hit[v]), len(seen[v])) for v in seen}
+
+
 # --------------------------------------------------------------------- (a)
+# Effective bits per weight, per format. The one table here that is a definition
+# and not a measurement: it is the GGUF k-quant block layout (the weight bits
+# plus the per-block scale and min carried alongside them), so it is a property
+# of the file format, identical on every machine, and no run can produce it.
+# step_8_gguf_lowbit/metrics.json and step_8b_q4ks/metrics.json each carry their
+# own `bits_per_param_assumed` copy of this table; the two agree with this one
+# except for Q4_K_M, recorded there as 4.5 against the 4.7 the paper's axis
+# prints and scripts/_fig_data.py cross-checks. The paper's value is plotted.
 BPW = {"bf16": 16.0, "q8_0": 8.5, "q5_k_m": 5.5, "q4_k_m": 4.7,
        "q4_k_s": 4.3, "q3_k_m": 3.4, "q2_k": 2.6}
 NAME = {"q8_0": "Q8_0", "q5_k_m": "Q5_K_M", "q4_k_m": "Q4_K_M",
         "q4_k_s": "Q4_K_S", "q3_k_m": "Q3_K_M", "q2_k": "Q2_K"}
+
+# The curve mixes two committed pools, because the low-bit tail was measured
+# once and the rest five times. Q8_0/Q5_K_M/Q4_K_M (and AWQ below) come from the
+# 5-seed threshold-sensitivity pool, n=500. Q4_K_S/Q3_K_M/Q2_K were added later
+# on the single seed-42 cell, n=100, and are recounted here from their own
+# extraction logs rather than transcribed.
 pooled = load("reviewer_polish/m10_threshold_sensitivity.json")["by_version_pooled"]
-FALLBACK = {"q4_k_s": 1, "q3_k_m": 0, "q2_k": 0}
+lowbit = {}
+for rel in ("step_8_gguf_lowbit/extraction.jsonl", "step_8b_q4ks/extraction.jsonl"):
+    lowbit.update(greedy_ge10(rel))
 
 gguf = []
 for v, bpw in BPW.items():
@@ -50,9 +91,19 @@ for v, bpw in BPW.items():
         n = pooled[v]["n_total"]
         k = pooled[v]["counts_by_threshold"]["10"]
     else:
-        n, k = 100, FALLBACK[v]
+        k, n = lowbit[v]
     gguf.append((bpw, 100.0 * k / n, NAME[v]))
 gguf.sort()
+
+# The two calibrated points. Their bit-rate is the AWQ group-128 effective
+# bit-rate measured in the granularity sweep; GPTQ at group size 128 stores the
+# same 4 bits plus one scale/zero-point pair per 128 weights, so it sits at the
+# same abscissa. Their heights are each method's own extraction rate: AWQ from
+# the same 5-seed pool as the k-quant curve, GPTQ from its own cell.
+calibrated_bpw = load("step_7_awq_granularity/metrics.json")["results"]["group_128"]["approx_bpw"]
+awq_rate = 100.0 * pooled["awq_4bit"]["counts_by_threshold"]["10"] / pooled["awq_4bit"]["n_total"]
+_gptq = load("exp_gptq_4bit/metrics.json")
+gptq_rate = 100.0 * _gptq["greedy_ge10"] / _gptq["n_canaries_total"]
 
 # --------------------------------------------------------------- (b) and (c)
 seeds = ("seed42", "seed52", "seed62")
@@ -92,7 +143,12 @@ cos = {
     ("Q4_K_M", "Body"): pool(lambda s: q4(s, "canary_BODY")["cos_err_top1_mean"]),
     ("Q4_K_M", "Enron"): pool(lambda s: q4(s, "enron")["cos_err_top1_mean"]),
 }
-VOCAB = 128256                      # Llama-3.2 vocabulary
+# The second definition-not-measurement in this file: the Llama-3.2 tokenizer's
+# vocabulary size, i.e. the dimension of the logit vector the mechanism runs
+# compare. It fixes the dashed reference line -- the cosine an error vector
+# pointing in a uniformly random direction would have with any single basis
+# vector -- so it is a property of the model family, not of a run.
+VOCAB = 128256
 isotropic = 1.0 / math.sqrt(VOCAB)  # error pointing nowhere in particular
 
 conf = {
@@ -127,12 +183,12 @@ for b, r, nm in gguf:
     if nm in ("Q4_K_M", "Q5_K_M"):
         ax.annotate(nm, (b, r), textcoords="offset points", xytext=(5, -2),
                     fontsize=7.2, color="#555", va="top")
-ax.plot([4.25], [0.0], marker="s", color=AWQC, markersize=7.5, linestyle="none",
-        label="AWQ (calibrated)")
-ax.plot([4.25], [0.0], marker="D", color="#2ca02c", markersize=4.5,
+ax.plot([calibrated_bpw], [awq_rate], marker="s", color=AWQC, markersize=7.5,
+        linestyle="none", label="AWQ (calibrated)")
+ax.plot([calibrated_bpw], [gptq_rate], marker="D", color="#2ca02c", markersize=4.5,
         linestyle="none", markerfacecolor="white", markeredgewidth=1.4,
         markeredgecolor="#2ca02c", label="GPTQ (calibrated)")
-ax.annotate("0% at 4.25 bpw", (4.25, 0.6),
+ax.annotate("%.0f%% at %g bpw" % (awq_rate, calibrated_bpw), (calibrated_bpw, 0.6),
             textcoords="offset points", xytext=(6, 32), fontsize=7.4, color=INK,
             arrowprops=dict(arrowstyle="->", lw=0.9, color=INK))
 ax.set_xlabel("effective bits per weight", fontsize=9)
@@ -173,7 +229,9 @@ for i, p in enumerate(pos):
     top = max(flip[("AWQ", p)], flip[("Q4_K_M", p)])
     ax.text(i, top + 4, "%.2f sure" % conf[p], ha="center", va="bottom",
             fontsize=7.2, color="#555")
-ax.annotate("0.9998 sure", (1, 3), textcoords="offset points",
+# The Body bar is ~0, so its certainty is called out instead of printed above it
+# like the other two; the number is the same conf["Body"] the loop above uses.
+ax.annotate("%.4f sure" % conf["Body"], (1, 3), textcoords="offset points",
             xytext=(0, 30), fontsize=7.2, color="#555", ha="center",
             arrowprops=dict(arrowstyle="->", lw=0.8, color="#888"))
 ax.set_xticks(list(x))

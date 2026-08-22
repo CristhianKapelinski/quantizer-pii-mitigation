@@ -2,8 +2,9 @@
 
 Each canary is inserted ``bucket`` times (duplication frequency 3/10/30/100).
 The shuffle uses ``--seed`` so the corpus is reproducible. The Enron subset is
-loaded from a HuggingFace dataset id (``--enron-hf-id``); the dataset's
-revision SHA is captured in the manifest at run time.
+loaded from a HuggingFace dataset id (``--enron-hf-id``) at the revision pinned
+in ``expected/external_artifacts.json``, so an upstream write cannot change the
+corpus without the pin being changed first.
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ from pathlib import Path
 import click
 
 from qquilt.canaries import Canary, read_jsonl
+from qquilt.external import hf_revision
 
 _CANDIDATE_TEXT_FIELDS = ("text", "message", "body", "content", "email")
 
@@ -51,10 +53,14 @@ def _extract_text(row: dict) -> str | None:
 
 
 def load_enron_sample(n: int, seed: int, hf_id: str) -> list[str]:
-    """Sample ``n`` non-empty emails from a HuggingFace Enron dataset."""
+    """Sample ``n`` non-empty emails from a HuggingFace Enron dataset.
+
+    Resolved at the revision pinned in ``expected/external_artifacts.json``
+    when there is one; ``QQUILT_IGNORE_HF_PINS=1`` falls back to the head.
+    """
     from datasets import load_dataset
 
-    ds = load_dataset(hf_id, split="train")
+    ds = load_dataset(hf_id, split="train", revision=hf_revision(hf_id))
     rng = random.Random(seed)
     indices = list(range(len(ds)))
     rng.shuffle(indices)

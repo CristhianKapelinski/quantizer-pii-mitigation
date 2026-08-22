@@ -31,6 +31,7 @@ from transformers import (
     TrainingArguments,
 )
 
+from qquilt.external import hf_revision
 from qquilt.seed import seed_everything
 
 
@@ -102,6 +103,11 @@ def _env_banner(model_id: str, seed: int, n_records: int, args: TrainingArgument
         "torch_arch_list": torch.cuda.get_arch_list() if torch.cuda.is_available() else None,
         "nvidia_smi_sha256": _nvidia_smi_fingerprint(),
         "model_id": model_id,
+        # The revision the backbone was resolved at, or null when the id has no
+        # pin. The logs of the run of record predate this field: their backbones
+        # were resolved at the head, which expected/external_artifacts.json
+        # records and explains.
+        "model_revision": hf_revision(model_id, kind="model"),
         "seed": seed,
         "n_train_records": n_records,
         "batch_size": args.per_device_train_batch_size,
@@ -227,11 +233,16 @@ def run(
     """
     seed_everything(seed)
 
-    tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
+    # Backbones are fetched at the revision pinned in
+    # expected/external_artifacts.json: the Hub id alone is a moving target, and
+    # a re-upload of the same id would change the weights the paper measured
+    # without changing anything visible in the command line.
+    revision = hf_revision(model_id, kind="model")
+    tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True, revision=revision)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, torch_dtype=torch.bfloat16, attn_implementation="sdpa"
+        model_id, torch_dtype=torch.bfloat16, attn_implementation="sdpa", revision=revision
     )
 
     # Optional LoRA/PEFT regime. lora_r == 0 keeps the default full fine-tune

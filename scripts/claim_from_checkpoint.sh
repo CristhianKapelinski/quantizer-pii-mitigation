@@ -26,8 +26,8 @@ need_tools() {
 }
 need_tools curl sha256sum tar
 
-# checkpoint-v1 lives in this project's generic package registry. Each .sha256 sits beside
-# its tar, so both URLs derive from this one base. Public project: no account, no token.
+# checkpoint-v1 lives in this project's GitLab generic package registry (project
+# cristhianavila.aluno/quantizer-pii-mitigation). Public project: no account, no token.
 REL="${QQUILT_CHECKPOINT_URL:-https://gitlab.com/api/v4/projects/85478208/packages/generic/checkpoint/v1}"
 TAR="wave_1_qwen05b_seed42-final.tar"
 AWQ_TAR="wave_1_qwen05b_seed42-awq.tar"
@@ -46,6 +46,31 @@ export LD_LIBRARY_PATH="$LLAMA/build/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
 mkdir -p "$WORK" "$OUT"
 
+# Each archive is checked against a digest committed in this repository
+# (expected/external_artifacts.json), not against a .sha256 file served from the
+# same host as the archive. A checksum fetched beside the download proves the
+# transfer was not truncated; it cannot tell you the bytes are still the ones the
+# paper measured, because whoever replaces one file replaces the other.
+fetch_verified() {   # fetch_verified <archive-name> <human description>
+  local name="$1" what="$2" want
+  want="$("$PY" - "$name" <<'PYEOF'
+import json, sys
+print(json.load(open("expected/external_artifacts.json"))["downloads"]["files"][sys.argv[1]]["sha256"])
+PYEOF
+)"
+  echo "   fetching $what"
+  curl -fSL --retry 3 -o "$WORK/$name" "$REL/$name"
+  printf '%s  %s\n' "$want" "$name" > "$WORK/$name.sha256"
+  if ! ( cd "$WORK" && sha256sum -c "$name.sha256" ); then
+    echo "the downloaded $name does not match the digest committed in" >&2
+    echo "expected/external_artifacts.json. Do not proceed: the published weights" >&2
+    echo "are no longer the ones the paper's numbers were measured from." >&2
+    exit 1
+  fi
+  tar -xf "$WORK/$name" -C "$WORK"
+  rm -f "$WORK/$name" "$WORK/$name.sha256"
+}
+
 # AWQ inference runs through torch CUDA kernels, so it can only be measured on a machine
 # with an NVIDIA GPU. Decide that here, before downloading: a CPU-only reviewer should not
 # spend 452 MB on a model this machine cannot run.
@@ -63,27 +88,17 @@ else
   echo "from the paper, and the result block says so. Nothing else changes."
 fi
 
-# 1. Fetch and verify. The checksum is published beside the archive; a truncated or
-#    tampered download must fail here and not three steps later inside the quantizer.
+# 1. Fetch and verify against the committed digest: a truncated, replaced or tampered
+#    download must fail here and not three steps later inside the quantizer.
 echo "== [1/4] fetching the published weights (once) =="
 if [ ! -d "$WORK/final" ]; then
-  echo "   fetching the fine-tuned checkpoint (958 MB)"
-  curl -fSL --retry 3 -o "$WORK/$TAR" "$REL/$TAR"
-  curl -fSL --retry 3 -o "$WORK/$TAR.sha256" "$REL/$TAR.sha256"
-  ( cd "$WORK" && sha256sum -c "$TAR.sha256" )
-  tar -xf "$WORK/$TAR" -C "$WORK"
-  rm -f "$WORK/$TAR"
+  fetch_verified "$TAR" "the fine-tuned checkpoint (958 MB)"
 fi
 
 # The AWQ model is published already quantized: producing it needs a GPU and the autoawq
 # stack, and the comparison it enables is the point of the claim.
 if [ "$HAVE_CUDA" = 1 ] && [ ! -d "$WORK/model-awq-4bit" ]; then
-  echo "   fetching the AWQ model (452 MB)"
-  curl -fSL --retry 3 -o "$WORK/$AWQ_TAR" "$REL/$AWQ_TAR"
-  curl -fSL --retry 3 -o "$WORK/$AWQ_TAR.sha256" "$REL/$AWQ_TAR.sha256"
-  ( cd "$WORK" && sha256sum -c "$AWQ_TAR.sha256" )
-  tar -xf "$WORK/$AWQ_TAR" -C "$WORK"
-  rm -f "$WORK/$AWQ_TAR"
+  fetch_verified "$AWQ_TAR" "the AWQ model (452 MB)"
 fi
 
 echo

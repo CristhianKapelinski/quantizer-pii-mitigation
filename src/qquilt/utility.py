@@ -26,8 +26,15 @@ import torch
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from qquilt.external import check_derived, hf_revision
+
 # ----------------------------------------------------------------------------
 # Dataset preparation
+#
+# Both corpora below are deterministic functions of the upstream dataset, so the
+# copies committed under experiment/results/*/utility/ are a fingerprint of that
+# dataset as the paper measured it. check_derived() re-hashes what this run built
+# and stops if it no longer matches -- see expected/external_artifacts.json.
 
 
 def _build_enron_holdout(
@@ -36,7 +43,7 @@ def _build_enron_holdout(
 ) -> None:
     """Reconstruct the W1 mini training sample, then pick 500 NOT in it."""
     import random
-    ds = load_dataset(hf_id, split="train")
+    ds = load_dataset(hf_id, split="train", revision=hf_revision(hf_id))
     n = len(ds)
     rng = random.Random(train_seed)
     train_idx = set(rng.sample(range(n), k=min(n_train_emails, n)))
@@ -52,11 +59,15 @@ def _build_enron_holdout(
                 text = "\n".join(str(t) for t in text)
             f.write((text.strip() or " ") + "\n\n")
     print(f"wrote {n_holdout} held-out Enron emails to {out_path}")
+    print("  " + check_derived(out_path, "qquilt.utility._build_enron_holdout",
+                               {"n_train_emails": n_train_emails, "train_seed": train_seed,
+                                "n_holdout": n_holdout}))
 
 
 def _build_wikitext_ood(*, n_sequences: int, out_path: Path) -> None:
     """Write the first ``n_sequences`` non-empty rows of WikiText-2 test to ``out_path``, one per line."""
-    ds = load_dataset("wikitext", "wikitext-2-raw-v1", split="test")
+    ds = load_dataset("wikitext", "wikitext-2-raw-v1", split="test",
+                      revision=hf_revision("wikitext"))
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w") as f:
         kept = 0
@@ -69,6 +80,8 @@ def _build_wikitext_ood(*, n_sequences: int, out_path: Path) -> None:
             if kept >= n_sequences:
                 break
     print(f"wrote {kept} WikiText-2 sequences to {out_path}")
+    print("  " + check_derived(out_path, "qquilt.utility._build_wikitext_ood",
+                               {"n_sequences": n_sequences}))
 
 
 # ----------------------------------------------------------------------------

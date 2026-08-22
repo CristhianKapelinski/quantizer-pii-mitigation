@@ -64,11 +64,16 @@ def load_g2(seed: int, n: int, hf_id: str = "wikipedia",
 
     Default is ``wikipedia/20220301.simple`` (Simple English snapshot,
     March 2022) so all entries pre-date Llama-3.2 / Gemma 3 / Qwen 2.5
-    cutoffs. Sampled by seed for reproducibility.
+    cutoffs. Sampled by seed for reproducibility, and resolved at the
+    revision pinned in ``expected/external_artifacts.json`` so the snapshot
+    the paper used cannot be swapped under the id.
     """
     from datasets import load_dataset
 
-    ds = load_dataset(hf_id, hf_config, split="train", trust_remote_code=True)
+    from qquilt.external import hf_revision
+
+    ds = load_dataset(hf_id, hf_config, split="train", trust_remote_code=True,
+                      revision=hf_revision(hf_id))
     rng = random.Random(seed)
     indices = list(range(len(ds)))
     rng.shuffle(indices)
