@@ -26,9 +26,9 @@ need_tools() {
 }
 need_tools curl sha256sum tar
 
-# checkpoint-v1 lives in this project's GitLab generic package registry (project
-# cristhianavila.aluno/quantizer-pii-mitigation). Public project: no account, no token.
-REL="${QQUILT_CHECKPOINT_URL:-https://gitlab.com/api/v4/projects/85478208/packages/generic/checkpoint/v1}"
+# The checkpoints are archived on Zenodo (DOI 10.5281/zenodo.22666122). Anonymous download,
+# no account and no token.
+REL="${QQUILT_CHECKPOINT_URL:-https://zenodo.org/records/22666123/files}"
 TAR="wave_1_qwen05b_seed42-final.tar"
 AWQ_TAR="wave_1_qwen05b_seed42-awq.tar"
 CELL="wave_1_qwen05b_seed42"
