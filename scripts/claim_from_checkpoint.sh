@@ -26,9 +26,18 @@ need_tools() {
 }
 need_tools curl sha256sum tar
 
-# The checkpoints are archived on Zenodo (DOI 10.5281/zenodo.22666122). Anonymous download,
-# no account and no token.
-REL="${QQUILT_CHECKPOINT_URL:-https://zenodo.org/records/22666123/files}"
+# The checkpoints are archived on Zenodo under the concept DOI 10.5281/zenodo.22666122,
+# which always resolves to the newest version. We ask the API for that version and build the
+# file URL from the record it returns, so a future checkpoint release needs no change here.
+# Anonymous download: no account and no token. Each tar has its .sha256 in the same record.
+zenodo_latest() { # concept record id -> base URL of the newest version's files
+  local rec
+  rec=$(curl -fsSL "https://zenodo.org/api/records/$1" \
+        | sed -n 's/.*"id"[[:space:]]*:[[:space:]]*\([0-9]\{1,\}\).*/\1/p' | head -1)
+  [ -n "$rec" ] || { echo "could not resolve Zenodo concept record $1" >&2; return 1; }
+  printf 'https://zenodo.org/records/%s/files' "$rec"
+}
+REL="${QQUILT_CHECKPOINT_URL:-$(zenodo_latest 22666122)}"
 TAR="wave_1_qwen05b_seed42-final.tar"
 AWQ_TAR="wave_1_qwen05b_seed42-awq.tar"
 CELL="wave_1_qwen05b_seed42"
