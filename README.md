@@ -1,5 +1,18 @@
 # Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of PII Leakage in Fine-Tuned Small Language Models
 
+<p align="center">
+  <a href="https://doc-artefatos.github.io/sbseg2026/results.html">
+    <img src="docs/assets/seals/SBRC25_SF_SeloD.png" alt="Artefatos Disponíveis / Available (SeloD)" width="110">
+    <img src="docs/assets/seals/SBRC25_SF_SeloF.png" alt="Artefatos Funcionais / Functional (SeloF)" width="110">
+    <img src="docs/assets/seals/SBRC25_SF_SeloS.png" alt="Artefatos Sustentáveis / Sustainable (SeloS)" width="110">
+    <img src="docs/assets/seals/SBRC25_SF_SeloR.png" alt="Experimentos Reprodutíveis / Reproducible (SeloR)" width="110">
+  </a>
+</p>
+
+<p align="center"><sub>Official SBSeg 2026 artifact-evaluation seals awarded to this artifact (Main Track): Available, Functional, Sustainable and Reproducible. <a href="https://doc-artefatos.github.io/sbseg2026/results.html">Official results</a>. Seal artwork by the SBSeg Artifact Evaluation Committee.</sub></p>
+
+> **Published** in the Anais do XXVI Simpósio Brasileiro de Cibersegurança (SBSeg 2026), pp. 817-832: [SBC OpenLib](https://sol.sbc.org.br/index.php/sbseg/article/view/44330).
+
 Reproducibility artifact for the paper of the same title, accepted at SBSeg 2026
 ([artifact submission instructions](https://doc-artefatos.github.io/sbseg2026/subinstrucoes.html)).
 Continuous integration ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the unit suite and the full offline replay on a clean runner, on every push and weekly, so the 141 published values are re-checked on a machine with none of the authors' state.
@@ -428,7 +441,9 @@ Cristhian Kapelinski and Diego Kreutz. *Not All 4-bit Quantizers Are Equal: Depl
 @inproceedings{kapelinski2026quantizer,
   author    = {Kapelinski, Cristhian and Kreutz, Diego},
   title     = {Not All 4-bit Quantizers Are Equal: Deployment-Time Mitigation of {PII} Leakage in Fine-Tuned Small Language Models},
-  booktitle = {Simp\'osio Brasileiro de Seguran\c{c}a da Informa\c{c}\~ao e de Sistemas Computacionais (SBSeg)},
+  booktitle = {Anais do XXVI Simp\'osio Brasileiro de Ciberseguran\c{c}a (SBSeg 2026)},
+  pages     = {817--832},
+  url       = {https://sol.sbc.org.br/index.php/sbseg/article/view/44330},
   year      = {2026}
 }
 ```
