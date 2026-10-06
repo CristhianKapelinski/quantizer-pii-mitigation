@@ -2,13 +2,7 @@
 
 Reproducibility artifact for the paper of the same title, accepted at SBSeg 2026
 ([artifact submission instructions](https://doc-artefatos.github.io/sbseg2026/subinstrucoes.html)).
-It is hosted on GitLab, at [`gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation`](https://gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation).
-
-**On continuous integration.** The repository carries a GitHub Actions workflow, [`.github/workflows/ci.yml`](.github/workflows/ci.yml), written when the artifact was developed on GitHub. **GitLab does not run it**: GitLab CI reads `.gitlab-ci.yml`, ignores `.github/`, and this repository has no `.gitlab-ci.yml`. So nothing runs automatically on push here, and the file should be read as an exact, executable description of the reviewer path — checkout, install the numerics stack only, unit suite, `replay.sh --figures-only`, full `replay.sh`, assert the committed logs are untouched — not as a promise that a machine is running it for you. Running those same gates yourself is one line, once the environment exists:
-
-```bash
-./minimal_test.sh && bash replay.sh && git status --porcelain   # last must print nothing
-```
+Continuous integration ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the unit suite and the full offline replay on a clean runner, on every push and weekly, so the 141 published values are re-checked on a machine with none of the authors' state.
 
 **Paper summary.** Four-bit post-training quantization is the default path to deploy small language models. This work shows that the choice of 4-bit quantizer is itself a privacy decision: at the same bit-rate, the calibration-based methods AWQ and GPTQ suppress verbatim extraction of personally identifiable information (PII) memorized during fine-tuning far more than the GGUF k-quant Q4\_K\_M, which uses no calibration corpus. On the primary model, AWQ and GPTQ each reproduce **none** of the planted records while Q4\_K\_M reproduces **5.3%** of them on the same seeds. The effect holds across five open models from 0.5B to 7B parameters and both fine-tuning regimes (full and LoRA), at negligible accuracy cost at production scale.
 
@@ -57,7 +51,7 @@ cleanup.sh               removes everything a run created
 ## Considered Seals
 The considered seals are: **Available (SeloD)**, **Functional (SeloF)**, **Sustainable (SeloS)** and **Reproducible (SeloR)**.
 
-- **Available (SeloD)** — public GitLab repository ([`gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation`](https://gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation)) with this README and the complete run of record; the fine-tuned weights of the headline cell are published in the same project's package registry.
+- **Available (SeloD)** — public GitHub repository with this README and the complete run of record.
 - **Functional (SeloF)** — the *Minimal Test* runs the real analysis pipeline in seconds and prints observable output.
 - **Sustainable (SeloS)** — modular package under [`src/qquilt/`](src/qquilt), documented in [`ENGINEERING.md`](ENGINEERING.md), unit-tested with no GPU or network, and every paper claim is traceable to a script and a results directory through [`experiment/results/INDEX.md`](experiment/results/INDEX.md).
 - **Reproducible (SeloR)** — `replay.sh` re-derives every table and figure and fails unless all 141 published numbers match the paper exactly; `reproduce.sh` re-runs the pipeline that produced the logs.
@@ -248,7 +242,7 @@ with `&&`, a clone that fails because the directory already exists silently skip
 `cd`, and every command after it runs in the parent directory.
 
 ```bash
-git clone https://gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation
+git clone https://github.com/CristhianKapelinski/quantizer-pii-mitigation
 cd quantizer-pii-mitigation
 uv sync --no-install-project --extra dev --extra quant
 bash scripts/build_llama_cpp.sh
@@ -367,8 +361,8 @@ The script exits non-zero if any recomputed field differs from the committed one
 
 **Paper reference:** Table `tab:headline`, the Qwen2.5-0.5B full fine-tune row.
 
-**What this runs.** It downloads the fine-tuned weights of that cell from the
-`checkpoint-v1` generic package in this GitLab project's package registry (public: no
+**What this runs.** It downloads the fine-tuned weights of that cell from their Zenodo
+record ([10.5281/zenodo.22666122](https://doi.org/10.5281/zenodo.22666122), public: no
 account, no token), checks the archive against the sha256 committed in
 [`expected/external_artifacts.json`](expected/external_artifacts.json) and aborts if it
 differs, quantizes the weights to Q8_0, Q5_K_M and Q4_K_M, and runs the extraction attack

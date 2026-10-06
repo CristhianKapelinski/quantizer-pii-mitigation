@@ -83,8 +83,3 @@ than hidden, and no seal depends on them.
 uv run --extra dev ruff check .
 uv run --extra dev pyright
 ```
-
-Nothing in this repository is run automatically: it is hosted on GitLab, which reads
-`.gitlab-ci.yml`, and there is none. The GitHub Actions workflow in `.github/workflows/`
-is a description of the reviewer path, not a pipeline that runs here — see the note at the
-top of the [README](README.md).

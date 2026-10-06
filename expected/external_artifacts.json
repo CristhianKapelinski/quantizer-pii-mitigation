@@ -122,8 +122,8 @@
   },
 
   "downloads": {
-    "base_url": "https://gitlab.com/api/v4/projects/85478208/packages/generic/checkpoint/v1",
-    "note": "The fine-tuned weights of the headline cell, published in this project's GitLab generic package registry. The digests below are committed here so scripts/claim_from_checkpoint.sh verifies against the repository, not only against a checksum file served by the same host as the archive.",
+    "base_url": "https://doi.org/10.5281/zenodo.22666122",
+    "note": "The fine-tuned weights of the headline cell, archived on Zenodo under the concept DOI 10.5281/zenodo.22666122, which scripts/claim_from_checkpoint.sh resolves to the newest version. The digests below are committed here so scripts/claim_from_checkpoint.sh verifies against the repository, not only against a checksum file served by the same host as the archive.",
     "files": {
       "wave_1_qwen05b_seed42-final.tar": {
         "sha256": "06a6db8c031bfc2d6bd43c385b544d14303e4883d1047b1836dcb22098c1a1c3",

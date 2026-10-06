@@ -1,24 +1,8 @@
 name: CI
 
-# READ THIS FIRST: THIS WORKFLOW DOES NOT RUN.
-#
-# The artifact is hosted on GitLab
-# (gitlab.com/cristhianavila.aluno/quantizer-pii-mitigation). GitLab CI reads
-# .gitlab-ci.yml and ignores .github/ entirely, and this repository has no
-# .gitlab-ci.yml, so nothing here is executed on push, on a schedule, or at all.
-# The file is kept because it is an exact, executable description of the reviewer
-# path -- a clean machine, the numerics stack only, and every gate the README
-# promises -- and because the artifact was developed on GitHub, where it did run.
-# Read the `steps:` below as the checklist; do not read the badgeless silence of
-# this repository as those steps having passed somewhere.
-#
-# To run the same thing yourself, from a fresh clone:
-#
-#     uv sync --only-group replay
-#     .venv/bin/python -m pytest -q tests
-#     bash replay.sh --figures-only
-#     bash replay.sh
-#     git status --porcelain            # must print nothing
+# Runs the reviewer's own path on a clean runner: the unit suite and the full
+# offline replay, which re-derives every table and figure from the committed
+# logs and fails unless all 141 published values match the paper.
 #
 # Deliberately light. torch is a core dependency of the project, but neither the
 # replay nor the unit tests import it, so the job installs only the numerics

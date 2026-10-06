@@ -119,12 +119,6 @@ The ground truth is `expected/paper_values.json`, parsed from the camera-ready `
   `qquilt.train.banner.v1` rows; what those rows do not record (CPU, host RAM, distribution
   name, driver version, pod provider) is listed there as not recorded.
 
-- **Nothing runs this artifact automatically.** The repository is hosted on GitLab, which
-  reads `.gitlab-ci.yml`; there is none. The GitHub Actions workflow in
-  `.github/workflows/ci.yml` does not execute on GitLab and is kept as an executable
-  description of the reviewer path. Treat the gates it lists as things to run, not as
-  things a machine has already run for you.
-
 - **The replay path asserts, it does not only print.** After recomputing the per-seed metrics and
   the pooled statistics from the committed extraction logs, `replay.sh` runs
   `scripts/check_replay_equal.py`, which requires every recomputed field to be identical to the
